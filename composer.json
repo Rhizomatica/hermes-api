@@ -1,0 +1,21 @@
+{
+    "name": "chgp/station-api",
+    "description": "Web Api for hermes station",
+    "type": "project",
+    "require": {
+        "vlucas/phpdotenv": "^5.2"
+    },
+    "autoload": {
+	"psr-4": {
+		"Src\\": "src/"
+	}
+    },
+
+    "license": "GPLV3",
+    "authors": [
+        {
+            "name": "chgp",
+            "email": "chgp@riseup.net"
+        }
+    ]
+}
