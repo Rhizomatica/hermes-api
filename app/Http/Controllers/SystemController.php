@@ -23,22 +23,22 @@ class SystemController extends Controller
      */
     public function getStations()
     {
-        $stations_sample= [["id" => 1, "name" => "rio", "location" => "para"],
-        ["id" => 2, "name" => "praia", "location" => "bahia"],
-        ["id" => 3, "name" => "floresta", "location" => "amazonas"],
-        ["id" => 4, "name" => "central", "location" => "brasilia"],
-        ["id" => 5, "name" => "una", "location" => "altamira"],
-        ["id" => 6, "name" => "barca", "location" => "alter do chao"],
-        ["id" => 7, "name" => "mobata", "location" => "altamira"],
-        ["id" => 8, "name" => "bacuri", "location" => "altamira"],
-        ["id" => 9, "name" => "xantana", "location" => "alter do chao"],
-        ["id" => 10, "name" => "niobia", "location" => "brasilia"],
-        ["id" => 11, "name" => "barra morta", "location" => "teste"],
-        ["id" => 12, "name" => "nativa", "location" => "alter"],
-        ["id" => 13, "name" => "maraca", "location" => "xingú"],
-        ["id" => 14, "name" => "tornado", "location" => "belo monte"]
+        $stations_sample= [
+            ["id" => 1, "name" => "rio", "location" => "para"],
+            ["id" => 2, "name" => "praia", "location" => "bahia"],
+            ["id" => 3, "name" => "floresta", "location" => "amazonas"],
+            ["id" => 4, "name" => "central", "location" => "brasilia"],
+            ["id" => 5, "name" => "una", "location" => "altamira"],
+            ["id" => 6, "name" => "barca", "location" => "alter do chao"],
+            ["id" => 7, "name" => "mobata", "location" => "altamira"],
+            ["id" => 8, "name" => "bacuri", "location" => "altamira"],
+            ["id" => 9, "name" => "xantana", "location" => "alter do chao"],
+            ["id" => 10, "name" => "niobia", "location" => "brasilia"],
+            ["id" => 11, "name" => "barra morta", "location" => "teste"],
+            ["id" => 12, "name" => "nativa", "location" => "alter"],
+            ["id" => 13, "name" => "maraca", "location" => "xingú"],
+            ["id" => 14, "name" => "tornado", "location" => "belo monte"]
         ];
-
         return $stations_sample;
     }
 
@@ -48,6 +48,7 @@ class SystemController extends Controller
      * @return table
      */
     public function isRunning(){
+        //TODO
         exec("pgrep -x uuardopd", $piduu);
         exec("pgrep -x ardop", $pidar);
         if(empty($piduu) || empty($pidar)){
@@ -237,18 +238,3 @@ class SystemController extends Controller
  */
 
 
-function exec_cli($command = "ls -l")
-    {
-        ob_start();
-        system($command , $return_var);
-        $output = ob_get_contents();
-        ob_end_clean();
-
-        //or die;
-        /*if ($exploder==true){
-                return (explode("\n", $output));
-                }*/
-
-        return ($output);
-
-    }
