@@ -42,8 +42,6 @@ $router->delete('user/{id}', ['uses' => 'UserController@delete']);
 $router->put('user/{id}', ['uses' => 'UserController@update']);
 $router->get('user/{id}', ['uses' => 'UserController@showOneUser']);
 
-
-
 $router->get('sys',  ['uses' => 'HelpController@showHelpSys']);
 
 // system commands

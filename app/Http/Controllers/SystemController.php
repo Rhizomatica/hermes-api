@@ -153,7 +153,6 @@ class SystemController extends Controller
             return $str;
         } else {
             // wrong password
-
             unlink($outfile);
             return FALSE;
         }
@@ -260,4 +259,4 @@ function exec_cli($command = "ls -l")
             }*/
 
     return ($output);
-        }
+}
