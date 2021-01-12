@@ -29,7 +29,8 @@ class HelpController extends Controller
     {
         $manual = [ 'Rhizo Hermes API' => 'V0.0.3 -  Sys page, help',
             'License and Copyrights' => 'gplv2, some rights reserved',
-            '-------ATALHOS ----------------' => '----------------------------------------',
+            '--------------------------' => '----------------------------------------',
+            'sys/ls' => 'showFiles',
             'sys/help' => 'showHelpSys()',
             'sys/getnodename' => 'getnodename()',
             'sys/getstations' => 'TODO mockup getStations()',
@@ -44,11 +45,25 @@ class HelpController extends Controller
             'sys/viewlog()' => 'TODO viewlog',
             'sys/listfiles()' => 'TODO listfiles',
             'sys/viewjob()' => 'TODO viewjob',
-            '------ FUNÇOES -----------------' => '----------------------------------------',
-            'exec_cli' => 'exec_cli($command)',
-
         ];
     return $manual;
     }
+
+    public function showHelpUser()
+    {
+        $manual = [ 'Rhizo Hermes API' => 'V0.0.3 -  Sys page, help',
+            'License and Copyrights' => 'gplv2, some rights reserved',
+            '----------------------' => '----------------------------------------',
+            'user POST' => 'UserController@create',
+            'user/{id} GET' => 'UserController@showOneUser',
+            'user/{id} PUT' => 'UserController@update',
+            'user/{id} DELETE' => 'UserController@delete',
+            'users GET' => 'UserController@showAll',
+        ];
+
+
+    return $manual;
+    }
+
 }
 
