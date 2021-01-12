@@ -17,9 +17,15 @@ class CreateUsersTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('email');
-            $table->string('fone');
-            $table->string('homesite');
+            $table->string('phone');
+            $table->string('site');
             $table->string('location');
+            $table->string('password');
+            $table->string('recoverphrase');
+            $table->string('recoveranswer');
+            $table->boolean('admin');
+
+
             $table->timestamps();
         });
     }
