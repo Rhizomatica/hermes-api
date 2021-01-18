@@ -13,7 +13,7 @@ class Message extends Model
      * @var array
      */
     protected $fillable = [
-        'id', 'name', 'origin', 'destin', 'text', 'tags', 'send', 'updated_at', 'created_at'
+        'id', 'name', 'origin', 'destin', 'text', 'tags', 'send', 'updated_at', 'created_at', 'draft', 'send'
     ];
 
     /**
@@ -21,5 +21,7 @@ class Message extends Model
      *
      * @var array
      */
-    protected $hidden = [];
+    protected $hidden = [
+        'updated_at', 'created_at'
+    ];
 }
