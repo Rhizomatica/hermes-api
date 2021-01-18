@@ -17,11 +17,10 @@ class CreateMessagesTable extends Migration
             $table->increments('id');
             $table->timestamps();
             $table->string('name');
-            $table->string('origin');
-            $table->string('destin');
+            $table->string('orig');
+            $table->string('dest');
             $table->string('text');
-            $table->string('tags');
-            $table->boolean('send');
+            $table->string('sent_at');
             $table->boolean('draft');
         });
     }
