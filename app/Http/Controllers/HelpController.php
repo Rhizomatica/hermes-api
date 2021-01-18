@@ -60,8 +60,20 @@ class HelpController extends Controller
             'user/{id} DELETE' => 'UserController@delete',
             'users GET' => 'UserController@showAll',
         ];
+    return $manual;
+    }
 
-
+    public function showHelpMessage()
+    {
+        $manual = [ 'Rhizo Hermes API' => 'V0.0.3 -  Sys page, help',
+            'License and Copyrights' => 'gplv2, some rights reserved',
+            '----------------------' => '----------------------------------------',
+            'message POST' => 'MessageController@create',
+            'message/{id} GET' => 'MessageController@showOneUser',
+            'message/{id} PUT' => 'MessageController@update',
+            'message/{id} DELETE' => 'MessageController@delete',
+            'messages GET' => 'MessageController@showAll',
+        ];
     return $manual;
     }
 

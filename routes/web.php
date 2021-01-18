@@ -34,6 +34,7 @@ $router->get('mock', function () {
     //
 }]);*/
 
+//Users routes
 $router->get('users',  ['uses' => 'UserController@showAllUsers']);
 
 $router->get('user', ['uses' => 'HelpController@showHelpUser']);
@@ -41,6 +42,17 @@ $router->post('user', ['uses' => 'UserController@create']);
 $router->delete('user/{id}', ['uses' => 'UserController@delete']);
 $router->put('user/{id}', ['uses' => 'UserController@update']);
 $router->get('user/{id}', ['uses' => 'UserController@showOneUser']);
+
+
+// Messages routes
+$router->get('messages',  ['uses' => 'MessageController@showAllMessages']);
+
+$router->get('message', ['uses' => 'HelpController@showHelpMessage']);
+$router->post('message', ['uses' => 'MessageController@create']);
+$router->delete('message/{id}', ['uses' => 'MessageController@delete']);
+$router->put('message/{id}', ['uses' => 'MessageController@update']);
+$router->get('message/{id}', ['uses' => 'MessageController@showOneMessage']);
+
 
 $router->get('sys',  ['uses' => 'HelpController@showHelpSys']);
 
