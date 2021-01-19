@@ -18,8 +18,12 @@ class HelpController extends Controller
             '/help' => 'TODO manual',
             '/sys/help' => 'TODO manual',
             '--------DATA---------------' => '----------------------------------------',
-            '/user/' => 'user, get, delete ',
-
+            '/user/id GET DELETE PUT' => 'users, get, delete, update',
+            '/users get' => 'users, get, delete ',
+            '/message/id GET DELETE PUT'=> 'messages, get, delete, update ',
+            '/message/id POST' => 'messages post',
+            '/messages get' => 'messages, get',
+            '/file POST' => 'messages, get'
         ];
     return $manual;
     }
