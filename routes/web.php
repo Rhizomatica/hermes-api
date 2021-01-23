@@ -53,8 +53,14 @@ $router->delete('message/{id}', ['uses' => 'MessageController@delete']);
 $router->put('message/{id}', ['uses' => 'MessageController@update']);
 $router->get('message/{id}', ['uses' => 'MessageController@showOneMessage']);
 
-$router->post('file', ['uses' => 'FileController@new']);
 
+
+$router->get('files', ['uses' => 'FileController@showAllFiles']);
+
+//TODO remove post or put
+$router->put('file', ['uses' => 'FileController@new']);
+$router->post('file', ['uses' => 'FileController@new']);
+$router->get('file/{id}', ['uses' => 'FileController@get']);
 
 $router->get('sys',  ['uses' => 'HelpController@showHelpSys']);
 

@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\FileUploader;
+
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
+
 use League\Flysystem\Adapter\Local;
 
 class FileController extends Controller
@@ -12,21 +15,64 @@ class FileController extends Controller
 
     public function new( Request $request)
     {
-           Storage::disk('local')->put('example2.txt', $request->file());
-           return response()->json( $request, 200);
-        //    $request->file('photo')->move($destinationPath);
 
+
+         if ( $request['data'] ) {
+            $data = json_decode($request['data']);
+            Storage::disk('local')->put('data' , $data);
+         }
+
+        /*$request->validate([
+            'file' => 'required|file|image|size:1024|dimensions:max_width=500,max_height=500',
+            'data.name' => 'required|filled|size:100',
+        ]);*/
+        if ($_FILES){
+            return response()->json( [ $_FILES], 200);
+            Storage::disk('local')->put('files' , $contents);
+        }
+
+
+        //$response = null;
+        //$timestamp=time();
+        //$output = $request->name;
+
+        //$output= file_get_contents($request->file->path);
+        //$output = file_get_contents($request->file);
+        //Storage::disk('local')->put('output' , $output);
+        //debug guarda request completo
+
+        //$path = $request->photo->storeAs('images', 'filename.jpg', 's3');
+
+
+
+        if($request->hasFile('file')){
+            //$file = $request->file('file')->getClientOriginalName();
+            $contents = file_get_contents($request->file('file'));
+            Storage::disk('local')->put('contents' , $contents);
+            return response()->json('{"method":"OPTIONS"}', 200, $headers);
+        }
+        else{
+            Storage::disk('local')->put('request' , $request);
+            return response()->json( [ $request], 200);
+        }
+
+        //return $request->file('file');
+
+
+/*
+        // get the `UploadedFile` object
+            $file = $request->file('file_name');
+            $file = $request->file_name;
+            // get the original file name
+        $filename = $request->file('file_name')->getClientOriginalName();
+        $filename = $request->file_name->getClientOriginalName();
+*/
     }
-
 
     public function get( $id)
     {
-           Storage::disk('local')->get($id);
-           return response()->json( $request, 200);
-        //    $request->file('photo')->move($destinationPath);
-
+        return Storage::disk('local')->get($id);
     }
-
 
     public function uploadImage(Request $request)
     {
@@ -66,3 +112,13 @@ class FileController extends Controller
     }
 }
 
+
+/*clues
+
+if (Storage::disk('s3')->exists('file.jpg')) {
+if (Storage::disk('s3')->missing('file.jpg')) {
+    
+    
+return Storage::download('file.jpg');
+
+return Storage::download('file.jpg', $name, $headers);

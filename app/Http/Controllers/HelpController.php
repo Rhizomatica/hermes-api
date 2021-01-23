@@ -12,18 +12,19 @@ class HelpController extends Controller
 
     public function showHelpMain()
     {
-        $manual = [ 'Rhizo Hermes API' => 'V0.0.3 -  default page, help',
+        $manual = [ 'Rhizo Hermes API' => 'V0.0.3 -  default page and help',
             'License and Copyrights' => 'gplv2, some rights reserved',
             '-----------------------' => '----------------------------------------',
             '/help' => 'TODO manual',
             '/sys/help' => 'TODO manual',
             '--------DATA---------------' => '----------------------------------------',
-            '/user/id GET DELETE PUT' => 'users, get, delete, update',
+            '/user/id GET DELETE PUT' => 'users, get, delete and update',
             '/users get' => 'users, get, delete ',
-            '/message/id GET DELETE PUT'=> 'messages, get, delete, update ',
+            '/message/id GET DELETE PUT'=> 'messages, get, delete and update ',
             '/message/id POST' => 'messages post',
             '/messages get' => 'messages, get',
-            '/file POST' => 'messages, get'
+            '/file POST' => 'file, create',
+            '/file/id GET DELETE PUT ' => 'file, get, delete and update'
         ];
     return $manual;
     }
