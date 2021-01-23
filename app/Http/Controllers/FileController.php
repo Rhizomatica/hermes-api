@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\FileUploader;
+use Illuminate\Http\Validate;
 
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
@@ -16,57 +17,47 @@ class FileController extends Controller
     public function new( Request $request)
     {
 
-
-         if ( $request['data'] ) {
-            $data = json_decode($request['data']);
-            Storage::disk('local')->put('data' , $data);
-         }
-
-        /*$request->validate([
-            'file' => 'required|file|image|size:1024|dimensions:max_width=500,max_height=500',
+       /*$request->validate([
+            'fileup' => 'required|file|image|size:1024|dimensions:max_width=500,max_height=500',
             'data.name' => 'required|filled|size:100',
         ]);*/
-        if ($_FILES){
-            return response()->json( [ $_FILES], 200);
-            Storage::disk('local')->put('files' , $contents);
-        }
 
 
-        //$response = null;
-        //$timestamp=time();
-        //$output = $request->name;
+        Storage::disk('local')->put('lastrequest' , $request);
+        //$filename = $request->file('fileup')->getClientOriginalName();
 
-        //$output= file_get_contents($request->file->path);
-        //$output = file_get_contents($request->file);
-        //Storage::disk('local')->put('output' , $output);
-        //debug guarda request completo
-
-        //$path = $request->photo->storeAs('images', 'filename.jpg', 's3');
-
-
-
-        if($request->hasFile('file')){
+        if($request->hasFile('fileup')){
+            $timestamp=time();
             //$file = $request->file('file')->getClientOriginalName();
-            $contents = file_get_contents($request->file('file'));
-            Storage::disk('local')->put('contents' , $contents);
-            return response()->json('{"method":"OPTIONS"}', 200, $headers);
+            $contents = file_get_contents($request->fileup);
+            //Storage::disk('local')->put($request->file('fileup')->getClientOriginalName() , $contents);
+            Storage::disk('local')->put($timestamp , $contents);
+            return response()->json( [ 'fileup', $request->file('fileup')->getClientOriginalName(), $timestamp], 200);
         }
         else{
-            Storage::disk('local')->put('request' , $request);
-            return response()->json( [ $request], 200);
+            return response()->json( [ 'Hermeserror - not a file?'], 500);
         }
 
-        //return $request->file('file');
-
-
-/*
+        /*
         // get the `UploadedFile` object
             $file = $request->file('file_name');
             $file = $request->file_name;
             // get the original file name
         $filename = $request->file('file_name')->getClientOriginalName();
         $filename = $request->file_name->getClientOriginalName();
-*/
+        */
+
+        /*
+         if ( $request['data'] ) {
+            $data = json_decode($request['data']);
+            Storage::disk('local')->put('data' , $data);
+         }
+
+        $response = null;
+        $output = $request->name;
+        */
+
+
     }
 
     public function get( $id)
