@@ -3,6 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,7 +16,28 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        /* $this->call('UsersTableSeeder');
+        DB::table('users')->insert([
+            'email' => 'postmaster',
+            'name' => 'admin',
+            'password' => 'admin',
+            'location' => 'local',
+            'admin' => true
+        ]);
+
+        for($a=1; $a<=5; $a++){
+            DB::table('messages')->insert([
+                'name' => 'test message '.Str::random(10),
+                'dest' => 'local',
+                'orig' => 'local',
+                'file' => null,
+                'text' => 'lorem ipsum',
+                'draft' => true
+            ]);
+        }
+
+        /*
+                $this->call('UserSeeder');
+
         Quote::create([
             'text' => 'Success is going from failure to failure without losing your enthusiasm',
             'author' => 'Winston Churchill',

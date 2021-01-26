@@ -14,14 +14,16 @@ class CreateMessagesTable extends Migration
     public function up()
     {
         Schema::create('messages', function (Blueprint $table) {
-            $table->increments('id');
-            $table->timestamps();
+            $table->increments('id')->unique();
             $table->string('name');
             $table->string('orig');
             $table->string('dest');
+            $table->string('file')->nullable(true);
             $table->string('text');
-            $table->string('sent_at');
+            $table->string('sent_at')->nullable(true);
             $table->boolean('draft');
+            $table->timestamps();
+
         });
     }
 

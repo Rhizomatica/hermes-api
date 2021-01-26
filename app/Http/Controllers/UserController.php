@@ -38,4 +38,24 @@ class UserController extends Controller
         User::findOrFail($id)->delete();
         return response('Deleted Successfully', 200);
     }
+
+
+    public function login(Request $request)
+    {
+        //$data = [$request->login, $request->password];
+        $object = (object) [
+            'ret' => 'ok',
+            'test' => 'teste',
+          ];
+
+          //TODO buscar do banco
+        if ($request->login == 'admin' ){
+           return response()->json("admin");
+        }
+
+        else{
+            return response()->json('$request->login');
+        }
+
+    }
 }
