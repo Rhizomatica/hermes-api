@@ -45,12 +45,13 @@ class UserController extends Controller
         //$data = [$request->login, $request->password];
         $object = (object) [
             'ret' => 'ok',
-            'test' => 'teste',
+            'login' => $request->login,
+            'admin' => true,
           ];
 
           //TODO buscar do banco
         if ($request->login == 'admin' ){
-           return response()->json("admin");
+           return response()->json($object);
         }
 
         else{
