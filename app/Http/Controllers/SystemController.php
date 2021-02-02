@@ -9,50 +9,42 @@ class SystemController extends Controller
      *
      * @return string
      */
-    public function getNodename()
+
+    public function getSysStatus()
     {
-        $command = "egrep -v '^\s*#' /etc/uucp/config | grep nodename | cut -f 2";
-        //return $command;
-        return exec_cli($command);
+
+        $sysname = explode("\n", exec_cli("uname -n"));
+        //$sysname = SystemController.getnodeName();
+        $piduu = exec_cli("pgrep -x uuardopd");
+        $pidar  = exec_cli("pgrep -x ardop");
+        $pidtst = explode("\n", exec_cli("echo teste"))[0];
+
+
+        $status = [
+            'status' => true,
+            'name' => $sysname[0],
+            'piduu' => $piduu?$piduu:false,
+            'pidar' => $pidar?$pidar:false,
+            'pidtst' => $pidtst
+        ];
+
+        return response(json_encode($status), 200);
     }
 
-    
+    public function getSysNodeName(){
+        return explode("\n", exec_cli("uname -n"))[0];
+    }
+
 
     public function getFiles()
     {
         $command = "ls -la /etc/uucp";
         $output = exec_cli($command);
         $output =  explode("\n ", $output);
-        
         return  $output;
     }
 
-    /**
-     * Get all possible Stations from uucp
-     *
-     * @return void
-     */
-    public function getStations()
-    {
-        $stations_sample= [
-            ["id" => 1, "name" => "rio", "location" => "para"],
-            ["id" => 2, "name" => "praia", "location" => "bahia"],
-            ["id" => 3, "name" => "floresta", "location" => "amazonas"],
-            ["id" => 4, "name" => "central", "location" => "brasilia"],
-            ["id" => 5, "name" => "una", "location" => "altamira"],
-            ["id" => 6, "name" => "barca", "location" => "alter do chao"],
-            ["id" => 7, "name" => "mobata", "location" => "altamira"],
-            ["id" => 8, "name" => "bacuri", "location" => "altamira"],
-            ["id" => 9, "name" => "xantana", "location" => "alter do chao"],
-            ["id" => 10, "name" => "niobia", "location" => "brasilia"],
-            ["id" => 11, "name" => "barra morta", "location" => "teste"],
-            ["id" => 12, "name" => "nativa", "location" => "alter"],
-            ["id" => 13, "name" => "maraca", "location" => "xingú"],
-            ["id" => 14, "name" => "tornado", "location" => "belo monte"]
-        ];
-        return $stations_sample;
-    }
-
+ 
     /**
      * Get info if system is running
      *
@@ -89,29 +81,30 @@ class SystemController extends Controller
         return [$output,$output2] ;
     }
 
-    /**
-     * old script get_systems
+     /**
+     * Get all possible Stations from uucp
      *
-     * @return table
+     * @return stations
      */
-
-
-    function exec_get_systems(){
-        //TODO
+ 
+    public function getSysStations(){
         $command = "egrep -v '^\s*#' /etc/uucp/sys | grep alias | cut -f 2 -d \" \"";
         $output = exec_cli($command);
         $sysnames = explode("\n", $output);
-        //TODO
         $sysnameslist=[];
 
         for ($i = "0" ; $i < count($sysnames); $i++) {
             if(!empty($sysnames[$i])) {
-                //echo $sysnames[$i];
-                //TODO adicionar elemento
-                array_push($a, sysnames[$i]);
+                $sysnameslist[]  =  [
+                    'id' => $i,
+                    'name' => $sysnames[$i],
+                    'location' => 'TODO location mockup'
+                ];
+
             }
         }
-        return [ $sysnames,$sysnameslist ];
+
+        return $sysnameslist;
     }
 
     public function fileLoad(){

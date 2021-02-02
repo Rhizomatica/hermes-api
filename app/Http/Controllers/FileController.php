@@ -14,9 +14,8 @@ use League\Flysystem\Adapter\Local;
 class FileController extends Controller
 {
 
-    public function new( Request $request)
+    public function uploadImage( Request $request)
     {
-
        /*$request->validate([
             'fileup' => 'required|file|image|size:1024|dimensions:max_width=500,max_height=500',
             'data.name' => 'required|filled|size:100',
@@ -28,44 +27,35 @@ class FileController extends Controller
 
         if($request->hasFile('fileup')){
             $timestamp=time();
+            $filename = $request->file('fileup')->getClientOriginalName();
+
             //$file = $request->file('file')->getClientOriginalName();
             $contents = file_get_contents($request->fileup);
             //Storage::disk('local')->put($request->file('fileup')->getClientOriginalName() , $contents);
-            Storage::disk('local')->put($timestamp , $contents);
-            return response()->json( [ 'fileup', $request->file('fileup')->getClientOriginalName(), $timestamp], 200);
+            Storage::disk('local')->put('uploads/' . $timestamp , $contents);
+            return response()->json( [ 'fileup', $filename, $timestamp], 200);
         }
         else{
             return response()->json( [ 'Hermeserror - not a file?'], 500);
         }
-
-        /*
-        // get the `UploadedFile` object
-            $file = $request->file('file_name');
-            $file = $request->file_name;
-            // get the original file name
-        $filename = $request->file('file_name')->getClientOriginalName();
-        $filename = $request->file_name->getClientOriginalName();
-        */
-
-        /*
-         if ( $request['data'] ) {
-            $data = json_decode($request['data']);
-            Storage::disk('local')->put('data' , $data);
-         }
-
-        $response = null;
-        $output = $request->name;
-        */
-
-
     }
 
-    public function get( $id)
+    public static function getImage( $id)
     {
-        return Storage::disk('local')->get($id);
-    }
+         return  Storage::disk('local')->get($id);
+   }
 
-    public function uploadImage(Request $request)
+    public function getImageHttp( $id)
+    {
+         $file =  $this:: getImage('uploads/' .$id);
+         return response($file)
+            ->header('Content-Type','image/png')
+            ->header('Pragma','public')
+            ->header('Content-Disposition','inline; filename="qrcodeimg.png"')
+            ->header('Cache-Control','max-age=60, must-revalidate');
+   }
+
+    public function uploadImage_old(Request $request)
     {
         $response = null;
         $user = (object) ['image' => ""];
@@ -108,8 +98,7 @@ class FileController extends Controller
 
 if (Storage::disk('s3')->exists('file.jpg')) {
 if (Storage::disk('s3')->missing('file.jpg')) {
-    
-    
+
 return Storage::download('file.jpg');
 
 return Storage::download('file.jpg', $name, $headers);

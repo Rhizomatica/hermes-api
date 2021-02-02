@@ -29,6 +29,17 @@ $app->configure('filesystems');
 
 $app->withEloquent();
 
+
+
+/*  TODO GlobalHermes Filesystem   
+
+    'hermes' => [
+        'upload' => 'upload',
+        'process' => 'process',
+        'output' => 'output'
+    ]
+    */ 
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings

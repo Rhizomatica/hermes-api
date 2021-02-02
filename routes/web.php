@@ -47,35 +47,74 @@ $router->post('login', ['uses' => 'UserController@login']);
 
 
 // Messages routes
+
+
 $router->get('messages',  ['uses' => 'MessageController@showAllMessages']);
 
-$router->get('message', ['uses' => 'HelpController@showHelpMessage']);
-$router->post('message', ['uses' => 'MessageController@create']);
-$router->delete('message/{id}', ['uses' => 'MessageController@delete']);
-$router->put('message/{id}', ['uses' => 'MessageController@update']);
-$router->get('message/{id}', ['uses' => 'MessageController@showOneMessage']);
+$router->group(['prefix' => '/message'], function () use ($router) {
+    $router->get('', ['uses' => 'HelpController@showHelpMessage']);
+    $router->get('help', ['uses' => 'HelpController@showHelpMessage']);
+    $router->get('list',  ['uses' => 'MessageController@showAllMessages']);
+    $router->post('', ['uses' => 'MessageController@create']);
+    $router->delete('{id}', ['uses' => 'MessageController@delete']);
+    $router->put('{id}', ['uses' => 'MessageController@update']);
+    $router->get('/{id}', ['uses' => 'MessageController@showOneMessage']);
+    $router->get('image/{id}', ['uses' => 'FileController@get']);
+    $router->get('render/{id}',  ['uses' => 'MessageController@renderMessage']);
+});
 
 
+$router->get('message/render/{id}',  ['uses' => 'MessageController@renderMessage']);
 
-$router->get('files', ['uses' => 'FileController@showAllFiles']);
+$router->group(['prefix' => '/outbox'], function () use ($router) {
+    $router->get('help', ['uses' => 'HelpController@showHelpMessage']);
+    $router->get('',  ['uses' => 'MessageController@showAllMessages']);
+    $router->post('', ['uses' => 'MessageController@create']);
+    $router->delete('{id}', ['uses' => 'MessageController@delete']);
+    $router->put('{id}', ['uses' => 'MessageController@update']);
+    $router->get('/{id}', ['uses' => 'MessageController@showOneMessage']);
+    $router->get('image/{id}', ['uses' => 'FileController@get']);
+    $router->get('render/{id}',  ['uses' => 'MessageController@renderMessage']);
+});
 
-//TODO remove post or put
-$router->put('file', ['uses' => 'FileController@new']);
-$router->post('file', ['uses' => 'FileController@new']);
-$router->get('file/{id}', ['uses' => 'FileController@get']);
+
+$router->group(['prefix' => '/inbox'], function () use ($router) {
+    $router->get('help', ['uses' => 'HelpController@showHelpInbox']);
+    $router->get('', ['uses' => 'MessageController@showAllInboxMessages']);
+    $router->get('{id}', ['uses' => 'MessageController@showOneInboxMessage']);
+    $router->get('image/{id}', ['uses' => 'MessageController@showOneInboxMessageImage']);
+    $router->get('delete/{id}', ['uses' => 'MessageController@deleteInboxMessage']);
+    $router->get('hide/{id}', ['uses' => 'MessageController@hideInboxMessage']);
+    $router->get('unhide/{id}', ['uses' => 'MessageController@unhideInboxMessage']);
+});
+
+
+$router->group(['prefix' => '/file'], function () use ($router) {
+    $router->get('', ['uses' => 'FileController@showAllFiles']);
+    $router->post('file', ['uses' => 'FileController@uploadImage']);
+    $router->get('{id}', ['uses' => 'FileController@getImageHttp']);
+});
+
+/*
+    $router->get('files', ['uses' => 'FileController@showAllFiles']);
+    $router->post('file', ['uses' => 'FileController@uploadImage']);
+    $router->get('file/{id}', ['uses' => 'FileController@getImageHttp']);
+*/
 
 $router->get('sys',  ['uses' => 'HelpController@showHelpSys']);
 
 // system commands
 $router->group(['prefix' => '/sys'], function () use ($router) {
+    $router->get('help',  ['uses' => 'HelpController@showHelpSys']);
 
     $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']);
-    $router->get('help',  ['uses' => 'HelpController@showHelpSys']);
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
     $router->get('node',  ['uses' => 'SystemController@getNodename']);
     $router->get('queueerase',  ['uses' => 'SystemController@queueErase']);
     $router->get('spoollist',  ['uses' => 'SystemController@getSpoolList']);
-    $router->get('getstations',  ['uses' => 'SystemController@getStations']);
+    $router->get('stations',  ['uses' => 'SystemController@getSysStations']);
+    $router->get('getnodename',  ['uses' => 'SystemController@getSysNodeName']);
+    $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
 
 });
 

@@ -53,7 +53,6 @@ class UserController extends Controller
         if ($request->login == 'admin' ){
            return response()->json($object);
         }
-
         else{
             return response()->json('$request->login');
         }

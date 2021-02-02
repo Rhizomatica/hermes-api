@@ -21,8 +21,9 @@ class HelpController extends Controller
             '/user/id GET DELETE PUT' => 'users, get, delete and update',
             '/users get' => 'users, get, delete ',
             '/message/id GET DELETE PUT'=> 'messages, get, delete and update ',
-            '/message/id POST' => 'messages post',
-            '/messages get' => 'messages, get',
+            '/message/id POST' => 'Create message, return 200 - message',
+            '/message/render/id GET' => 'return 200 - genertae message id',
+            '/message/list get' => 'return 200 - all messages',
             '/file POST' => 'file, create',
             '/file/id GET DELETE PUT ' => 'file, get, delete and update'
         ];
