@@ -90,7 +90,14 @@ class SystemController extends Controller
     public function getSysStations(){
         $command = "egrep -v '^\s*#' /etc/uucp/sys | grep alias | cut -f 2 -d \" \"";
         $output = exec_cli($command);
+        $command2 = "egrep -v '^\s*#' /etc/uucp/sys | grep system | cut -f 2 -d \" \"";
+        $output2 = exec_cli($command2);
+        $command3 = "egrep -v '^\s*#' /etc/uucp/sys | grep address | cut -f 2 -d \" \"";
+        $output3 = exec_cli($command3);
+
         $sysnames = explode("\n", $output);
+        $sysnames2 = explode("\n", $output2);
+        $sysnames3 = explode("\n", $output3);
         $sysnameslist=[];
 
         for ($i = "0" ; $i < count($sysnames); $i++) {
@@ -98,30 +105,48 @@ class SystemController extends Controller
                 $sysnameslist[]  =  [
                     'id' => $i,
                     'name' => $sysnames[$i],
-                    'location' => 'TODO location mockup'
+                    'alias' => $sysnames2[$i],
+                    'location' => $sysnames3[$i]
                 ];
-
             }
         }
 
         return $sysnameslist;
     }
 
+
+
+    //fila de transmissao
+    //port spool_list
+    public function sysGetSpoolList(){
+        $command = "uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"";
+        //TODO fix path in sed $cfg['path_uploads'])
+        //  $command = "uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"";
+        $output=exec_cli($command) or die;
+        $output = explode("\n", $output);
+        $spool=[];
+
+        for ($i = "0" ; $i < count($output); $i++) {
+            if(!empty($output[$i])) {
+                $fields = explode(" ", $output[$i]);
+                $spool[]  =  [
+                    'id' => $i,
+                    'dest' => $fields[0],
+                    'file' => $fields[1],
+                    'file' => $fields[2] . ' ' .  $fields[3] ,
+                ];
+            }
+        }
+
+        return response($spool, 200);
+    }
+
+    //TODO
     public function fileLoad(){
         $command = "uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"";
             $output = exec_cli($command);
             //TODO return true or false?
             return $output;
-    }
-
-    //fila de transmissao
-    //port spool_list
-    public function getSpoolList(){
-        $command = "uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"";
-        //TODO fix path in sed $cfg['path_uploads'])
-        //  $command = "uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"";
-        $output=exec_cli($command) or die;
-        return($output);
     }
 
     //decrypt
@@ -206,27 +231,20 @@ class SystemController extends Controller
         $output4 = exec_cli($command);
 
         //TODO
-        return [$output0,$output1,$output2,$output3,$output4,$output5];
+        return json_encode([$output0,$output1,$output2,$output3,$output4,$output5]);
     }
 
-    function systemShutdown(){
+    function sysDoShutdown(){
         $command = "sudo halt";
         exec_cli($command);
     }
 
-    function systemLog(){
-        $command = "uulog|tail";
+    function sysGetLog(){
+        $command = "uulog|tail -50";
         $output=exec_cli($command);
+        $output = explode("\n",$output);
         return $output;
     }
-
-    //TODO json clue
-    function json(){
-        $data = explode("\n",$out);
-        json_encode($data);
-    }
-
-
 }
 
 

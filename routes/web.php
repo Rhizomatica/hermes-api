@@ -61,6 +61,7 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('/{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('image/{id}', ['uses' => 'FileController@get']);
     $router->get('render/{id}',  ['uses' => 'MessageController@renderMessage']);
+    $router->get('test/{id}',  ['uses' => 'MessageController@renderMessage2']);
 });
 
 
@@ -105,16 +106,20 @@ $router->get('sys',  ['uses' => 'HelpController@showHelpSys']);
 
 // system commands
 $router->group(['prefix' => '/sys'], function () use ($router) {
+    $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
+    $router->get('getnodename',  ['uses' => 'SystemController@getSysNodeName']);
     $router->get('help',  ['uses' => 'HelpController@showHelpSys']);
-
+    
     $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']);
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
     $router->get('node',  ['uses' => 'SystemController@getNodename']);
     $router->get('queueerase',  ['uses' => 'SystemController@queueErase']);
-    $router->get('spoollist',  ['uses' => 'SystemController@getSpoolList']);
+    $router->get('spool',  ['uses' => 'SystemController@sysGetSpoolList']);
     $router->get('stations',  ['uses' => 'SystemController@getSysStations']);
-    $router->get('getnodename',  ['uses' => 'SystemController@getSysNodeName']);
-    $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
+
+
+    $router->get('shutdown',  ['uses' => 'SystemController@sysDoShutdown']);
+    $router->get('getlog',  ['uses' => 'SystemController@sysGetLog']);
 
 });
 

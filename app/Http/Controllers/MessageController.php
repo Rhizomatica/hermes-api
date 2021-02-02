@@ -49,7 +49,31 @@ class MessageController extends Controller
         $message_concat = $message . $message_image;
         \Storage::disk('local')->put('output/' . $id  , $message_concat);
         return response($message);
+    }
 
+    //Render output message with folders and tar
+    public function renderMessage2($id)
+    {
+        $message = Message::find($id);
+        $image = [];
+
+        if (Storage::disk('local')->exists('uploads/'.$id)) {
+            $image = FileController::getImage('uploads/' . $id);
+            \Storage::disk('local')->put('tmp/' . $id . '/image'  , $message_image);
+            // $message_concat = $message_concat . $image;
+        }
+
+        if ($message){
+            \Storage::disk('local')->put('tmp/' . $id . '/json'  , $message);
+        }
+
+        $path = Storage::path('tmp/');
+
+        $command  = "";
+        //exec_cli($command);
+        Storage::deleteDirectory('tmp/'.$id);
+
+        return response($message);
     }
 
     public function showAllInboxMessages()

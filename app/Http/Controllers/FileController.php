@@ -21,7 +21,6 @@ class FileController extends Controller
             'data.name' => 'required|filled|size:100',
         ]);*/
 
-
         Storage::disk('local')->put('lastrequest' , $request);
         //$filename = $request->file('fileup')->getClientOriginalName();
 
@@ -54,29 +53,6 @@ class FileController extends Controller
             ->header('Content-Disposition','inline; filename="qrcodeimg.png"')
             ->header('Cache-Control','max-age=60, must-revalidate');
    }
-
-    public function uploadImage_old(Request $request)
-    {
-        $response = null;
-        $user = (object) ['image' => ""];
-
-        if ($request->hasFile('image')) {
-            $original_filename = $request->file('image')->getClientOriginalName();
-            $original_filename_arr = explode('.', $original_filename);
-            $file_ext = end($original_filename_arr);
-            $destination_path = './upload/user/';
-            $image = 'U-' . time() . '.' . $file_ext;
-
-            if ($request->file('image')->move($destination_path, $image)) {
-                $user->image = '/upload/user/' . $image;
-                return $this->responseRequestSuccess($user);
-            } else {
-                return $this->responseRequestError('Cannot upload file');
-            }
-        } else {
-            return $this->responseRequestError('File not found');
-        }
-    }
 
     protected function responseRequestSuccess($ret)
     {
