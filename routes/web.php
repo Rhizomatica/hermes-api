@@ -34,6 +34,8 @@ $router->get('mock', function () {
     //
 }]);*/
 
+$router->get('test/{id}',  ['uses' => 'MessageController@processInboxMessage']);
+
 //Users routes
 $router->get('users',  ['uses' => 'UserController@showAllUsers']);
 
@@ -92,7 +94,7 @@ $router->group(['prefix' => '/inbox'], function () use ($router) {
 
 $router->group(['prefix' => '/file'], function () use ($router) {
     $router->get('', ['uses' => 'FileController@showAllFiles']);
-    $router->post('file', ['uses' => 'FileController@uploadImage']);
+    $router->post('', ['uses' => 'FileController@uploadImage']);
     $router->get('{id}', ['uses' => 'FileController@getImageHttp']);
 });
 

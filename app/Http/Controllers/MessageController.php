@@ -67,12 +67,29 @@ class MessageController extends Controller
             \Storage::disk('local')->put('tmp/' . $id . '/json'  , $message);
         }
 
-        $path = Storage::path('tmp');
+        $path = Storage::disk('local')->path('tmp');
 
         $command  = "tar cvfz " .  $path . '/' . $id . '.tgz ' . $path . '/' . $id  ;
         $output = exec_cli($command);
         Storage::deleteDirectory('tmp/'.$id);
             return response(['render test', $output],200);
+    }
+    public function processInboxMessage($id){
+          $messagePack = Storage::disk('local')->get('inbox/'. $id . '.hmp');
+          $path = Storage::disk('local')->path('');
+          $command  = 'tar xvfz ' .  $path . 'inbox/' . $id . '.hmp ' .  '-C ' . $path . 'inbox/'  ;
+          $output = exec_cli($command);
+          $files[] = explode(' ', $output);
+          if (Storage::disk('local')->exists('inbox/'.$id.'/json')){
+            $message = json_decode(Storage::disk('local')->get('inbox/'. $id . '/json'));
+            $message = @json_decode(json_encode($message), true);
+            $message['id'] = null;
+            $message['inbox'] = true;
+          }
+
+          $message = Message::create($message);
+
+          return $message;
     }
 
     public function showAllInboxMessages()
@@ -80,6 +97,10 @@ class MessageController extends Controller
         $files = \Storage::allFiles('inbox');
         $file = [];
 
+        /*$filtered_files = array_filter($files, function($str){
+            return strpos($str, "hmp") === 0;
+        });*/
+        
         $files_out = [];
         for ($i = "0" ; $i < count($files); $i++) {
             $file = explode('inbox/', $files[$i]);
@@ -89,7 +110,7 @@ class MessageController extends Controller
             }
 
         }
-        return response()->json($files_out);
+        return response()->json($files);
     }
 
     public function showOneInboxMessage($id)
