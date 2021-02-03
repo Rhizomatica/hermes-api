@@ -67,19 +67,29 @@ class MessageController extends Controller
             \Storage::disk('local')->put('tmp/' . $id . '/json'  , $message);
         }
 
-        $path = Storage::path('tmp/');
+        $path = Storage::path('tmp');
 
-        $command  = "";
-        //exec_cli($command);
+        $command  = "tar cvfz " .  $path . '/' . $id . '.tgz ' . $path . '/' . $id  ;
+        $output = exec_cli($command);
         Storage::deleteDirectory('tmp/'.$id);
-
-        return response($message);
+            return response(['render test', $output],200);
     }
 
     public function showAllInboxMessages()
     {
         $files = \Storage::allFiles('inbox');
-        return response()->json($files);
+        $file = [];
+
+        $files_out = [];
+        for ($i = "0" ; $i < count($files); $i++) {
+            $file = explode('inbox/', $files[$i]);
+
+            if(!empty($files[$i])) {
+                $files_out[] = $file[1];
+            }
+
+        }
+        return response()->json($files_out);
     }
 
     public function showOneInboxMessage($id)
@@ -114,6 +124,15 @@ class MessageController extends Controller
     {
         $file = \Storage::get('inbox/' . $id);
         return response('Deleted Successfully', 200);
+    }
+
+    //Unpack output message with folders and tar
+    public function unpackInboxMessage($id)
+    {
+        $inboxPath = Storage::path('inbox');
+        $command  = "tar xvfz " .  $inboxPath . '/' . $id . '.tgz ' . $inboxPath  ;
+        $output = exec_cli($command);
+        //return response(['render test', $output],200);
     }
 
 }
