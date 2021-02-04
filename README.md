@@ -1,24 +1,32 @@
-# Lumen PHP Framework
+# Hermes Project
+[Hermes](https://www.rhizomatica.org/hermes/) is a High-frequency Emergency and Rural Multimedia Exchange System.
 
-[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
-[![Total Downloads](https://img.shields.io/packagist/dt/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Stable Version](https://img.shields.io/packagist/v/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![License](https://img.shields.io/packagist/l/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
 
-Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
 
-## Official Documentation
+## Hermes station api
+This is a REST api for use on Hermes stations to exchange messages between then,
+ it uses [Lumen PHP Framework](https://lumen.laravel.com/).
 
-Documentation for the framework can be found on the [Lumen website](https://lumen.laravel.com/docs).
+## depends on a web server and php 7.3 setup
 
-## Contributing
+## to configure
+- Setup your settings creating a .env file from .env.example
+- Run:
+     compose install
 
-Thank you for considering contributing to Lumen! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- To start a fresh database:
+    php artisan migrate:refresh --seed
 
-## Security Vulnerabilities
+## Running on port 8000:
+❯ php -S localhost:8000 -t public
 
-If you discover a security vulnerability within Lumen, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+## Hermes Message Pack
+is a tar gziped file named .hmp
 
-## License
+## storage local file structure paths (storage/app/)
 
-The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+uploads (Files of outgoing messages)
+downloads (Files generated from the inbox received messages)
+inbox (incoming hermes message packs)
+outbox (hermes message pack for deliver)
+tmp (tmp files)
