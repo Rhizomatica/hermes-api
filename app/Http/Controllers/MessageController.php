@@ -42,7 +42,7 @@ class MessageController extends Controller
         return response('Deleted Successfully', 200);
     }
 
-    public function renderMessage($id)
+    public function oldRenderMessage($id)
     {
         $message = Message::find($id);
         $message_image =  FileController::getImage('uploads/' . $id);
@@ -52,57 +52,164 @@ class MessageController extends Controller
     }
 
     //Render output message with folders and tar
-    public function renderMessage2($id)
+    public function packMessage($id)
     {
-        $message = Message::find($id);
-        $image = [];
+        //find the message in database
+        if($message = Message::find($id)){
 
-        if (Storage::disk('local')->exists('uploads/'.$id)) {
-            $image = FileController::getImage('uploads/' . $id);
-            \Storage::disk('local')->put('tmp/' . $id . '/image'  , $message_image);
-            // $message_concat = $message_concat . $image;
+            // Assures to delete the working path
+            Storage::deleteDirectory('tmp/'.$id);
+
+            // Writes message file
+            if (! Storage::disk('local')->put('tmp/' . $id . '/hmp.json'  , $message)){
+                return response('Hermes pack message Error: can\'t write message file',500);
+            }
+            // test for image  - TODO change file for image in DB
+            if ($message['file']){
+                // test for image file
+                if (Storage::disk('local')->exists('uploads/'.$id)) {
+                    // TODO testing purposes -  change for move
+                    // if (!$image = Storage::disk('local')->move('uploads/' . $id , 'tmp/'. $id . '/image' )){
+                    if (! Storage::disk('local')->copy('uploads/' . $id , 'tmp/' . $id . '/image' )){
+                        return response('Hermes pack message Error: 1 can\'t move image file',500);
+                    }
+                }
+                else{
+                    return response('Hermes pack message Error: theres a file path but can\'t find the image file');
+                }
+            }
+
+            $path = Storage::disk('local')->path('tmp');
+            $command  = 'tar cfz ' . $path . '/' . $id . '.hmp -C '.  $path . ' ' . $id  ;
+            if ($output = exec_cli($command) ){
+                return response('Hermes pack message Error: can\'t package the files: ' . $output . $command);
+            }
+
+            // Clean outbox destination and move the package
+            Storage::disk('local')->delete('outbox/'.$id.'.hmp');
+            if (! Storage::disk('local')->move('tmp/'.$id.'.hmp', 'outbox/'.$id.'.hmp')){
+                return response('Hermes pack message Error: can\'t package the files: ' . $output . $command);
+            }
+            //$message = @json_decode(json_encode($messagefile), true);
+            Storage::disk('local')->deleteDirectory('tmp/'.$id);
+
+            //sendMessage($id);
         }
-
-        if ($message){
-            \Storage::disk('local')->put('tmp/' . $id . '/json'  , $message);
+        else{
+            return response('Hermes pack message Error: cant find message');
         }
-
-        $path = Storage::disk('local')->path('tmp');
-
-        $command  = "tar cvfz " .  $path . '/' . $id . '.tgz ' . $path . '/' . $id  ;
-        $output = exec_cli($command);
-        Storage::deleteDirectory('tmp/'.$id);
-            return response(['render test', $output],200);
+        return response(['packed', $message],200);
     }
-    public function processInboxMessage($id){
-          $messagePack = Storage::disk('local')->get('inbox/'. $id . '.hmp');
-          $path = Storage::disk('local')->path('');
-          $command  = 'tar xvfz ' .  $path . 'inbox/' . $id . '.hmp ' .  '-C ' . $path . 'inbox/'  ;
-          $output = exec_cli($command);
-          $files[] = explode(' ', $output);
-          if (Storage::disk('local')->exists('inbox/'.$id.'/json')){
-            $message = json_decode(Storage::disk('local')->get('inbox/'. $id . '/json'));
-            $message = @json_decode(json_encode($message), true);
-            $message['id'] = null;
-            $message['inbox'] = true;
-          }
 
-          $message = Message::create($message);
+    public function sendMessage($id)
+    {
+        if($message = Message::find($id)){
+            /* // TODO test for draft
+            if($message['draft']){
 
-          return $message;
+            }*/
+            if (Storage::disk('local')->exists('outbox/'.$id.'.hmp')) {
+                $command  = 'tar cfz ' . $path . '/' . $id . '.hmp -C '.  $path . ' ' . $id  ;
+                $output = exec_cli($command);
+                //TODO test output for error
+            }
+            else{
+                return response('Hermes sendMessage Error: can\'t find message package in outbox: ' . $output . $command);
+            }
+        }
+        else{
+            return response('Hermes sendMessage Error: can\'t find message: ' . $output . $command);
+        }
+        return response(['packed', $message],200);
+    }
+
+    //Process Inbox Message HMP - Hermes Message Pack
+    public function unpackInboxMessage($id){
+
+        // Test for tmp dir, if doesnt exist, creates it
+        if (! Storage::disk('local')->exists('inbox/tmp')){
+            if(!Storage::disk('local')->makeDirectory('tmp')){
+                return response('Hermes unpack inbox message Error: can\'t find or create tmp dir');
+            }
+        }
+
+        // Test for HMP file and unpack it
+        if (Storage::disk('local')->exists('inbox/' . $id . '.hmp')){
+            $messagePack = Storage::disk('local')->get('inbox/'. $id . '.hmp');
+            $message='';
+
+            // Get path, unpack into tmp and read message data
+            $path = Storage::disk('local')->path('');
+            $command  = 'tar xvfz ' .  $path . 'inbox/' . $id . '.hmp ' .  '-C ' . $path . 'tmp/'  ;
+            $output = exec_cli($command);
+            $files[] = explode(' ', $output);
+
+            // Test for HMP: hermes message package, create record on messages database
+            if (Storage::disk('local')->exists('tmp/'.$id.'/hmp.json')){
+                $messagefile = json_decode(Storage::disk('local')->get('tmp/'. $id . '/hmp.json'));
+                $message = @json_decode(json_encode($messagefile), true);
+                $message['id'] = null;
+                $message['inbox'] = true;
+            }
+            else {
+                return response('Hermes unpack inbox message Error: cant file data from unpacked message');
+            }
+            // Move attached files
+            if (Storage::disk('local')->exists('tmp/'.$id.'/image')){
+                // Test and create download folder if it doesn't exists
+                if (! Storage::disk('local')->exists('downloads')){
+                    if(!Storage::disk('local')->makeDirectory('downloads')){
+                        return response('Hermes unpack inbox message Error: can\'t find or create downloads dir');
+                    }
+                }
+                // TODO can be remvoed, just  for debugging and test
+                Storage::disk('local')->delete('downloads/' . $id . '.image');
+
+                // move image
+                if (!Storage::disk('local')->copy('tmp/' . $id . '/image', 'downloads/' .$id. '.image' )){
+                    return response('Hermes unpack inbox message Error: can\'t copy file image from unpacked message');
+                }
+                // TODO move audio and other files
+            }
+            else {
+                return response('Hermes unpack inbox message Error: can\'t file image from unpacked message');
+            }
+
+            //create message on database, delete tar and hmp
+            if($message = Message::create($message)){
+                if (Storage::disk('local')->exists('tmp/'.$id)){
+                    if (!Storage::disk('local')->deleteDirectory('tmp/' . $id)){
+                        return response('Hermes unpack inbox message Error: cant delete dir');
+                    }
+                    if (!Storage::disk('local')->delete('inbox/' . $id . '.hmp')){
+                        return response('Hermes unpack inbox message Error: cant delete dir');
+                    }
+                }
+                else{
+                    return response('Hermes unpack inbox message Error: cant create message on database', 500);
+                }
+            } else {
+                return response('Hermes unpack inbox message Error: cant delete dir', 500);
+            }
+
+        }
+        else {
+            return response('Hermes unpack inbox message Error: cant find HMP', 500);
+        }
+        return response( $message,200);
     }
 
     public function showAllInboxMessages()
     {
-        $files = \Storage::allFiles('inbox');
+        $files = \Storage::Files('inbox');
         $file = [];
 
         /*$filtered_files = array_filter($files, function($str){
-            return strpos($str, "hmp") === 0;
+            return strpos($str, 'hmp') === 0;
         });*/
-        
+
         $files_out = [];
-        for ($i = "0" ; $i < count($files); $i++) {
+        for ($i = '0' ; $i < count($files); $i++) {
             $file = explode('inbox/', $files[$i]);
 
             if(!empty($files[$i])) {
@@ -110,14 +217,15 @@ class MessageController extends Controller
             }
 
         }
-        return response()->json($files);
+        //var_dump($files_out);
+        return response()->json($files_out);
     }
 
     public function showOneInboxMessage($id)
     {
         $file = \Storage::get('inbox/' . $id);
         $output = explode('}', $file)[0];
-        $output = $output . "}";
+        $output = $output . '}';
         $output = json_decode($output);
         return response()->json($output);
     }
@@ -147,13 +255,5 @@ class MessageController extends Controller
         return response('Deleted Successfully', 200);
     }
 
-    //Unpack output message with folders and tar
-    public function unpackInboxMessage($id)
-    {
-        $inboxPath = Storage::path('inbox');
-        $command  = "tar xvfz " .  $inboxPath . '/' . $id . '.tgz ' . $inboxPath  ;
-        $output = exec_cli($command);
-        //return response(['render test', $output],200);
-    }
 
 }

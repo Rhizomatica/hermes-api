@@ -34,7 +34,7 @@ $router->get('mock', function () {
     //
 }]);*/
 
-$router->get('test/{id}',  ['uses' => 'MessageController@processInboxMessage']);
+
 
 //Users routes
 $router->get('users',  ['uses' => 'UserController@showAllUsers']);
@@ -56,14 +56,14 @@ $router->get('messages',  ['uses' => 'MessageController@showAllMessages']);
 $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('', ['uses' => 'HelpController@showHelpMessage']);
     $router->get('help', ['uses' => 'HelpController@showHelpMessage']);
-    $router->get('list',  ['uses' => 'MessageController@showAllMessages']);
-    $router->post('', ['uses' => 'MessageController@create']);
+    $router->get('list',  ['uses' => '@showAllMessages']);
+    $router->post('', ['uses' => 'MessageControllerMessageController@create']);
     $router->delete('{id}', ['uses' => 'MessageController@delete']);
     $router->put('{id}', ['uses' => 'MessageController@update']);
     $router->get('/{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('image/{id}', ['uses' => 'FileController@get']);
-    $router->get('render/{id}',  ['uses' => 'MessageController@renderMessage']);
-    $router->get('test/{id}',  ['uses' => 'MessageController@renderMessage2']);
+    //TODO switch to pack
+    $router->get('pack/{id}',  ['uses' => 'MessageController@packMessage']);
 });
 
 
@@ -89,6 +89,7 @@ $router->group(['prefix' => '/inbox'], function () use ($router) {
     $router->get('delete/{id}', ['uses' => 'MessageController@deleteInboxMessage']);
     $router->get('hide/{id}', ['uses' => 'MessageController@hideInboxMessage']);
     $router->get('unhide/{id}', ['uses' => 'MessageController@unhideInboxMessage']);
+    $router->get('unpack/{id}',  ['uses' => 'MessageController@unpackInboxMessage']);
 });
 
 
