@@ -92,12 +92,12 @@ class SystemController extends Controller
         $output = exec_cli($command);
         $command2 = "egrep -v '^\s*#' /etc/uucp/sys | grep system | cut -f 2 -d \" \"";
         $output2 = exec_cli($command2);
-        $command3 = "egrep -v '^\s*#' /etc/uucp/sys | grep address | cut -f 2 -d \" \"";
-        $output3 = exec_cli($command3);
+        //$command3 = "egrep -v '^\s*#' /etc/uucp/sys | grep address | cut -f 2 -d \" \"";
+        //$output3 = exec_cli($command3);
 
         $sysnames = explode("\n", $output);
         $sysnames2 = explode("\n", $output2);
-        $sysnames3 = explode("\n", $output3);
+        //$sysnames3 = explode("\n", $output3);
         $sysnameslist=[];
 
         for ($i = "0" ; $i < count($sysnames); $i++) {
@@ -106,7 +106,7 @@ class SystemController extends Controller
                     'id' => $i,
                     'name' => $sysnames[$i],
                     'alias' => $sysnames2[$i],
-                    'location' => $sysnames3[$i]
+          //          'location' => $sysnames3[$i]
                 ];
             }
         }
@@ -141,7 +141,7 @@ class SystemController extends Controller
         return response($spool, 200);
     }
 
-    //TODO
+    //DONE in FileController
     public function fileLoad(){
         $command = "uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"";
             $output = exec_cli($command);

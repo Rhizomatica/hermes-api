@@ -8,10 +8,8 @@ use League\Flysystem\Adapter\Local;
 use App\Message;
 use Illuminate\Http\Request;
 
-
 class MessageController extends Controller
 {
-
     public function showAllMessages()
     {
         return response()->json(Message::all());
@@ -71,7 +69,7 @@ class MessageController extends Controller
                     // TODO testing purposes -  change for move
                     // if (!$image = Storage::disk('local')->move('uploads/' . $id , 'tmp/'. $id . '/image' )){
                     if (! Storage::disk('local')->copy('uploads/' . $id , 'tmp/' . $id . '/image' )){
-                        return response('Hermes pack message Error: 1 can\'t move image file',500);
+                        return response('Hermes pack message Error:  can\'t move image file',500);
                     }
                 }
                 else{
@@ -92,25 +90,38 @@ class MessageController extends Controller
             }
             //$message = @json_decode(json_encode($messagefile), true);
             Storage::disk('local')->deleteDirectory('tmp/'.$id);
-
-            //sendMessage($id);
         }
         else{
-            return response('Hermes pack message Error: cant find message');
+            return response('Hermes pack message Error: can\'t find message');
         }
-        return response(['packed', $message],200);
+        return response(['Hermes pack DONE', $message],200);
     }
 
     public function sendMessage($id)
     {
         if($message = Message::find($id)){
+            //TODO remove mock
+            //$remote = $message->dest . $remotePath;
+            $remote = "trambolho";
+            //work path
+            $path = Storage::disk('local')->path('outbox/'.$id.'.hmp');
+            $source =  env('HERMES_NAME');
+            $remotePath = env('HERMES_PATH') . env('HERMES_INBOX');
             /* // TODO test for draft
             if($message['draft']){
-
             }*/
+
+            // UUCP -C Copy  (default) / -d create dirs
             if (Storage::disk('local')->exists('outbox/'.$id.'.hmp')) {
-                $command  = 'tar cfz ' . $path . '/' . $id . '.hmp -C '.  $path . ' ' . $id  ;
-                $output = exec_cli($command);
+                $command = 'uucp -C -d \'' .  $path . '\' ' . $remote . '!~/' . $source . '/' . $id . '.hmp' ;
+                if ($output = exec_cli($command) ){
+                    return response('Hermes sendMessage: Error on uucp : ' . $output . $command);
+                }
+                $message['draft']=false;
+                //$message->update($message);
+
+                Storage::prepend('send.log', 'sent . '. $id  . ' ' .  time() . ' ' );
+                //$output = exec_cli($command);
                 //TODO test output for error
             }
             else{
@@ -120,7 +131,7 @@ class MessageController extends Controller
         else{
             return response('Hermes sendMessage Error: can\'t find message: ' . $output . $command);
         }
-        return response(['packed', $message],200);
+        return response(['Hermes sendMessage: DONE', $command,'output cli: '. $output,$message],200);
     }
 
     //Process Inbox Message HMP - Hermes Message Pack
@@ -152,7 +163,7 @@ class MessageController extends Controller
                 $message['inbox'] = true;
             }
             else {
-                return response('Hermes unpack inbox message Error: cant file data from unpacked message');
+                return response('Hermes unpack inbox message Error: can\'t file data from unpacked message');
             }
             // Move attached files
             if (Storage::disk('local')->exists('tmp/'.$id.'/image')){
@@ -162,7 +173,7 @@ class MessageController extends Controller
                         return response('Hermes unpack inbox message Error: can\'t find or create downloads dir');
                     }
                 }
-                // TODO can be remvoed, just  for debugging and test
+                // TODO can be removed, just  for debugging and test
                 Storage::disk('local')->delete('downloads/' . $id . '.image');
 
                 // move image
@@ -179,22 +190,21 @@ class MessageController extends Controller
             if($message = Message::create($message)){
                 if (Storage::disk('local')->exists('tmp/'.$id)){
                     if (!Storage::disk('local')->deleteDirectory('tmp/' . $id)){
-                        return response('Hermes unpack inbox message Error: cant delete dir');
+                        return response('Hermes unpack inbox message Error: can\'t delete dir');
                     }
                     if (!Storage::disk('local')->delete('inbox/' . $id . '.hmp')){
-                        return response('Hermes unpack inbox message Error: cant delete dir');
+                        return response('Hermes unpack inbox message Error: can\'t delete dir');
                     }
                 }
                 else{
-                    return response('Hermes unpack inbox message Error: cant create message on database', 500);
+                    return response('Hermes unpack inbox message Error: can\'t create message on database', 500);
                 }
             } else {
-                return response('Hermes unpack inbox message Error: cant delete dir', 500);
+                return response('Hermes unpack inbox message Error: can\'t delete dir', 500);
             }
-
         }
         else {
-            return response('Hermes unpack inbox message Error: cant find HMP', 500);
+            return response('Hermes unpack inbox message Error: can\'t find HMP', 500);
         }
         return response( $message,200);
     }
@@ -254,6 +264,4 @@ class MessageController extends Controller
         $file = \Storage::get('inbox/' . $id);
         return response('Deleted Successfully', 200);
     }
-
-
 }

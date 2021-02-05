@@ -64,21 +64,12 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('image/{id}', ['uses' => 'FileController@get']);
     //TODO switch to pack
     $router->get('pack/{id}',  ['uses' => 'MessageController@packMessage']);
+    $router->get('send/{id}',  ['uses' => 'MessageController@sendMessage']);
 });
 
 
 $router->get('message/render/{id}',  ['uses' => 'MessageController@renderMessage']);
 
-$router->group(['prefix' => '/outbox'], function () use ($router) {
-    $router->get('help', ['uses' => 'HelpController@showHelpMessage']);
-    $router->get('',  ['uses' => 'MessageController@showAllMessages']);
-    $router->post('', ['uses' => 'MessageController@create']);
-    $router->delete('{id}', ['uses' => 'MessageController@delete']);
-    $router->put('{id}', ['uses' => 'MessageController@update']);
-    $router->get('/{id}', ['uses' => 'MessageController@showOneMessage']);
-    $router->get('image/{id}', ['uses' => 'FileController@get']);
-    $router->get('render/{id}',  ['uses' => 'MessageController@renderMessage']);
-});
 
 
 $router->group(['prefix' => '/inbox'], function () use ($router) {

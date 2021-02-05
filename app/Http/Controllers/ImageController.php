@@ -10,60 +10,6 @@ class ImageController extends Controller
      * @return void
      */
 
-     //TODO configurar parametros, etc
-    function receive(){
-        $dir = '/var/www/html/arquivos/';
-        $files = scandir($dir);
-
-        foreach($files as $key => $value){
-            $path = realpath($dir.DIRECTORY_SEPARATOR.$value);
-            if(is_dir($path) && $value != "." && $value != "..") {
-                echo "<div class=\"body\">Arquivos de Origem da Estação ".$value."</div><br />";
-                $files_st = scandir($dir.DIRECTORY_SEPARATOR.$value);
-                $class="bodywt";
-                foreach($files_st as $key_st => $value_st){
-                    $path_st = realpath($dir.DIRECTORY_SEPARATOR.$value.DIRECTORY_SEPARATOR.$value_st);
-                    if(!is_dir($path_st)) {
-                        $file_ext = pathinfo($path_st, PATHINFO_EXTENSION);
-                        if ($class == "bodywt"){
-                            echo "<div class=\"bodywt\">";
-                            $class="body";
-                        } else {
-                            echo "<div class=\"body\">";
-                            $class="bodywt";
-                        }
-                        if ($file_ext=="gpg") {
-                            echo $value_st;
-                            echo "<form action=\"decrypt.php\" method=\"post\" enctype=\"multipart/form-data\" style=\"display: inline;\">";
-                            echo "<br />Senha: ";
-                            echo "<input type=\"text\" name=\"password\" />";
-                            echo "<input type=\"submit\" value=\"Abrir com Senha\" name=\"submit\" />";
-                            echo "<input type=\"hidden\" name=\"path\" value=\"".$path_st."\" />";
-                            echo "</form>";
-                        }
-                        else {
-                            echo "<a href=\"arquivos/".$value."/".$value_st."\">".$value_st."</a>";
-                        }
-                        // echo "<br />";
-                        echo "</div>";
-    }
-                    // $results[] = $path;
-                }
-            }
-        }
-
-        if ($class == "bodywt"){
-            echo "<div class=\"bodywt\">";
-        } else {
-            echo "<div class=\"body\">";
-        }
-
-        echo "<a href=\"clean_files.php\"><i class=\"material-icons\">cancel</i>
-    Limpar Todos Arquivos</a>";
-
-        echo "</div>";
-    }
-
     function upload(){
         $target_dir = "/var/www/html/uploads/";
         $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
@@ -209,18 +155,3 @@ class ImageController extends Controller
     }
 }
 
-function exec_cli($command = "ls -l")
-    {
-        ob_start();
-        system($command , $return_var);
-        $output = ob_get_contents();
-        ob_end_clean();
-
-        //or die;
-        /*if ($exploder==true){
-                return (explode("\n", $output));
-                }*/
-
-        return ($output);
-
-    }
