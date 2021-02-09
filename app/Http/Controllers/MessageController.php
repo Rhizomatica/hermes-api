@@ -23,6 +23,7 @@ class MessageController extends Controller
     public function create(Request $request)
     {
         $message = Message::create($request->all());
+        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'create message . ' . $message  );
         return response()->json($message, 201);
     }
 
@@ -30,13 +31,14 @@ class MessageController extends Controller
     {
         $message = Message::findOrFail($id);
         $message->update($request->all());
-
+        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'update message . '. $id  .  ' -> ' . $remote  );
         return response()->json($user, 200);
     }
 
     public function delete($id)
     {
         Message::findOrFail($id)->delete();
+        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'delete message . '. $id  );
         return response('Deleted Successfully', 200);
     }
 
@@ -46,6 +48,7 @@ class MessageController extends Controller
         $message_image =  FileController::getImage('uploads/' . $id);
         $message_concat = $message . $message_image;
         \Storage::disk('local')->put('output/' . $id  , $message_concat);
+        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'old render message . '. $id  .  ' -> ' . $remote  );
         return response($message);
     }
 
@@ -94,6 +97,7 @@ class MessageController extends Controller
         else{
             return response('Hermes pack message Error: can\'t find message');
         }
+        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'pack message . '. $id  . ' - ' . $message['name'] );
         return response(['Hermes pack DONE', $message],200);
     }
 
@@ -120,7 +124,7 @@ class MessageController extends Controller
                 $message['draft']=false;
                 //$message->update($message);
 
-                Storage::prepend('send.log', 'sent . '. $id  . ' ' .  time() . ' ' );
+                Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'sent message . '. $id  . ' - ' . $message .  ' -> ' . $remote  );
                 //$output = exec_cli($command);
                 //TODO test output for error
             }
@@ -206,6 +210,7 @@ class MessageController extends Controller
         else {
             return response('Hermes unpack inbox message Error: can\'t find HMP', 500);
         }
+        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'unpack  '. $id  . ' - ' . $message .  ' -> ' . $remote  );
         return response( $message,200);
     }
 
@@ -250,18 +255,21 @@ class MessageController extends Controller
     public function hideInboxMessage($id)
     {
         \Storage::move('inbox/' . $id, 'inbox/.' . $id);
+        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'hide message . '. $id  .  ' -> ' . $remote  );
         return response('hide ' . $id . ' Successfully', 200);
     }
 
     public function unhideInboxMessage($id)
     {
         \Storage::move('inbox/.' . $id, 'inbox/' . $id);
+        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'unhide message . '. $id  );
         return response('unhide ' . $id . ' Successfully', 200);
     }
 
     public function deleteInboxMessage($id)
     {
         $file = \Storage::get('inbox/' . $id);
+        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'delete message . '. $id   );
         return response('Deleted Successfully', 200);
     }
 }
