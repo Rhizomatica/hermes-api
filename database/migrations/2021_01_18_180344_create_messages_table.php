@@ -21,7 +21,7 @@ class CreateMessagesTable extends Migration
             $table->string('file')->nullable(true);
             $table->string('image')->nullable(true);
             $table->string('audio')->nullable(true);
-            $table->string('text');
+            $table->text('text');
             $table->string('sent_at')->nullable(true);
             $table->boolean('draft')->default(true);
             $table->boolean('inbox')->default(false);

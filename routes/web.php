@@ -101,12 +101,11 @@ $router->get('sys',  ['uses' => 'HelpController@showHelpSys']);
 // system commands
 $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
-    $router->get('getnodename',  ['uses' => 'SystemController@getSysNodeName']);
+    $router->get('nodename',  ['uses' => 'SystemController@getSysNodeName']);
     $router->get('help',  ['uses' => 'HelpController@showHelpSys']);
     
     $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']);
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
-    $router->get('node',  ['uses' => 'SystemController@getNodename']);
     $router->get('queueerase',  ['uses' => 'SystemController@queueErase']);
     $router->get('spool',  ['uses' => 'SystemController@sysGetSpoolList']);
     $router->get('stations',  ['uses' => 'SystemController@getSysStations']);

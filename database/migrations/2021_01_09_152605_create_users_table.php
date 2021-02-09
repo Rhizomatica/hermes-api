@@ -19,10 +19,10 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('phone')->nullable(true);
             $table->string('site')->nullable(true);
-            $table->string('location')->nullable(true);;
-            $table->string('recoverphrase')->nullable(true);;
-            $table->string('recoveranswer')->nullable(true);;
-            $table->boolean('admin');
+            $table->string('location')->nullable(true);
+            $table->string('recoverphrase')->nullable(true);
+            $table->string('recoveranswer')->nullable(true);
+            $table->boolean('admin')->nullable(true);;
             $table->timestamps();
         });
     }

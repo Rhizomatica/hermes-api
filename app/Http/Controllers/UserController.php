@@ -20,13 +20,19 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
-        $user = User::create($request->all());
-
-        return response()->json($user, 201);
+        //var_dump($request->all);
+        if ($request['password']){
+            $request['password'] = hash('sha256', $request['password']);
+        }
+        //return response()->json($user, 201);
+        return response()->json($request, 201);
     }
 
     public function update($id, Request $request)
     {
+        if ($request['password']){
+            $request['password'] = hash('sha256', $request['password']);
+        }
         $user = User::findOrFail($id);
         $user->update($request->all());
 
@@ -39,23 +45,21 @@ class UserController extends Controller
         return response('Deleted Successfully', 200);
     }
 
-
     public function login(Request $request)
     {
-        //$data = [$request->login, $request->password];
-        $object = (object) [
-            'ret' => 'ok',
-            'login' => $request->login,
-            'admin' => true,
-          ];
-
-          //TODO buscar do banco
-        if ($request->login == 'admin' ){
-           return response()->json($object);
+        $user = new User;
+        if ($request->email){
+            $user = User::firstWhere('email', $request->email);
+            if ($user['password'] == hash('sha256', $request->password)){ //sucessfull login
+                unset($user['password']);
+                unset($user['recoverphrase']);
+                unset($user['recoveranswer']);
+                return response()->json($user, 200);
+            }
         }
-        else{
-            return response()->json('$request->login');
+        else //fail
+        {
+            return response()->json('error', 404);
         }
-
     }
 }

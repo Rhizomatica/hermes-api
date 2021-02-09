@@ -2,6 +2,15 @@
 
 namespace App\Http\Controllers;
 
+function exec_nodename(){
+
+    $command = 'cat /etc/uucp/config|grep nodename|cut -f 2 -d " "';
+    $output = exec_cli($command);
+    $output = explode("\n", $output)[0];
+
+    return $output;
+}
+
 class SystemController extends Controller
 {
     /**
@@ -9,46 +18,60 @@ class SystemController extends Controller
      *
      * @return string
      */
+    public function  getSysNodeName()
+    {
+       return  response(json_encode(exec_nodename()),200);
+    }
 
+    /**
+     * Get system status
+     *
+     * @return Table
+     */
     public function getSysStatus()
     {
 
-        $sysname = explode("\n", exec_cli("uname -n"));
-        //$sysname = SystemController.getnodeName();
+        $sysname = explode("\n", exec_cli("uname -n"))[0];
         $piduu = exec_cli("pgrep -x uuardopd");
         $pidar  = exec_cli("pgrep -x ardop");
         $pidtst = explode("\n", exec_cli("echo teste"))[0];
-
+        $ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''))[0];
+        // $ip = exec_cli('hostname -I');// doesnt work on arch
+        $memory = explode(" ", exec_cli("free | grep Mem|cut -f 8,13,19,25,31,37 -d \" \""));
 
         $status = [
             'status' => true,
-            'name' => $sysname[0],
+            'name' => $sysname,
+            'nodename' => exec_nodename(),
             'piduu' => $piduu?$piduu:false,
             'pidar' => $pidar?$pidar:false,
-            'pidtst' => $pidtst
+            'pidtst' => $pidtst,
+            'ipaddress' => $ip,
+            'memory' => $memory
         ];
-
         return response(json_encode($status), 200);
     }
 
-    public function getSysNodeName(){
-        return explode("\n", exec_cli("uname -n"))[0];
-    }
-
-
-    public function getFiles()
+    /**
+     * Get files from $path
+     *
+     * @return Table
+     */
+    public function getFiles($path)
     {
-        $command = "ls -la /etc/uucp";
+        if (!$path ){
+            $command = "ls -la /etc/uucp";
+        }
+        $command = "ls -la " . $path;
         $output = exec_cli($command);
         $output =  explode("\n ", $output);
         return  $output;
     }
 
- 
     /**
      * Get info if system is running
      *
-     * @return table
+     * @return Boolean
      */
     public function isRunning(){
         //TODO
