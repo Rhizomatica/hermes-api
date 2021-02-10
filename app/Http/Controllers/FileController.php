@@ -78,3 +78,4 @@ if (Storage::disk('s3')->missing('file.jpg')) {
 return Storage::download('file.jpg');
 
 return Storage::download('file.jpg', $name, $headers);
+*/

@@ -57,7 +57,7 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('', ['uses' => 'HelpController@showHelpMessage']);
     $router->get('help', ['uses' => 'HelpController@showHelpMessage']);
     $router->get('list',  ['uses' => '@showAllMessages']);
-    $router->post('', ['uses' => 'MessageController@create']);
+    $router->post('', ['uses' => 'MessageController@sendHMP']);
     $router->delete('{id}', ['uses' => 'MessageController@delete']);
     $router->put('{id}', ['uses' => 'MessageController@update']);
     $router->get('/{id}', ['uses' => 'MessageController@showOneMessage']);
@@ -80,7 +80,7 @@ $router->group(['prefix' => '/inbox'], function () use ($router) {
     $router->get('delete/{id}', ['uses' => 'MessageController@deleteInboxMessage']);
     $router->get('hide/{id}', ['uses' => 'MessageController@hideInboxMessage']);
     $router->get('unhide/{id}', ['uses' => 'MessageController@unhideInboxMessage']);
-    $router->get('unpack/{id}',  ['uses' => 'MessageController@unpackInboxMessage']);
+    $router->get('unpack/{orig},{id}',  ['uses' => 'MessageController@unpackInboxMessage']);
 });
 
 
