@@ -24,9 +24,9 @@ class DatabaseSeeder extends Seeder
             'admin' => true
         ]);
 
-        for($a=1; $a<=5; $a++){
+        for($a=1; $a<=20; $a++){
             DB::table('messages')->insert([
-                'name' => 'test message '.Str::random(10),
+                'name' => 'stuck test message '.Str::random(10),
                 'dest' => 'local',
                 'orig' => 'local',
                 'file' => null,

@@ -66,7 +66,7 @@ class MessageController extends Controller
 
             // UUCP -C Copy  (default) / -d create dirs
             if (Storage::disk('local')->exists('outbox/'.$message->id.'.hmp')) {
-                $command = 'uucp -C -d \'' .  $path . '\' ' . $message->dest . '!~/' . $message->orig . '/' . $message->id . '.hmp' ;
+                $command = 'uucp -C -d \'' .  $path . '\' ' . $message->dest . '!~/' . $message->orig . '-' . $message->id  ;
                 if ($output = exec_cli($command) ){
                     return response('Hermes sendMessage: Error on uucp: ' . $output . $command);
                 }
@@ -96,7 +96,7 @@ class MessageController extends Controller
         return response()->json($message, 201);
     }
 
-    public function update($id, Request $request)
+    public function updateMessage($id, Request $request)
     {
         $message = Message::findOrFail($id);
         $message->update($request->all());
@@ -104,7 +104,7 @@ class MessageController extends Controller
         return response()->json($user, 200);
     }
 
-    public function delete($id)
+    public function deleteMessage($id)
     {
         Message::findOrFail($id)->delete();
         Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'delete message . '. $id  );
@@ -123,7 +123,10 @@ class MessageController extends Controller
 
 
     //Process Inbox Message HMP - Hermes Message Pack
-    public function unpackInboxMessage($orig, $id){
+    public function unpackInboxMessage($arg){
+        $arg = explode('-', $arg);
+        $orig = $arg[0];
+        $id = $arg[1];
 
         $message='';
         // Test for tmp dir, if doesnt exist, creates it
@@ -134,11 +137,12 @@ class MessageController extends Controller
         }
         // Test for HMP file and unpack it
         //TODO remove trambolho
-         if (Storage::disk('local')->exists('inbox/'. $orig  . '/' . $id .   '.hmp')){
+         if (Storage::disk('local')->exists('inbox/'. $orig  . '-' . $id )){
             //$messagePack = Storage::disk('local')->get('inbox/'. $id . '.hmp');
             // Get path, unpack into tmp and read message data
             $path = Storage::disk('local')->path('');
-            $command  = 'tar xvfz ' .  $path . 'inbox/' . $orig .'/' . $id . '.hmp ' .  '-C ' . $path . 'tmp/'  ;
+            $command  = 'tar xvfz ' .  $path . 'inbox/' . $orig .'-' . $id  .  ' -C ' . $path . 'tmp/'  ;
+            echo $command;
             $output = exec_cli($command);
             $files[] = explode(' ', $output);
 
@@ -150,7 +154,7 @@ class MessageController extends Controller
                 $message['inbox'] = true;
             }
             else {
-                return response('Hermes unpack inbox message Error: can\'t file data from unpacked message');
+                return response('Hermes unpack inbox message Error: can\'t find data file from unpacked message');
             }
             // Move attached files
             if (Storage::disk('local')->exists('tmp/'.$id.'/image')){
@@ -177,15 +181,15 @@ class MessageController extends Controller
                     if (!Storage::disk('local')->deleteDirectory('tmp/' .  $id)){
                         return response('Hermes unpack inbox message Error: can\'t delete tmp dir');
                     }
-                    /*if (!Storage::disk('local')->delete('inbox/' . $id . '.hmp')){
-                        return response('Hermes unpack inbox message Error: can\'t delete dir');
-                    }*/
+                    if (!Storage::disk('local')->delete('inbox/' . $orig . '-' . $id )){
+                        return response('Hermes unpack inbox message Error: can\'t delete orig file');
+                    }
                 }
                 else{
                     return response('Hermes unpack inbox message Error: can\'t create message on database', 500);
                 }
             } else {
-                return response('Hermes unpack inbox message Error: can\'t delete dir' , 500);
+                return response('Hermes unpack inbox message Error: can\'t create message on db' , 500);
             }
         }
         else {
@@ -247,10 +251,5 @@ class MessageController extends Controller
         return response('unhide ' . $id . ' Successfully', 200);
     }
 
-    public function deleteInboxMessage($id)
-    {
-        $file = \Storage::get('inbox/' . $id);
-        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'delete message . '. $id   );
-        return response('Deleted Successfully', 200);
-    }
+
 }

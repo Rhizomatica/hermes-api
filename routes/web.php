@@ -58,7 +58,7 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('help', ['uses' => 'HelpController@showHelpMessage']);
     $router->get('list',  ['uses' => '@showAllMessages']);
     $router->post('', ['uses' => 'MessageController@sendHMP']);
-    $router->delete('{id}', ['uses' => 'MessageController@delete']);
+    $router->delete('{id}', ['uses' => 'MessageController@deleteMessage']);
     $router->put('{id}', ['uses' => 'MessageController@update']);
     $router->get('/{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('image/{id}', ['uses' => 'FileController@get']);
@@ -80,9 +80,9 @@ $router->group(['prefix' => '/inbox'], function () use ($router) {
     $router->get('delete/{id}', ['uses' => 'MessageController@deleteInboxMessage']);
     $router->get('hide/{id}', ['uses' => 'MessageController@hideInboxMessage']);
     $router->get('unhide/{id}', ['uses' => 'MessageController@unhideInboxMessage']);
-    $router->get('unpack/{orig},{id}',  ['uses' => 'MessageController@unpackInboxMessage']);
 });
 
+$router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']);
 
 $router->group(['prefix' => '/file'], function () use ($router) {
     $router->get('', ['uses' => 'FileController@showAllFiles']);
