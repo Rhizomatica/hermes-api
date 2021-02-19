@@ -38,7 +38,7 @@ class MessageController extends Controller
             if (Storage::disk('local')->exists('uploads/'.$message->id)) {
                 // TODO testing purposes -  change for move
                 // if (!$image = Storage::disk('local')->move('uploads/' . $id , 'tmp/'. $id . '/image' )){
-                if (! Storage::disk('local')->copy('uploads/' . $message->id , 'tmp/' . $message->id . '/image' )){
+                if (! Storage::disk('local')->move('uploads/' . $message->id , 'tmp/' . $message->id . '/image' )){
                     return response('Hermes send message Error:  can\'t move image file',500);
                 }
             }
@@ -136,13 +136,10 @@ class MessageController extends Controller
             }
         }
         // Test for HMP file and unpack it
-        //TODO remove trambolho
          if (Storage::disk('local')->exists('inbox/'. $orig  . '-' . $id )){
-            //$messagePack = Storage::disk('local')->get('inbox/'. $id . '.hmp');
             // Get path, unpack into tmp and read message data
             $path = Storage::disk('local')->path('');
             $command  = 'tar xvfz ' .  $path . 'inbox/' . $orig .'-' . $id  .  ' -C ' . $path . 'tmp/'  ;
-            echo $command;
             $output = exec_cli($command);
             $files[] = explode(' ', $output);
 
@@ -156,6 +153,12 @@ class MessageController extends Controller
             else {
                 return response('Hermes unpack inbox message Error: can\'t find data file from unpacked message');
             }
+
+            //create message on database, delete tar and hmp
+            if(!$message = Message::create($message)){
+                return response('Hermes unpack inbox message Error: can\'t create message on db' , 500);
+            }
+
             // Move attached files
             if (Storage::disk('local')->exists('tmp/'.$id.'/image')){
                 // Test and create download folder if it doesn't exists
@@ -164,32 +167,29 @@ class MessageController extends Controller
                         return response('Hermes unpack inbox message Error: can\'t find or create downloads dir');
                     }
                 }
-                // TODO can be removed, just  for debugging and test
-                Storage::disk('local')->delete('downloads/' . $id . '.image');
 
                 // move image
-                if (!Storage::disk('local')->copy('tmp/' . $id . '/image', 'downloads/' .$id. '.image' )){
+                if (Storage::disk('local')->copy('tmp/' . $id . '/image', 'downloads/' . $message['id']. '.image' )){
+                    
+                }
+                else{
                     return response('Hermes unpack inbox message Error: can\'t copy file image from unpacked message');
                 }
+                
                 // TODO move audio and other files
             }
 
 
-            //create message on database, delete tar and hmp
-            if($message = Message::create($message)){
-                if (Storage::disk('local')->exists('tmp/'.$id)){
-                    if (!Storage::disk('local')->deleteDirectory('tmp/' .  $id)){
-                        return response('Hermes unpack inbox message Error: can\'t delete tmp dir');
-                    }
-                    if (!Storage::disk('local')->delete('inbox/' . $orig . '-' . $id )){
-                        return response('Hermes unpack inbox message Error: can\'t delete orig file');
-                    }
+            if (Storage::disk('local')->exists('tmp/'.$id)){
+                if (!Storage::disk('local')->deleteDirectory('tmp/' .  $id)){
+                    return response('Hermes unpack inbox message Error: can\'t delete tmp dir');
                 }
-                else{
-                    return response('Hermes unpack inbox message Error: can\'t create message on database', 500);
-                }
-            } else {
-                return response('Hermes unpack inbox message Error: can\'t create message on db' , 500);
+                /*if (!Storage::disk('local')->delete('inbox/' . $orig . '-' . $id )){
+                    return response('Hermes unpack inbox message Error: can\'t delete orig file');
+                }*/
+            }
+            else{
+                return response('Hermes unpack inbox message Error: can\'t create message on database', 500);
             }
         }
         else {

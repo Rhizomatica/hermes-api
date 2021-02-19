@@ -16,10 +16,10 @@ class FileController extends Controller
 
     public function uploadImage( Request $request)
     {
-       $request->validate([
-            'file' => 'required|file|image|size:1024|dimensions:max_width=500,max_height=500',
+       /*$request->validate([
+            'fileup' => 'required|file|image|size:1024|dimensions:max_width=500,max_height=500',
             'data.name' => 'required|filled|size:100',
-        ]);
+        ]);*/
 
         Storage::disk('local')->put('lastrequest' , $request);
         //$filename = $request->file('fileup')->getClientOriginalName();
