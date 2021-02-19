@@ -38,7 +38,7 @@ class MessageController extends Controller
             if (Storage::disk('local')->exists('uploads/'.$message->id)) {
                 // TODO testing purposes -  change for move
                 // if (!$image = Storage::disk('local')->move('uploads/' . $id , 'tmp/'. $id . '/image' )){
-                if (! Storage::disk('local')->move('uploads/' . $message->id , 'tmp/' . $message->id . '/image' )){
+                if (! Storage::disk('local')->copy('uploads/' . $message->id , 'tmp/' . $message->id . '/image' )){
                     return response('Hermes send message Error:  can\'t move image file',500);
                 }
             }
@@ -167,15 +167,12 @@ class MessageController extends Controller
                         return response('Hermes unpack inbox message Error: can\'t find or create downloads dir');
                     }
                 }
-
                 // move image
                 if (Storage::disk('local')->copy('tmp/' . $id . '/image', 'downloads/' . $message['id']. '.image' )){
-                    
                 }
                 else{
                     return response('Hermes unpack inbox message Error: can\'t copy file image from unpacked message');
                 }
-                
                 // TODO move audio and other files
             }
 
@@ -184,9 +181,9 @@ class MessageController extends Controller
                 if (!Storage::disk('local')->deleteDirectory('tmp/' .  $id)){
                     return response('Hermes unpack inbox message Error: can\'t delete tmp dir');
                 }
-                /*if (!Storage::disk('local')->delete('inbox/' . $orig . '-' . $id )){
+                if (!Storage::disk('local')->delete('inbox/' . $orig . '-' . $message['id'] )){
                     return response('Hermes unpack inbox message Error: can\'t delete orig file');
-                }*/
+                }
             }
             else{
                 return response('Hermes unpack inbox message Error: can\'t create message on database', 500);
