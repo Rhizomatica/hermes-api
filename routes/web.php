@@ -41,9 +41,9 @@ $router->get('mock', function () {
 $router->group(['prefix' => '/user'], function () use ($router) {
     $router->get('help', ['uses' => 'HelpController@showHelpUser']);
     $router->get('', ['uses' => 'UserController@showAllUsers']);
-    $router->get('/{id}', ['uses' => 'UserController@showOneUser']);
+    $router->get('{id}', ['uses' => 'UserController@showOneUser']);
     $router->post('', ['uses' => 'UserController@create']);
-    $router->put('{id}', ['uses' => 'UserController@update']);
+    $router->post('{id}', ['uses' => 'UserController@update']);
     $router->delete('{id}', ['uses' => 'UserController@delete']);
 
 });
@@ -60,7 +60,7 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('list',  ['uses' => '@showAllMessages']);
     $router->post('', ['uses' => 'MessageController@sendHMP']);
     $router->delete('{id}', ['uses' => 'MessageController@deleteMessage']);
-    $router->put('{id}', ['uses' => 'MessageController@update']);
+    $router->post('{id}', ['uses' => 'MessageController@update']);
     $router->get('/{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('image/{id}', ['uses' => 'FileController@get']);
     //TODO switch to pack

@@ -15,7 +15,13 @@ class UserController extends Controller
 
     public function showOneUser($id)
     {
-        return response()->json(User::find($id));
+         if( $user = User::firstWhere('email', $id)){
+            return response()->json($user, 200);
+         }
+         else
+         {
+            return response()->json('Error: cant find user ', 500);
+         }
     }
 
     public function create(Request $request)
@@ -25,24 +31,53 @@ class UserController extends Controller
             $request['password'] = hash('sha256', $request['password']);
         }
         //return response()->json($user, 201);
-        return response()->json($request, 201);
+        if($user = User::create($request->all())){
+            return response()->json($request, 201); //Created
+        }
+        else{
+            return response()->json('error', 500);
+        }
+
     }
 
     public function update($id, Request $request)
     {
-        if ($request['password']){
-            $request['password'] = hash('sha256', $request['password']);
-        }
-        $user = User::findOrFail($id);
-        $user->update($request->all());
+        if ($request->all()){
+            if(  $user = User::firstWhere('email', $id)){
+                if ($request['password']){
+                    $request['password'] = hash('sha256', $request['password']);
+                }
 
-        return response()->json($user, 200);
+                if (User::where('email', $id)->update($request->all())){
+                    return response()->json($id . ' updated', 200);
+                }
+                else {
+                    return response()->json('can\'t delete', 500);
+                }
+            }
+            else {
+                return response()->json('can\'t find', 500);
+            }
+        }
+        else {
+            return response()->json('Error, does not have request data', 500);
+        }
     }
 
     public function delete($id)
     {
-        User::findOrFail($id)->delete();
-        return response('Deleted Successfully', 200);
+        if( User::firstWhere('email', $id)){
+            if (User::where('email', $id)->delete()){
+                return response()->json($id . ' deleted', 200);
+            }
+            else {
+                return response()->json('can\'t delete', 500);
+             }
+         }
+         else {
+            return response()->json('can\'t find', 500);
+         }
+
     }
 
     public function login(Request $request)
