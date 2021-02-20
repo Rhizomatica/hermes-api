@@ -48,9 +48,11 @@ $router->group(['prefix' => '/user'], function () use ($router) {
 
 });
 
-$router->post('login', ['uses' => 'UserController@login']);
+
 // Messages routes
 
+$router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']);
+$router->get('message/render/{id}',  ['uses' => 'MessageController@renderMessage']);
 
 $router->get('messages',  ['uses' => 'MessageController@showAllMessages']);
 
@@ -69,7 +71,7 @@ $router->group(['prefix' => '/message'], function () use ($router) {
 });
 
 
-$router->get('message/render/{id}',  ['uses' => 'MessageController@renderMessage']);
+
 
 
 
@@ -83,7 +85,7 @@ $router->group(['prefix' => '/inbox'], function () use ($router) {
     $router->get('unhide/{id}', ['uses' => 'MessageController@unhideInboxMessage']);
 });
 
-$router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']);
+
 
 $router->group(['prefix' => '/file'], function () use ($router) {
     $router->get('', ['uses' => 'FileController@showAllFiles']);
@@ -97,14 +99,17 @@ $router->group(['prefix' => '/file'], function () use ($router) {
     $router->get('file/{id}', ['uses' => 'FileController@getImageHttp']);
 */
 
-$router->get('sys',  ['uses' => 'HelpController@showHelpSys']);
+
+$router->get('help',  ['uses' => 'HelpController@showHelpSys']);
 
 // system commands
+$router->post('login', ['uses' => 'UserController@login']); //TODO remove
+
 $router->group(['prefix' => '/sys'], function () use ($router) {
+    $router->post('login', ['uses' => 'UserController@login']); 
     $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
     $router->get('nodename',  ['uses' => 'SystemController@getSysNodeName']);
     $router->get('help',  ['uses' => 'HelpController@showHelpSys']);
-    
     $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']);
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
     $router->get('queueerase',  ['uses' => 'SystemController@queueErase']);

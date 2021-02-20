@@ -35,7 +35,7 @@ class UserController extends Controller
             return response()->json($request, 201); //Created
         }
         else{
-            return response()->json('error', 500);
+            return response()->json('error', 404);
         }
 
     }
@@ -56,7 +56,7 @@ class UserController extends Controller
                 }
             }
             else {
-                return response()->json('can\'t find', 500);
+                return response()->json('can\'t find', 404);
             }
         }
         else {
@@ -75,7 +75,7 @@ class UserController extends Controller
              }
          }
          else {
-            return response()->json('can\'t find', 500);
+            return response()->json('can\'t find', 404);
          }
 
     }
@@ -84,17 +84,26 @@ class UserController extends Controller
     {
         $user = new User;
         if ($request->email){
-            $user = User::firstWhere('email', $request->email);
-            if ($user['password'] == hash('sha256', $request->password)){ //sucessfull login
-                unset($user['password']);
-                unset($user['recoverphrase']);
-                unset($user['recoveranswer']);
-                return response()->json($user, 200);
+            if ($user = User::firstWhere('email', $request->email)){
+                if ($user['password'] == hash('sha256', $request->password)){ //sucessfull login
+                    unset($user['password']);
+                    unset($user['recoverphrase']);
+                    unset($user['recoveranswer']);
+                    unset($user['created_at']);
+                    unset($user['updated_at']);
+                    return response()->json($user, 200);
+                }
+                else{//fail
+                    return response()->json('wrong password', 500);
+                }
+            }
+            else{ //fail
+                return response()->json('wrong user', 404);
             }
         }
         else //fail
         {
-            return response()->json('error', 404);
+            return response()->json('lack parameters', 500);
         }
     }
 }
