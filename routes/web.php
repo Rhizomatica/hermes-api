@@ -37,24 +37,25 @@ $router->get('mock', function () {
 
 
 //Users routes
-$router->get('users',  ['uses' => 'UserController@showAllUsers']);
 
-$router->get('user', ['uses' => 'HelpController@showHelpUser']);
-$router->post('user', ['uses' => 'UserController@create']);
-$router->delete('user/{id}', ['uses' => 'UserController@delete']);
-$router->put('user/{id}', ['uses' => 'UserController@update']);
-$router->get('user/{id}', ['uses' => 'UserController@showOneUser']);
+$router->group(['prefix' => '/user'], function () use ($router) {
+    $router->get('help', ['uses' => 'HelpController@showHelpUser']);
+    $router->get('', ['uses' => 'UserController@showAllUsers']);
+    $router->get('/{id}', ['uses' => 'UserController@showOneUser']);
+    $router->post('', ['uses' => 'UserController@create']);
+    $router->put('{id}', ['uses' => 'UserController@update']);
+    $router->delete('{id}', ['uses' => 'UserController@delete']);
+
+});
 
 $router->post('login', ['uses' => 'UserController@login']);
-
-
 // Messages routes
 
 
 $router->get('messages',  ['uses' => 'MessageController@showAllMessages']);
 
 $router->group(['prefix' => '/message'], function () use ($router) {
-    $router->get('', ['uses' => 'HelpController@showHelpMessage']);
+    $router->get('', ['uses' => 'MessageController@showAllMessages']);
     $router->get('help', ['uses' => 'HelpController@showHelpMessage']);
     $router->get('list',  ['uses' => '@showAllMessages']);
     $router->post('', ['uses' => 'MessageController@sendHMP']);
