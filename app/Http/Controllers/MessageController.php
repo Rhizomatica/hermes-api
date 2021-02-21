@@ -15,11 +15,23 @@ class MessageController extends Controller
         return response()->json(Message::all());
     }
 
+    /**
+     * Get message
+     *  parameter: message id
+     *
+     * @return Json
+     */
     public function showOneMessage($id)
     {
         return response()->json(Message::find($id));
     }
 
+    /**
+     * SendHMP - Send Hermes Message Pack
+     * parameter: http request
+     *
+     * @return Json
+     */
     public function sendHMP(Request $request)
     {
         $request->inbox=false;
@@ -88,6 +100,12 @@ class MessageController extends Controller
         return response(['Hermes sendMessage: DONE', $command,'output cli: '. $output, $message],200);
     }
 
+     /**
+     * createMessage - createMessage on database
+     * parameter: http request
+     *
+     * @return Json
+     */
     public function createMessage(Request $request)
     {
         $request->inbox=false;
@@ -96,14 +114,30 @@ class MessageController extends Controller
         return response()->json($message, 201);
     }
 
+    /**
+     * updateMessage - Send Hermes Message Pack
+     * parameter: id and http request
+     *
+     * @return Json
+     */
     public function updateMessage($id, Request $request)
     {
-        $message = Message::findOrFail($id);
-        $message->update($request->all());
-        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'update message . '. $id  .  ' -> ' . $remote  );
-        return response()->json($user, 200);
+        if($message = Message::findOrFail($id)){
+            $message->update($request->all());
+            Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'update message . '. $id  .  ' -> ' . $remote  );
+            return response()->json($user, 200);
+        }
+        else{
+            return response()->json('cant find ' . $user, 404);
+        }
     }
 
+    /**
+     * deleteMessage - deleteMessage
+     * parameter: message id
+     * TODO deal with files
+     * @return Json
+     */
     public function deleteMessage($id)
     {
         Message::findOrFail($id)->delete();
@@ -111,18 +145,12 @@ class MessageController extends Controller
         return response('Deleted Successfully', 200);
     }
 
-    public function oldRenderMessage($id)
-    {
-        $message = Message::find($id);
-        $message_image =  FileController::getImage('uploads/' . $id);
-        $message_concat = $message . $message_image;
-        \Storage::disk('local')->put('output/' . $id  , $message_concat);
-        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'old render message . '. $id  .  ' -> ' . $remote  );
-        return response($message);
-    }
-
-
-    //Process Inbox Message HMP - Hermes Message Pack
+    /**
+     * unpackInboxMessage - Unpack Hermes Message Pack
+     * parameter: id and http request
+     *
+     * @return Json
+     */
     public function unpackInboxMessage($arg){
         $arg = explode('-', $arg);
         $orig = $arg[0];
@@ -196,6 +224,11 @@ class MessageController extends Controller
         return response( $message,200);
     }
 
+    /**
+     * showAllInboxMessages
+     *
+     * @return Json
+     */
     public function showAllInboxMessages()
     {
         $files = \Storage::allFiles('inbox');
@@ -218,6 +251,11 @@ class MessageController extends Controller
         return response()->json($files_out);
     }
 
+    /**
+     * showOneInboxMessage
+     * parameter: message id
+     * @return Json
+     */
     public function showOneInboxMessage($id)
     {
         $file = \Storage::get('inbox/' . $id);
@@ -227,6 +265,12 @@ class MessageController extends Controller
         return response()->json($output);
     }
 
+   /**
+     * showOneInboxMessageImage
+     * parameter: message id
+     * TODO deal with files
+     * @return Json
+     */
     public function showOneInboxMessageImage($id)
     {
         $file = \Storage::get('inbox/' . $id);
@@ -234,19 +278,60 @@ class MessageController extends Controller
         return response($output[1],200);
     }
 
+    /**
+     * hideInboxMessage
+     * parameter: message id
+     * TODO deal with files
+     * @return Json
+     */
     public function hideInboxMessage($id)
     {
         \Storage::move('inbox/' . $id, 'inbox/.' . $id);
-        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'hide message . '. $id  .  ' -> ' . $remote  );
         return response('hide ' . $id . ' Successfully', 200);
     }
 
+    /**
+     * unhideInboxMessage
+     * parameter: message id
+     *
+     * @return Json
+     */
     public function unhideInboxMessage($id)
     {
         \Storage::move('inbox/.' . $id, 'inbox/' . $id);
-        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'unhide message . '. $id  );
         return response('unhide ' . $id . ' Successfully', 200);
     }
 
+    /**
+     * execDecrypt
+     * parameter: message id
+     * TODO ALL
+     * @return Json
+     */
+    public function execDecrypt($id){
+        //TODO path
+        $path = $_POST['path'];
+        $dec_subdir=dirname($path)."/dec/";
+        mkdir($dec_subdir, 0777, TRUE);
+        $outfile=$dec_subdir.basename($path,".gpg");
+        //TODO
+        $command = "decrypt.sh ".$path." ".$outfile." ".$_POST['password'];
+        $output = exec_cli($command);
 
+        if ($return_var == 0){
+            //TODO this path can't be here
+            $prefix = '/var/www/html/';
+
+            if (substr($outfile, 0, strlen($prefix)) == $prefix) {
+                $str = substr($outfile, strlen($prefix));
+            }
+            //correct password
+            //TODO  // basename($str);
+            return $str;
+        } else {
+            // wrong password
+            unlink($outfile);
+            return FALSE;
+        }
+    }
 }

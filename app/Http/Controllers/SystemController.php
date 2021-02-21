@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Adapter\Local;
+
+
 function exec_nodename(){
 
     $command = 'cat /etc/uucp/config|grep nodename|cut -f 2 -d " "';
@@ -32,22 +37,27 @@ class SystemController extends Controller
     {
 
         $sysname = explode("\n", exec_cli("uname -n"))[0];
-        $piduu = exec_cli("pgrep -x uuardopd");
-        $pidar  = exec_cli("pgrep -x ardop");
-        $pidtst = explode("\n", exec_cli("echo teste"))[0];
+        $piduu = explode("\n", exec_cli("pgrep -x uuardopd"))[0];
+        $pidmodem  = explode("\n", exec_cli("pgrep -x VARA"))[0];
+        $piddb = explode("\n", exec_cli("pgrep -x mariadbd"))[0];
+        $pidir = explode("\n", exec_cli("pgrep -x iredadmin"))[0];
+        $pidpf = explode("\n", exec_cli("pgrep -x postfix"))[0];
+        $pidtst = explode("\n", exec_cli("echo test"))[0];
         $ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''))[0];
         // $ip = exec_cli('hostname -I');// doesnt work on arch
         $memory = explode(" ", exec_cli("free | grep Mem|cut -f 8,13,19,25,31,37 -d \" \""));
-
+        $phpmemory = ( ! function_exists('memory_get_usage')) ? '0' : round(memory_get_usage()/1024/1024, 2).'MB';
         $status = [
             'status' => true,
             'name' => $sysname,
             'nodename' => exec_nodename(),
             'piduu' => $piduu?$piduu:false,
-            'pidar' => $pidar?$pidar:false,
+            'piddb' => $piddb?$piddb:false,
+            'pidmodem' => $pidmodem?$pidmodem:false,
             'pidtst' => $pidtst,
             'ipaddress' => $ip,
-            'memory' => $memory
+            'memory' => $memory,
+            'phpmemory' => $phpmemory
         ];
         return response(json_encode($status), 200);
     }
@@ -78,11 +88,9 @@ class SystemController extends Controller
         exec("pgrep -x uuardopd", $piduu);
         exec("pgrep -x ardop", $pidar);
         if(empty($piduu) || empty($pidar)){
-            //Sistema com Problemas!;
-            return false;
+            return false; //we have a problem!;
         } else {
-            //Sistema Funcionando!;
-            return true;
+            return true; //system is working!;
         }
     }
 
@@ -105,7 +113,7 @@ class SystemController extends Controller
     }
 
      /**
-     * Get all possible Stations from uucp
+     * Get all Stations from uucp
      *
      * @return stations
      */
@@ -137,10 +145,11 @@ class SystemController extends Controller
         return $sysnameslist;
     }
 
-
-
-    //fila de transmissao
-    //port spool_list
+    /**
+     * Get transmission pool list TODO
+     *
+     * @return Json
+     */
     public function sysGetSpoolList(){
         $command = "uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"";
         //TODO fix path in sed $cfg['path_uploads'])
@@ -172,53 +181,23 @@ class SystemController extends Controller
             return $output;
     }
 
-    //decrypt
-    //TODO
-    public function exec_decrypt(){
-        //TODO path
-        $path = $_POST['path'];
-        $dec_subdir=dirname($path)."/dec/";
-        mkdir($dec_subdir, 0777, TRUE);
-        $outfile=$dec_subdir.basename($path,".gpg");
-        //TODO
-        $command = "decrypt.sh ".$path." ".$outfile." ".$_POST['password'];
-        $output = exec_cli($command);
-
-        if ($return_var == 0){
-            //TODO this path can't be here
-            $prefix = '/var/www/html/';
-
-            if (substr($outfile, 0, strlen($prefix)) == $prefix) {
-                $str = substr($outfile, strlen($prefix));
-            }
-            //correct password
-            //TODO  // basename($str);
-            return $str;
-        } else {
-            // wrong password
-            unlink($outfile);
-            return FALSE;
-        }
-    }
-
-    //TODO
-    public function jobKill($param){
-        //TODO
-        //$command = "kill_job.sh";
+    public function uucpJobsKill(){
+        
+        //$command = 'sudo killall -9 uucico && sudo killall -9 uuport';
         $output=exec_cli($command) or die;
         return $output;
     }
 
-    function jobList(){
+    function uucpJobList(){
         //TODO fix sed
-        $command = "uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"";
+        $command = 'uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"';
         $output = exec_cli($command);
         echo $output;
     }
 
     //TODO
     // Open a directory, and read its contents
-    public function dirList(){
+    public function systemDirList(){
 
         if (is_dir($cfg['path_files'])){
             if ($dh = opendir($cfg['path_files'])){
