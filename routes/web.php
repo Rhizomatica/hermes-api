@@ -52,9 +52,9 @@ $router->group(['prefix' => '/user'], function () use ($router) {
 // Messages routes
 
 $router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']);
-$router->get('message/render/{id}',  ['uses' => 'MessageController@renderMessage']);
 
-$router->get('messages',  ['uses' => 'MessageController@showAllMessages']);
+
+$router->get('/messages',  ['uses' => 'MessageController@showAllMessages']);
 
 $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('', ['uses' => 'MessageController@showAllMessages']);
@@ -63,17 +63,10 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     $router->post('', ['uses' => 'MessageController@sendHMP']);
     $router->delete('{id}', ['uses' => 'MessageController@deleteMessage']);
     $router->post('{id}', ['uses' => 'MessageController@update']);
-    $router->get('/{id}', ['uses' => 'MessageController@showOneMessage']);
+    $router->get('{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('image/{id}', ['uses' => 'FileController@get']);
-    //TODO switch to pack
-    $router->get('pack/{id}',  ['uses' => 'MessageController@packMessage']);
     $router->get('send/{id}',  ['uses' => 'MessageController@sendMessage']);
 });
-
-
-
-
-
 
 $router->group(['prefix' => '/inbox'], function () use ($router) {
     $router->get('help', ['uses' => 'HelpController@showHelpInbox']);
@@ -86,11 +79,12 @@ $router->group(['prefix' => '/inbox'], function () use ($router) {
 });
 
 
-
+//TODO double check
 $router->group(['prefix' => '/file'], function () use ($router) {
     $router->get('', ['uses' => 'FileController@showAllFiles']);
     $router->post('', ['uses' => 'FileController@uploadImage']);
-    $router->get('{id}', ['uses' => 'FileController@getImageHttp']);
+    $router->get('up/{id}', ['uses' => 'FileController@getImageUploadHttp']);
+    $router->get('down/{id}', ['uses' => 'FileController@getImageDownloadHttp']);
 });
 
 /*
@@ -112,11 +106,13 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('help',  ['uses' => 'HelpController@showHelpSys']);
     $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']);
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
+    $router->get('list',  ['uses' => 'SystemController@systemDirList']);
     $router->get('queueerase',  ['uses' => 'SystemController@queueErase']);
     $router->get('spool',  ['uses' => 'SystemController@sysGetSpoolList']);
     $router->get('stations',  ['uses' => 'SystemController@getSysStations']);
-
-
+    $router->get('restart',  ['uses' => 'SystemController@systemRestart']);
+    $router->get('killuucp',  ['uses' => 'SystemController@uucpJobsKill']);
+    $router->get('jobs',  ['uses' => 'SystemController@uucpJobList']);
     $router->get('shutdown',  ['uses' => 'SystemController@sysDoShutdown']);
     $router->get('getlog',  ['uses' => 'SystemController@sysGetLog']);
 
