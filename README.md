@@ -2,21 +2,25 @@
 [Hermes](https://www.rhizomatica.org/hermes/) is a High-frequency Emergency and Rural Multimedia Exchange System.
 
 
-
 ## Hermes station api
 This is a REST api for use on Hermes stations to exchange messages between then,
- it uses [Lumen PHP Framework](https://lumen.laravel.com/).
+ it uses [Lumen PHP Framework](https://lumen.laravel.com/) and composer to manage its own dependencies.
 
-## depends on a web server and php 7.3 setup
+## Server Requirements:
+- web server
+- PHP >= 7.3
+- OpenSSL PHP Extension
+- PDO PHP Extension
+- Mbstring PHP Extension
 
 ## to configure
 - Setup your settings creating a .env file from .env.example
+- Setup public folders inbox / outbox to uucp public
 - Run:
      compose install
 
 - To start a fresh database:
     php artisan migrate:refresh --seed
-
 ## Running on port 8000:
 ❯ php -S localhost:8000 -t public
 
