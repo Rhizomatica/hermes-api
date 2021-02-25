@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Http\Request;
 
+
+
 class UserController extends Controller
 {
 
@@ -37,8 +39,8 @@ class UserController extends Controller
         else{
             return response()->json('error', 404);
         }
-
     }
+
 
     public function update($id, Request $request)
     {
@@ -47,7 +49,7 @@ class UserController extends Controller
                 if ($request['password']){
                     $request['password'] = hash('sha256', $request['password']);
                 }
-
+ 
                 if (User::where('email', $id)->update($request->all())){
                     return response()->json($id . ' updated', 200);
                 }

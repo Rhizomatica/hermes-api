@@ -29,17 +29,6 @@ $app->configure('filesystems');
 
 $app->withEloquent();
 
-
-
-/*  TODO GlobalHermes Filesystem   
-
-    'hermes' => [
-        'upload' => 'upload',
-        'process' => 'process',
-        'output' => 'output'
-    ]
-    */ 
-
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -60,6 +49,7 @@ $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
     App\Console\Kernel::class
 );
+
 
 /*
 |--------------------------------------------------------------------------
@@ -90,10 +80,9 @@ $app->middleware([
     App\Http\Middleware\CorsMiddleware::class
  ]);
 
- 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+ $app->routeMiddleware([
+     'auth' => App\Http\Middleware\Authenticate::class,
+ ]);
 
 /*
 
@@ -120,7 +109,9 @@ $app->routeMiddleware([
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
+$app->register(Artisaninweb\SoapWrapper\ServiceProvider::class);
 
+class_alias('Artisaninweb\SoapWrapper\Facade', 'SoapWrapper');
 
 /*
 |--------------------------------------------------------------------------

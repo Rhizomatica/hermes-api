@@ -45,9 +45,12 @@ $router->group(['prefix' => '/user'], function () use ($router) {
     $router->post('', ['uses' => 'UserController@create']);
     $router->post('{id}', ['uses' => 'UserController@update']);
     $router->delete('{id}', ['uses' => 'UserController@delete']);
-
 });
 
+
+    $router->post('createemail', ['uses' => 'ISPController@createEmail']);
+    $router->post('updateemail', ['uses' => 'ISPController@updateEmail']);
+    $router->post('deleteemail', ['uses' => 'ISPController@deleteEmail']);
 
 // Messages routes
 
@@ -101,6 +104,7 @@ $router->post('login', ['uses' => 'UserController@login']); //TODO remove
 
 $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->post('login', ['uses' => 'UserController@login']); 
+
     $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
     $router->get('nodename',  ['uses' => 'SystemController@getSysNodeName']);
     $router->get('help',  ['uses' => 'HelpController@showHelpSys']);
