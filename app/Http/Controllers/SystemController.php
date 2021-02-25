@@ -6,6 +6,20 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 
+function exec_cli($command = "ls -l")
+{
+    ob_start();
+    system($command , $return_var);
+    $output = ob_get_contents();
+    ob_end_clean();
+
+    //or die;
+    /*if ($exploder==true){
+            return (explode("\n", $output));
+            }*/
+
+    return ($output);
+}
 
 function exec_nodename(){
 
@@ -35,7 +49,6 @@ class SystemController extends Controller
      */
     public function getSysStatus()
     {
-
         $sysname = explode("\n", exec_cli("uname -n"))[0];
         $piduu = explode("\n", exec_cli("pgrep -x uuardopd"))[0];
         $pidmodem  = explode("\n", exec_cli("pgrep -x VARA"))[0];
@@ -48,7 +61,7 @@ class SystemController extends Controller
         $memory = explode(" ", exec_cli("free | grep Mem|cut -f 8,13,19,25,31,37 -d \" \""));
         $phpmemory = ( ! function_exists('memory_get_usage')) ? '0' : round(memory_get_usage()/1024/1024, 2).'MB';
         $status = [
-            'status' => true,
+            'status' => $piduu && $pidmodem && $pidir && $pidpf,
             'name' => $sysname,
             'nodename' => exec_nodename(),
             'piduu' => $piduu?$piduu:false,
@@ -59,7 +72,7 @@ class SystemController extends Controller
             'memory' => $memory,
             'phpmemory' => $phpmemory
         ];
-        return response(json_encode($status), 200);
+        return response($status, 200);
     }
 
     /**
@@ -112,16 +125,15 @@ class SystemController extends Controller
         return [$output,$output2] ;
     }
 
-     /**
+    /**
      * Get all Stations from uucp
      *
      * @return stations
      */
- 
     public function getSysStations(){
-        $command = "egrep -v '^\s*#' /etc/uucp/sys | grep alias | cut -f 2 -d \" \"";
+        $command = "egrep -v '^\s*#' /etc/uucp/sys | grep system | cut -f 2 -d \" \"";
         $output = exec_cli($command);
-        $command2 = "egrep -v '^\s*#' /etc/uucp/sys | grep system | cut -f 2 -d \" \"";
+        $command2 = "egrep -v '^\s*#' /etc/uucp/sys | grep alias | cut -f 2 -d \" \"";
         $output2 = exec_cli($command2);
         $command3 = "egrep -v '^\s*#' /etc/uucp/sys | grep address | cut -f 2 -d \" \"";
         $output3 = exec_cli($command3);
@@ -182,7 +194,6 @@ class SystemController extends Controller
     }
 
     public function uucpJobsKill(){
-        
         //$command = 'sudo killall -9 uucico && sudo killall -9 uuport';
         $output=exec_cli($command) or die;
         return $output;
@@ -195,7 +206,7 @@ class SystemController extends Controller
         echo $output;
     }
 
-    //TODO
+    //TODO convert to eloquent/flysystem
     // Open a directory, and read its contents
     public function systemDirList(){
 
@@ -261,17 +272,3 @@ class SystemController extends Controller
  */
 
 
-function exec_cli($command = "ls -l")
-{
-    ob_start();
-    system($command , $return_var);
-    $output = ob_get_contents();
-    ob_end_clean();
-
-    //or die;
-    /*if ($exploder==true){
-            return (explode("\n", $output));
-            }*/
-
-    return ($output);
-}
