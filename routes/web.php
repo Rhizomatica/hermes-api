@@ -122,3 +122,18 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
 
 });
 
+$router->group(['prefix' => '/radio'], function () use ($router) {
+    $router->post('login', ['uses' => 'UserController@login']); 
+
+    $router->get('status',  ['uses' => 'RadioController@getRadioStatus']);
+    $router->get('mode',  ['uses' => 'RadioController@getRadioMode']);
+    $router->post('mode',  ['uses' => 'RadioController@setRadioMode']);
+    $router->get('freq',  ['uses' => 'RadioController@getRadioFreq']);
+    $router->post('freq',  ['uses' => 'RadioController@setRadioFreq']);
+    $router->get('bfo1',  ['uses' => 'RadioController@getRadioBfo']);
+    $router->post('bfo1',  ['uses' => 'RadioController@setRadioBfo']);
+    
+});
+
+
+

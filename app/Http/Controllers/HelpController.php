@@ -22,7 +22,7 @@ class HelpController extends Controller
             '/users get' => 'users, get, delete ',
             '/message/id GET DELETE PUT'=> 'messages, get, delete and update ',
             '/message/id POST' => 'Create message, return 200 - message',
-            '/message/render/id GET' => 'return 200 - genertae message id',
+            //'/message/render/id GET' => 'return 200 - generate message id',
             '/message/list get' => 'return 200 - all messages',
             '/file POST' => 'file, create',
             '/file/id GET DELETE PUT ' => 'file, get, delete and update'
@@ -80,6 +80,28 @@ class HelpController extends Controller
             'message/{id} PUT' => 'MessageController@update',
             'message/{id} DELETE' => 'MessageController@delete',
             'messages GET' => 'MessageController@showAll',
+        ];
+    return $manual;
+    }
+    
+    public function showHelpRadio()
+    {
+        $manual = [ 'Rhizo Hermes API' => 'V0.0.3 -  Sys page, help',
+            'License and Copyrights' => 'gplv2, some rights reserved',
+            '----------------------' => '----------------------------------------',
+            'radio/help GET' => 'HelpController@ShowHelpRadio',
+            'radio/status GET' =>  'RadioController@getRadioStatus',
+            'radio/mode GET' => 'RadioController@getRadioMode',
+            /* TODO
+            $router->get('status',  ['uses' => 'RadioController@getRadioStatus']);
+            $router->post('mode/{mode}',  ['uses' => 'RadioController@setRadioMode']);
+            $router->get('freq',  ['uses' => 'RadioController@getRadioFreq']);
+            $router->post('freq/{freq}',  ['uses' => 'RadioController@setRadioFreq']);
+            $router->get('bfo',  ['uses' => 'RadioController@getRadioBfo']);
+            $router->post('bfo/{freq}',  ['uses' => 'RadioController@setRadioBfo']);
+            */
+            
+
         ];
     return $manual;
     }
