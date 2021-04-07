@@ -194,7 +194,8 @@ class SystemController extends Controller
     }
 
     public function uucpJobsKill(){
-        $command = 'sudo killall -9 uucico && sudo killall -9 uuport';
+
+        $command = 'sudo killall -9 uucico && sudo killall -9 uuport'; //TODO check uuport
         $output=exec_cli($command) or die;
         return $output;
     }

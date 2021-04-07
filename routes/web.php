@@ -103,11 +103,11 @@ $router->get('help',  ['uses' => 'HelpController@showHelpSys']);
 $router->post('login', ['uses' => 'UserController@login']); //TODO remove
 
 $router->group(['prefix' => '/sys'], function () use ($router) {
-    $router->post('login', ['uses' => 'UserController@login']); 
-
-    $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
-    $router->get('nodename',  ['uses' => 'SystemController@getSysNodeName']);
     $router->get('help',  ['uses' => 'HelpController@showHelpSys']);
+    $router->post('login', ['uses' => 'UserController@login']); 
+    $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
+    $router->get('',  ['uses' => 'SystemController@getSysStatus']); //double hit for status
+    $router->get('nodename',  ['uses' => 'SystemController@getSysNodeName']);
     $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']);
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
     $router->get('list',  ['uses' => 'SystemController@systemDirList']);
@@ -119,20 +119,17 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('jobs',  ['uses' => 'SystemController@uucpJobList']);
     $router->get('shutdown',  ['uses' => 'SystemController@sysDoShutdown']);
     $router->get('getlog',  ['uses' => 'SystemController@sysGetLog']);
-
 });
 
 $router->group(['prefix' => '/radio'], function () use ($router) {
-    $router->post('login', ['uses' => 'UserController@login']); 
-
-    $router->get('status',  ['uses' => 'RadioController@getRadioStatus']);
+    $router->get('help',  ['uses' => 'HelpController@showHelpRadio']);
+    $router->get('',  ['uses' => 'RadioController@getRadioStatus']);
     $router->get('mode',  ['uses' => 'RadioController@getRadioMode']);
-    $router->post('mode',  ['uses' => 'RadioController@setRadioMode']);
+    $router->post('mode/{mode}',  ['uses' => 'RadioController@setRadioMode']);
     $router->get('freq',  ['uses' => 'RadioController@getRadioFreq']);
-    $router->post('freq',  ['uses' => 'RadioController@setRadioFreq']);
-    $router->get('bfo1',  ['uses' => 'RadioController@getRadioBfo']);
-    $router->post('bfo1',  ['uses' => 'RadioController@setRadioBfo']);
-    
+    $router->post('freq/{freq}',  ['uses' => 'RadioController@setRadioFreq']);
+    $router->get('bfo',  ['uses' => 'RadioController@getRadioBfo']);
+    $router->post('bfo/{freq}',  ['uses' => 'RadioController@setRadioBfo']);
 });
 
 
