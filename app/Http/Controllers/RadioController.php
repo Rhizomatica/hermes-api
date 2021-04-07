@@ -30,7 +30,7 @@ function exec_nodename(){
     return $output;
 }
 
-class SystemController extends Controller
+class RadioController extends Controller
 {
 
     /**
@@ -41,28 +41,13 @@ class SystemController extends Controller
     public function getRadioStatus()
     {
         //TODO copied from system status
-        $sysname = explode("\n", exec_cli("caduceu -n"))[0];
-        $piduu = explode("\n", exec_cli("pgrep -x uuardopd"))[0];
-        $pidmodem  = explode("\n", exec_cli("pgrep -x VARA"))[0];
-        $piddb = explode("\n", exec_cli("pgrep -x mariadbd"))[0];
-        $pidir = explode("\n", exec_cli("pgrep -x iredadmin"))[0];
-        $pidpf = explode("\n", exec_cli("pgrep -x postfix"))[0];
         $pidtst = explode("\n", exec_cli("echo test"))[0];
-        $ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''))[0];
-        // $ip = exec_cli('hostname -I');// doesnt work on arch
-        $memory = explode(" ", exec_cli("free | grep Mem|cut -f 8,13,19,25,31,37 -d \" \""));
-        $phpmemory = ( ! function_exists('memory_get_usage')) ? '0' : round(memory_get_usage()/1024/1024, 2).'MB';
+        $radioFreq = 7142;
+
         $status = [
-            'status' => $piduu && $pidmodem && $pidir && $pidpf,
-            'name' => $sysname,
-            'nodename' => exec_nodename(),
-            'piduu' => $piduu?$piduu:false,
-            'piddb' => $piddb?$piddb:false,
-            'pidmodem' => $pidmodem?$pidmodem:false,
-            'pidtst' => $pidtst,
-            'ipaddress' => $ip,
-            'memory' => $memory,
-            'phpmemory' => $phpmemory
+            'freq' => "TODO freq: " . $pidtst,
+            'mode' => "TODO SSB: USB or LSB : " . $pidtst,
+            'bfo' => "TODO bfo: " . $pidtst,
         ];
         return response($status, 200);
     }
@@ -74,7 +59,7 @@ class SystemController extends Controller
      */
     public function getRadioMode()
     {
-        return response("teste", 200);
+        return response("getRadioMode TODO", 200);
     }
 
     /**
