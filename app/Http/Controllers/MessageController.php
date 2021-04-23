@@ -35,7 +35,24 @@ class MessageController extends Controller
     public function sendHMP(Request $request)
     {
         $request->inbox=false;
+
         if($message = Message::create($request->all())){
+            if($request->password){
+                //TODO deal with input
+                $command = 'echo "'. $request->text . '"| gpg -o - -c -t --cipher-algo AES256 --utf8-strings --batch --passphrase "' . $request->password . '"  --yes -';
+                $cryptout = "";
+                if ($output = exec_cli($command) ){
+                    $cryptout = $output; // redundant
+                }
+                else {
+                    return response('Hermes send message Error: can\'t encrypt the message: ' . $output . $command);
+                }
+                $message->secure=true;
+                $message->text=bin2hex($cryptout);
+                $message->save();
+            }
+
+            //log
             Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'create message . ' . $message  );
             //find the message in database
             // Assures to delete the working path
