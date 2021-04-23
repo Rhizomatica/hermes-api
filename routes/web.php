@@ -56,7 +56,6 @@ $router->group(['prefix' => '/user'], function () use ($router) {
 
 $router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']);
 
-
 $router->get('/messages',  ['uses' => 'MessageController@showAllMessages']);
 
 $router->group(['prefix' => '/message'], function () use ($router) {
@@ -130,6 +129,17 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('freq/{freq}',  ['uses' => 'RadioController@setRadioFreq']);
     $router->get('bfo',  ['uses' => 'RadioController@getRadioBfo']);
     $router->post('bfo/{freq}',  ['uses' => 'RadioController@setRadioBfo']);
+    $router->get('fwd',  ['uses' => 'RadioController@getRadioFwd']);
+    $router->post('fwd/{freq}',  ['uses' => 'RadioController@setRadioFwd']);
+    $router->get('led',  ['uses' => 'RadioController@getRadioLedStatus']);
+    $router->post('led/{status}',  ['uses' => 'RadioController@setRadioLedStatus']);
+    $router->get('ref',  ['uses' => 'RadioController@getRadioRef']);
+    $router->get('txrx',  ['uses' => 'RadioController@getRadioTxrx']);
+    $router->get('mastercal',  ['uses' => 'RadioController@getRadioMasterCal']);
+    $router->post('mastercal/{freq}',  ['uses' => 'RadioController@setRadioMasterCal']);
+    $router->get('protection',  ['uses' => 'RadioController@getRadioProtection']);
+    $router->get('bypass',  ['uses' => 'RadioController@getRadioBypassStatus']);
+    $router->post('bypass/{status}',  ['uses' => 'RadioController@setRadioBypassStatus']);
 });
 
 
