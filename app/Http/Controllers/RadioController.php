@@ -315,18 +315,8 @@ class RadioController extends Controller
             return response("setRadioLedStatus fail", 500 );
         }
 
-        $output = exec_cli($cmd);
-        $output = explode("\n", $output)[0];
-        $command = explode("\n", exec_cli("set_bfo -a " . $freq))[0];
-        if ($command == "OK"){
-            $radio_bfo = explode("\n", exec_cli("get_bfo"))[0];
-            return response($radio_bfo , 200);
-        }
-        else {
-            return response( "error: " . $command, 500);
-            
-        }
-        return response("TODO setRadioLEDS : ", $output, 200);
+        $radio_led= exec_cli($par);
+        return response("TODO setRadioLEDS : ", $radio_led, 200);
     }
 
     /**

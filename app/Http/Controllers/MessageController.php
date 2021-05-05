@@ -37,9 +37,9 @@ class MessageController extends Controller
         $request->inbox=false;
 
         if($message = Message::create($request->all())){
-            if($request->password){
+            if($request->pass){
                 //TODO deal with input
-                $command = 'echo "'. $request->text . '"| gpg -o - -c -t --cipher-algo AES256 --utf8-strings --batch --passphrase "' . $request->password . '"  --yes -';
+                $command = 'echo "'. $request->text . '"| gpg -o - -c -t --cipher-algo AES256 --utf8-strings --batch --passphrase "' . $request->pass. '"  --yes -';
                 $cryptout = "";
                 if ($output = exec_cli($command) ){
                     $cryptout = $output; // redundant
