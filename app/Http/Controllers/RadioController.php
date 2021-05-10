@@ -48,13 +48,40 @@ class RadioController extends Controller
         $radio_frequency= explode("\n", exec_cli("get_frequency"))[0];
         $radio_mode= explode("\n", exec_cli("get_mode"))[0];
         $radio_led= explode("\n", exec_cli("get_led_status"))[0];
+        if ($radio_led== "LED_ON"){
+            $radio_led=true;
+        }
+        else if($radio_led == "LED_OFF" || !$radio_led){
+            $radio_led=false;
+        }
+
         $radio_bfo= explode("\n", exec_cli("get_bfo"))[0];
         $radio_fwd= explode("\n", exec_cli("get_fwd"))[0];
         $radio_ref= explode("\n", exec_cli("get_ref"))[0];
         $radio_txrx= explode("\n", exec_cli("get_txrx_status"))[0];
+        if ($radio_txrx == "INRX"){
+            $radio_rx =true;
+            $radio_tx =false;
+        }
+        else if($radio_txrx== "INTX" || !$radio_txrx){
+            $radio_tx =true;
+            $radio_rx =false;
+        }
         $radio_mastercal= explode("\n", exec_cli("get_mastercal"))[0];
         $radio_protection= explode("\n", exec_cli("get_protection_status"))[0];
+        if ($radio_protection == "PROTECTION_ON"){
+            $radio_protection=true;
+        }
+        else if($radio_protection == "PROTECTION_OFF" || !$radio_protection){
+            $radio_protection = false;
+        }
         $radio_bypass= explode("\n", exec_cli("get_bypass_status"))[0];
+        if ($radio_bypass== "BYPASS_ON"){
+            $radio_bypass=true;
+        }
+        else if($radio_bypass == "BYPASS_OFF" || !$radio_bypass){
+            $radio_bypass = false;
+        }
 
         $status = [
             'freq' => $radio_frequency,
@@ -64,6 +91,8 @@ class RadioController extends Controller
             'fwd' => $radio_fwd,
             'ref' => $radio_ref,
             'txrx' => $radio_txrx,
+            'tx' => $radio_tx,
+            'rx' => $radio_rx,
             'mastercal' => $radio_mastercal,
             'protection' => $radio_protection,
             'bypass' =>  $radio_bypass,
@@ -156,8 +185,9 @@ class RadioController extends Controller
         elseif( $mode == "LSB"){
             $command= explode("\n", exec_cli("set_mode -a LSB"))[0];
         }
-        else{
-            return response("mode invalid error: " . $command, 500);
+            return response($command, 200);
+        /*else{
+            return response("setRadioMode invalid error: is not USB or LSB" . $command, 500);
         }
 
         if ($command== "OK"){
@@ -165,11 +195,10 @@ class RadioController extends Controller
             return response($radio_mode, 200);
         }
         else{
-            return response("error: " . $mode, 500);
+            return response("test error: " . $radio_mode, 500);
 
-        }
+        }*/
     }
-
 
     /**
      * Get Radio Beat Frequency Oscilator
@@ -211,23 +240,6 @@ class RadioController extends Controller
         return response($bfo, 200);
     }
 
-    /**
-     * Set Radio Fwd
-     *
-     * @return Json
-     */
-    public function setRadioFwd($freq)
-    {
-        $command = explode("\n", exec_cli("set_fwd -a " . $freq))[0];
-        if ($command == "OK"){
-            $radio_fwd= explode("\n", exec_cli("get_fwd"))[0];
-            return response($radio_fwd, 200);
-        }
-        else {
-            return response( "error: " . $command, 500);
-            
-        }
-    }
 
     /**
      * Get Radio Ref
@@ -239,6 +251,7 @@ class RadioController extends Controller
         $radio_ref = explode("\n", exec_cli("get_ref"))[0];
         return response( $radio_ref, 200);
     }
+
 
     /**
      * Get Radio TXRX
@@ -296,7 +309,6 @@ class RadioController extends Controller
 
         }
     }
-
 
     /**
      * Set Radio LED Status
@@ -356,7 +368,6 @@ class RadioController extends Controller
             return response( "error", $radio_bypass, 500);
         }
     }
-
 
     /**
      * Set Radio Bypass Status
