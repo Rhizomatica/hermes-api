@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
+use Illuminate\Http\Request;
+
+use App\System;
+
 
 function exec_cli($command = "ls -l")
 {
@@ -32,6 +37,29 @@ function exec_nodename(){
 
 class SystemController extends Controller
 {
+
+    public function getSysConfig()
+    {
+        return response()->json(System::all());
+    }
+
+    public function setSysConfig(Request $request)
+    {
+        if ($request->all()){
+            //TODO
+              if (System::where('host', 'stationx.hermes.radio')->update($request->all())){
+                return response()->json($request->all() , 200);
+            }
+            else {
+                return response()->json('can\'t update', 500);
+            }
+        }
+        else {
+            return response()->json('Error, does not have request data', 500);
+        }
+    }
+
+
     /**
      * Get Name station from uucp
      *

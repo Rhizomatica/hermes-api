@@ -54,7 +54,7 @@ class UserController extends Controller
                     return response()->json($id . ' updated', 200);
                 }
                 else {
-                    return response()->json('can\'t delete', 500);
+                    return response()->json('can\'t update', 500);
                 }
             }
             else {

@@ -24,6 +24,11 @@ class DatabaseSeeder extends Seeder
             'admin' => true
         ]);
 
+        DB::table('systems')->insert([
+            'host' => 'stationx.hermes.radio',
+            'allowfile' => 'users'
+        ]);
+
         for($a=1; $a<=20; $a++){
             DB::table('messages')->insert([
                 'name' => 'stuck test message '.Str::random(10),
