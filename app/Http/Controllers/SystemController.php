@@ -47,7 +47,7 @@ class SystemController extends Controller
     {
         if ($request->all()){
             //TODO
-              if (System::where('host', 'stationx.hermes.radio')->update($request->all())){
+              if (System::select()->update($request->all())){
                 return response()->json($request->all() , 200);
             }
             else {
