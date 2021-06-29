@@ -40,7 +40,7 @@ class SystemController extends Controller
 
     public function getSysConfig()
     {
-        return response()->json(System::all());
+        return response(System::first(),200);
     }
 
     public function setSysConfig(Request $request)
