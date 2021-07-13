@@ -16,7 +16,7 @@
 
 
 $router->get('/',  ['uses' => 'HelpController@showHelpMain']);
-$router->get('help',  ['uses' => 'HelpController@showHelpMain']);
+$router->get('/help',  ['uses' => 'HelpController@showHelpMain']);
 $router->get('/version', function () use ($router) {
     return $router->app->version()  ; 
 });
@@ -36,10 +36,10 @@ $router->get('mock', function () {
 
 
 
+$router->get('help',  ['uses' => 'HelpController@showHelpMain']);
 //Users routes
 
 $router->group(['prefix' => '/user'], function () use ($router) {
-    $router->get('help', ['uses' => 'HelpController@showHelpUser']);
     $router->get('', ['uses' => 'UserController@showAllUsers']);
     $router->get('{id}', ['uses' => 'UserController@showOneUser']);
     $router->post('', ['uses' => 'UserController@create']);
@@ -48,9 +48,9 @@ $router->group(['prefix' => '/user'], function () use ($router) {
 });
 
 
-    $router->post('createemail', ['uses' => 'ISPController@createEmail']);
-    $router->post('updateemail', ['uses' => 'ISPController@updateEmail']);
-    $router->post('deleteemail', ['uses' => 'ISPController@deleteEmail']);
+$router->post('createemail', ['uses' => 'ISPController@createEmail']);
+$router->post('updateemail', ['uses' => 'ISPController@updateEmail']);
+$router->post('deleteemail', ['uses' => 'ISPController@deleteEmail']);
 
 // Messages routes
 
@@ -60,7 +60,6 @@ $router->get('/messages',  ['uses' => 'MessageController@showAllMessages']);
 
 $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('', ['uses' => 'MessageController@showAllMessages']);
-    $router->get('help', ['uses' => 'HelpController@showHelpMessage']);
     $router->get('list',  ['uses' => '@showAllMessages']);
     $router->post('', ['uses' => 'MessageController@sendHMP']);
     $router->delete('{id}', ['uses' => 'MessageController@deleteMessage']);
@@ -71,7 +70,6 @@ $router->group(['prefix' => '/message'], function () use ($router) {
 });
 
 $router->group(['prefix' => '/inbox'], function () use ($router) {
-    $router->get('help', ['uses' => 'HelpController@showHelpInbox']);
     $router->get('', ['uses' => 'MessageController@showAllInboxMessages']);
     $router->get('{id}', ['uses' => 'MessageController@showOneInboxMessage']);
     $router->get('image/{id}', ['uses' => 'MessageController@showOneInboxMessageImage']);
@@ -96,13 +94,11 @@ $router->group(['prefix' => '/file'], function () use ($router) {
 */
 
 
-$router->get('help',  ['uses' => 'HelpController@showHelpSys']);
 
 // system commands
 $router->post('login', ['uses' => 'UserController@login']); //TODO remove
 
 $router->group(['prefix' => '/sys'], function () use ($router) {
-    $router->get('help',  ['uses' => 'HelpController@showHelpSys']);
     $router->post('login', ['uses' => 'UserController@login']); 
     $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
     $router->get('config',  ['uses' => 'SystemController@getSysConfig']);
@@ -123,7 +119,6 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
 });
 
 $router->group(['prefix' => '/radio'], function () use ($router) {
-    $router->get('help',  ['uses' => 'HelpController@showHelpRadio']);
     $router->get('',  ['uses' => 'RadioController@getRadioStatus']);
     $router->get('mode',  ['uses' => 'RadioController@getRadioMode']);
     $router->post('mode/{mode}',  ['uses' => 'RadioController@setRadioMode']);

@@ -29,7 +29,27 @@ class DatabaseSeeder extends Seeder
             'allowfile' => 'users'
         ]);
 
-        for($a=1; $a<=20; $a++){
+        DB::table('messages')->insert([
+            'name' => 'send test message ',
+            'dest' => 'local',
+            'orig' => 'local',
+            'file' => null,
+            'text' => 'lorem ipsum',
+            'draft' => false 
+        ]);
+
+        for($a=1; $a<=5; $a++){
+            DB::table('messages')->insert([
+                'name' => 'received test message '.Str::random(10),
+                'dest' => 'local',
+                'orig' => 'local',
+                'file' => null,
+                'text' => 'lorem ipsum',
+                'draft' => false ,
+                'inbox' => true
+            ]);
+        }
+        for($a=1; $a<=5; $a++){
             DB::table('messages')->insert([
                 'name' => 'stuck test message '.Str::random(10),
                 'dest' => 'local',
