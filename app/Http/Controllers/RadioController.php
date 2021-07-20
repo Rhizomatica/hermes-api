@@ -389,13 +389,53 @@ class RadioController extends Controller
         return response( $status, 200);
     }
 
-    function rests_of_some_legacy_function(){
-        $command = "uulog|tail -50";
-        $output=exec_cli($command);
-        $output = explode("\n",$output);
-        return $output;
+    /**
+     * Get Radio  serial
+     *
+     * @return Json
+     */
+    public function getRadioSerial()
+    {
+        $radio_serial = explode("\n", exec_cli("get_serial"))[0];
+        if($radio_serial == "Serial"){
+            return response( true, 200);
+        }
+        else{
+            return response( "error:  " . $radio_serial, 500);
+        }
     }
-}
 
-
+    /**
+     * Set Radio Serial
+     *
+     * @return Json
+     */
+    public function setRadioSerial($serial)
+    {
+        $par = "set_serial " . $serial;
+        $radio_bypass= explode("\n", exec_cli($par))[0];
+        if($radio_bypass == "OK"){
+            return response("setRadioSerial" . $serial, 200);
+        }
+        else{
+            return response("setRadioSerial fail", 500 );
+        }
+    }
     
+    /**
+     * Get Radio  serial
+     *
+     * @return Json
+     */
+    public function resetRadioProtection()
+    {
+        $radio_serial = explode("\n", exec_cli("reset_protection"))[0];
+        if($radio_serial == "OK"){
+            return response( true, 200);
+        }
+        else{
+            return response( "error: " . $radio_serial, 500);
+        }
+    }
+
+}

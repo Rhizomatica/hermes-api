@@ -132,6 +132,9 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->get('protection',  ['uses' => 'RadioController@getRadioProtection']);
     $router->get('bypass',  ['uses' => 'RadioController@getRadioBypassStatus']);
     $router->post('bypass/{status}',  ['uses' => 'RadioController@setRadioBypassStatus']);
+    $router->get('serial',  ['uses' => 'RadioController@getRadioSerial']);
+    $router->post('serial/{serial}',  ['uses' => 'RadioController@setRadioSerial']);
+    $router->post('reset',  ['uses' => 'RadioController@resetRadioProtection']);
 });
 
 
