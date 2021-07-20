@@ -47,15 +47,8 @@ $router->group(['prefix' => '/user'], function () use ($router) {
     $router->delete('{id}', ['uses' => 'UserController@delete']);
 });
 
-
-$router->post('createemail', ['uses' => 'ISPController@createEmail']);
-$router->post('updateemail', ['uses' => 'ISPController@updateEmail']);
-$router->post('deleteemail', ['uses' => 'ISPController@deleteEmail']);
-
 // Messages routes
-
 $router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']);
-
 $router->get('/messages',  ['uses' => 'MessageController@showAllMessages']);
 
 $router->group(['prefix' => '/message'], function () use ($router) {
@@ -63,6 +56,7 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('list',  ['uses' => '@showAllMessages']);
     $router->post('', ['uses' => 'MessageController@sendHMP']);
     $router->delete('{id}', ['uses' => 'MessageController@deleteMessage']);
+    $router->delete('', ['uses' => 'MessageController@deleteMessage']);
     $router->post('{id}', ['uses' => 'MessageController@update']);
     $router->get('{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('image/{id}', ['uses' => 'FileController@get']);
