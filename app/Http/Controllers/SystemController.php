@@ -162,10 +162,12 @@ class SystemController extends Controller
         $command = "egrep -v '^\s*#' /etc/uucp/sys | grep system | cut -f 2 -d \" \"";
         $output = exec_cli($command);
         $command2 = "egrep -v '^\s*#' /etc/uucp/sys | grep alias | cut -f 2 -d \" \"";
-        $output2 = exec_cli($command2);
+        if (!$output2 = exec_cli($command2)){
+            $output2 = null;
+        }
+
         $command3 = "egrep -v '^\s*#' /etc/uucp/sys | grep address | cut -f 2 -d \" \"";
         $output3 = exec_cli($command3);
-
         $sysnames = explode("\n", $output);
         $sysnames2 = explode("\n", $output2);
         $sysnames3 = explode("\n", $output3);
@@ -186,14 +188,12 @@ class SystemController extends Controller
     }
 
     /**
-     * Get transmission pool list TODO
+     * Get transmission spool 
      *
      * @return Json
      */
     public function sysGetSpoolList(){
-        $command = "uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"";
-        //TODO fix path in sed $cfg['path_uploads'])
-        //  $command = "uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"";
+        $command = "uustat -a";
         $output=exec_cli($command) or die;
         $output = explode("\n", $output);
         $spool=[];
@@ -202,10 +202,15 @@ class SystemController extends Controller
             if(!empty($output[$i])) {
                 $fields = explode(" ", $output[$i]);
                 $spool[]  =  [
-                    'id' => $i,
-                    'dest' => $fields[0],
-                    'file' => $fields[1],
-                    'file' => $fields[2] . ' ' .  $fields[3] ,
+                    //  '#' => $i,
+                    'id' => $fields[0],
+                    'dest' => $fields[1],
+                    'user' => $fields[2],
+                    'date' => $fields[3],
+                    'time' => $fields[4],
+                    'desc' => $fields[5] . ' ' .  $fields[6] . ' ' . $fields[7] . ' ' . 
+                              $fields[8] . ' '. $fields[9] . ' ' . $fields[10] 
+
                 ];
             }
         }
