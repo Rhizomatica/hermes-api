@@ -103,13 +103,14 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
     $router->get('list',  ['uses' => 'SystemController@systemDirList']);
     $router->get('queueerase',  ['uses' => 'SystemController@queueErase']);
-    $router->get('spool',  ['uses' => 'SystemController@sysGetSpoolList']);
     $router->get('stations',  ['uses' => 'SystemController@getSysStations']);
-    $router->get('restart',  ['uses' => 'SystemController@systemRestart']);
-    $router->get('killuucp',  ['uses' => 'SystemController@uucpJobsKill']);
-    $router->get('jobs',  ['uses' => 'SystemController@uucpJobList']);
-    $router->get('shutdown',  ['uses' => 'SystemController@sysDoShutdown']);
+    $router->get('uuls',  ['uses' => 'SystemController@sysGetSpoolList']);
+    $router->post('uuka',  ['uses' => 'SystemController@uucpKillJobs']);
+    $router->post('uuk/{id}',  ['uses' => 'SystemController@uucpKillJob']);
+    $router->post('uur/{id}',  ['uses' => 'SystemController@uucpRejuvenateJob']);
     $router->get('getlog',  ['uses' => 'SystemController@sysGetLog']);
+    $router->get('restart',  ['uses' => 'SystemController@sysRestart']);
+    $router->get('shutdown',  ['uses' => 'SystemController@sysShutdown']);
 });
 
 $router->group(['prefix' => '/radio'], function () use ($router) {
@@ -136,6 +137,3 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('serial/{serial}',  ['uses' => 'RadioController@setRadioSerial']);
     $router->post('reset',  ['uses' => 'RadioController@resetRadioProtection']);
 });
-
-
-

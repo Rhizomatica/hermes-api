@@ -161,20 +161,21 @@ class SystemController extends Controller
     public function getSysStations(){
         $command = "egrep -v '^\s*#' /etc/uucp/sys | grep system | cut -f 2 -d \" \"";
         $output = exec_cli($command);
+        $sysnames = explode("\n", $output);
+
         $command2 = "egrep -v '^\s*#' /etc/uucp/sys | grep alias | cut -f 2 -d \" \"";
-        if (!$output2 = exec_cli($command2)){
-            $output2 = null;
-        }
+        $output2 = exec_cli($command2);
+        $sysnames2 = explode("\n", $output2);
 
         $command3 = "egrep -v '^\s*#' /etc/uucp/sys | grep address | cut -f 2 -d \" \"";
         $output3 = exec_cli($command3);
-        $sysnames = explode("\n", $output);
-        $sysnames2 = explode("\n", $output2);
         $sysnames3 = explode("\n", $output3);
+
         $sysnameslist=[];
 
         for ($i = "0" ; $i < count($sysnames); $i++) {
             if(!empty($sysnames[$i])) {
+				// if (empty ($sysnames2[$i])){
                 $sysnameslist[]  =  [
                     'id' => $i,
                     'name' => $sysnames[$i],
@@ -218,26 +219,23 @@ class SystemController extends Controller
         return response($spool, 200);
     }
 
-    //DONE in FileController
-    public function fileLoad(){
-        $command = "uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"";
-            $output = exec_cli($command);
-            //TODO return true or false?
-            return $output;
+    public function uucpRejuvenateJob($id){
+        $command = 'sudo uustat -r ' . $id; 
+        $output=exec_cli($command) or die;
+        return response($output, 200);
     }
 
-    public function uucpJobsKill(){
+    public function uucpKillJob($id){
+        $command = 'sudo uustat -k ' . $id; 
+        $output=exec_cli($command) or die;
+        return response($output, 200);
+    }
+
+    public function uucpKillJobs(){
 
         $command = 'sudo killall -9 uucico && sudo killall -9 uuport'; //TODO check uuport
         $output=exec_cli($command) or die;
-        return $output;
-    }
-
-    function uucpJobList(){
-        //TODO fix sed
-        $command = 'uustat -a| cut -f 2,7,8,9 -d \" \" | sed \"s/\/var\/www\/html\/uploads\///\"';
-        $output = exec_cli($command);
-        echo $output;
+        return response($output, 200);
     }
 
     //TODO convert to eloquent/flysystem
@@ -260,7 +258,7 @@ class SystemController extends Controller
     }
 
     //port script restart_system.sh
-    public function systemRestart() {
+    public function sysRestart() {
         $command = "sudo systemctl stop uuardopd";
         $output0 = exec_cli($command);
 
@@ -281,7 +279,7 @@ class SystemController extends Controller
         return json_encode([$output0,$output1,$output2,$output3,$output4,$output5]);
     }
 
-    function sysDoShutdown(){
+    function sysShutdown(){
         $command = "sudo halt";
         exec_cli($command);
     }
@@ -293,16 +291,3 @@ class SystemController extends Controller
         return $output;
     }
 }
-
-
-//TODO
-//alias.sh bash contents
-/*
- * oline=$(grep -n $1 /etc/uucp/sys|cut -d ':' -f 1)
- *  linePlus=$((line+1))
- *  #echo $line
- *  name=$(head -$linePlus /etc/uucp/sys|tail -1|cut -d ' ' -f 2)
- *  echo -n $name
- */
-
-

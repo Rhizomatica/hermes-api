@@ -1,2 +1,2 @@
 #!/bin/bash
-inotifywait -q --format '%f' -m -r -e close_write . | xargs -I{} -r sh -c 'curl http://localhost:8000/unpack/$(basename {})'
+inotifywait -q --format '%f' -m -r -e close_write . | xargs -I{} -r sh -c 'curl https://localhost/api/unpack/$(basename {}) -k'
