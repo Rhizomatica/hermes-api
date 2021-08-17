@@ -79,25 +79,33 @@ class SystemController extends Controller
     {
         $sysname = explode("\n", exec_cli("uname -n"))[0];
         $piduu = explode("\n", exec_cli("pgrep -x uuardopd"))[0];
-        $pidmodem  = explode("\n", exec_cli("pgrep -x VARA"))[0];
+        $pidmodem = explode("\n", exec_cli("pgrep -x VARA.exe"))[0];
+        $pidradio = explode("\n", exec_cli("pgrep -x ubitx_controller"))[0];
+        $pidhmp = explode("\n", exec_cli("pgrep -x inotifywait"))[0];
         $piddb = explode("\n", exec_cli("pgrep -x mariadbd"))[0];
-        $pidir = explode("\n", exec_cli("pgrep -x iredadmin"))[0];
         $pidpf = explode("\n", exec_cli("pgrep -x postfix"))[0];
-        $pidtst = explode("\n", exec_cli("echo test"))[0];
-        $ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''))[0];
-        // $ip = exec_cli('hostname -I');// doesnt work on arch
-        $memory = explode(" ", exec_cli("free | grep Mem|cut -f 8,13,19,25,31,37 -d \" \""));
+        $pidtst = explode("\n", exec_cli("echo OK"))[0];
+        //$ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''));
+        $ip = explode("\n", exec_cli('ip r'));
+		array_pop($ip);
+        //$memory = explode(" ", exec_cli("free | grep Mem|cut -f 8,13,19,25,31,37 -d \" \""));
+        $memory = explode(" ", exec_cli("free --mega| grep Mem | awk '{print ($2\" \"$3\" \"$4)}'"));
+
         $phpmemory = ( ! function_exists('memory_get_usage')) ? '0' : round(memory_get_usage()/1024/1024, 2).'MB';
         $status = [
             'status' => $piduu && $pidmodem && $pidir && $pidpf,
             'name' => $sysname,
             'nodename' => exec_nodename(),
             'piduu' => $piduu?$piduu:false,
-            'piddb' => $piddb?$piddb:false,
             'pidmodem' => $pidmodem?$pidmodem:false,
-            'pidtst' => $pidtst,
-            'ipaddress' => $ip,
-            'memory' => $memory,
+            'pidradio' => $pidradio?$pidradio:false,
+            'pidhmp' => $pidhmp?$pidhmp:false,
+            'piddb' => $piddb?$piddb:false,
+            'pidpf' => $pidpf?$pidpf:false,
+            'pidtst' => $pidtst?$pidtst:false,
+ 			'memtotal' => $memory[0]."MB",
+            'memused' => $memory[1]."MB",
+            'memfree' => explode("\n", $memory[2])[0]."MB",
             'phpmemory' => $phpmemory
         ];
         return response($status, 200);
