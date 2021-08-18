@@ -84,29 +84,37 @@ class SystemController extends Controller
         $pidhmp = explode("\n", exec_cli("pgrep -x inotifywait"))[0];
         $piddb = explode("\n", exec_cli("pgrep -x mariadbd"))[0];
         $pidpf = explode("\n", exec_cli("pgrep -x postfix"))[0];
-        $pidtst = explode("\n", exec_cli("echo OK"))[0];
-        //$ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''));
-        $ip = explode("\n", exec_cli('ip r'));
+        $pidadb = explode("\n", exec_cli("pgrep -x Xtigervnc"))[0];
+        $pidvnc = explode("\n", exec_cli("pgrep -x Xtigervnc"))[0];
+        $wifiessid = explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep ssid | cut -c6-"))[0];
+        $wifich= explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep channel| cut -c9-"))[0];
+        $ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''));
 		array_pop($ip);
+        $interfaces= explode("\n", exec_cli('ip r'));
+		array_pop($interfaces);
         //$memory = explode(" ", exec_cli("free | grep Mem|cut -f 8,13,19,25,31,37 -d \" \""));
         $memory = explode(" ", exec_cli("free --mega| grep Mem | awk '{print ($2\" \"$3\" \"$4)}'"));
 
         $phpmemory = ( ! function_exists('memory_get_usage')) ? '0' : round(memory_get_usage()/1024/1024, 2).'MB';
         $status = [
-            'status' => $piduu && $pidmodem && $pidir && $pidpf,
+            'status' => $piduu && $pidmodem &&  $pidradio && $pidhmp && $piduu && $pidpf,
             'name' => $sysname,
             'nodename' => exec_nodename(),
+            'ip' => $ip,
+            'interfaces' => $interfaces,
+            'wifiessid' => $wifiessid?$wifiessid:false,
+            'wifich' => $wifich?$wifich:false,
+            'interfaces' => $interfaces,
             'piduu' => $piduu?$piduu:false,
             'pidmodem' => $pidmodem?$pidmodem:false,
             'pidradio' => $pidradio?$pidradio:false,
             'pidhmp' => $pidhmp?$pidhmp:false,
             'piddb' => $piddb?$piddb:false,
             'pidpf' => $pidpf?$pidpf:false,
-            'pidtst' => $pidtst?$pidtst:false,
  			'memtotal' => $memory[0]."MB",
             'memused' => $memory[1]."MB",
             'memfree' => explode("\n", $memory[2])[0]."MB",
-            'phpmemory' => $phpmemory
+            'memfree' => explode("\n", $memory[2])[0]."MB",
         ];
         return response($status, 200);
     }
@@ -288,7 +296,7 @@ class SystemController extends Controller
     }
 
     function sysShutdown(){
-        $command = "sudo halt";
+        $command = "sudo poweroff";
         exec_cli($command);
     }
 
