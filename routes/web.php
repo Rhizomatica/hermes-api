@@ -111,6 +111,8 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('getlog',  ['uses' => 'SystemController@sysGetLog']);
     $router->get('restart',  ['uses' => 'SystemController@sysRestart']);
     $router->get('shutdown',  ['uses' => 'SystemController@sysShutdown']);
+    $router->get('reboot',  ['uses' => 'SystemController@sysReboot']);
+    $router->get('restore',  ['uses' => 'SystemController@sysRestore']);
 });
 
 $router->group(['prefix' => '/radio'], function () use ($router) {

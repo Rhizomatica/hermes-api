@@ -297,7 +297,21 @@ class SystemController extends Controller
 
     function sysShutdown(){
         $command = "sudo poweroff";
-        exec_cli($command);
+        $output = exec_cli($command);
+       return $output;
+    }
+
+    function sysReboot(){
+        $command = "sudo reboot";
+        $output = exec_cli($command);
+       return $output;
+    }
+
+    function sysRestore(){
+        $command = "echo test running on php restore";
+        $output = exec_cli($command);
+       return $output;
+        return json_encode($output);
     }
 
     function sysGetLog(){
