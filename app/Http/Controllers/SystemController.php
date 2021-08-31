@@ -77,7 +77,7 @@ class SystemController extends Controller
      */
     public function getSysStatus()
     {
-        $sysname = explode("\n", exec_cli("uname -n"))[0];
+        $uname = explode("\n", exec_cli("uname -n"))[0];
         $piduu = explode("\n", exec_cli("pgrep -x uuardopd"))[0];
         $pidmodem = explode("\n", exec_cli("pgrep -x VARA.exe"))[0];
         $pidradio = explode("\n", exec_cli("pgrep -x ubitx_controller"))[0];
@@ -98,11 +98,13 @@ class SystemController extends Controller
         $phpmemory = ( ! function_exists('memory_get_usage')) ? '0' : round(memory_get_usage()/1024/1024, 2).'MB';
         $status = [
             'status' => $piduu && $pidmodem &&  $pidradio && $pidhmp && $piduu && $pidpf,
-            'name' => $sysname,
+            'uname' => $uname,
             'nodename' => exec_nodename(),
+			'name' => env('HERMES_NAME'),
+			'domain' => env('HERMES_NETWORK'),
             'ip' => $ip,
             'interfaces' => $interfaces,
-            'wifiessid' => $wifiessid?$wifiessid:false,
+            //'wifiessid' => $wifiessid?$wifiessid:false,
             'wifich' => $wifich?$wifich:false,
             'interfaces' => $interfaces,
             'piduu' => $piduu?$piduu:false,
