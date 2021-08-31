@@ -107,6 +107,7 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->post('uuka',  ['uses' => 'SystemController@uucpKillJobs']);
     $router->post('uuk/{id}',  ['uses' => 'SystemController@uucpKillJob']);
     $router->post('uur/{id}',  ['uses' => 'SystemController@uucpRejuvenateJob']);
+    $router->post('uucall',  ['uses' => 'SystemController@uucpCall']);
     $router->get('getlog',  ['uses' => 'SystemController@sysGetLog']);
     $router->get('restart',  ['uses' => 'SystemController@sysRestart']);
     $router->get('shutdown',  ['uses' => 'SystemController@sysShutdown']);
