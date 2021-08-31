@@ -56,7 +56,6 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('list',  ['uses' => '@showAllMessages']);
     $router->post('', ['uses' => 'MessageController@sendHMP']);
     $router->delete('{id}', ['uses' => 'MessageController@deleteMessage']);
-    $router->delete('', ['uses' => 'MessageController@deleteMessage']);
     $router->post('{id}', ['uses' => 'MessageController@update']);
     $router->get('{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('image/{id}', ['uses' => 'FileController@get']);

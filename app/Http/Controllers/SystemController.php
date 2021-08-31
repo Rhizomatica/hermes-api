@@ -104,7 +104,7 @@ class SystemController extends Controller
 			'domain' => env('HERMES_NETWORK'),
             'ip' => $ip,
             'interfaces' => $interfaces,
-            //'wifiessid' => $wifiessid?$wifiessid:false,
+            'wifiessid' => $wifiessid?$wifiessid:false,
             'wifich' => $wifich?$wifich:false,
             'interfaces' => $interfaces,
             'piduu' => $piduu?$piduu:false,
@@ -208,7 +208,7 @@ class SystemController extends Controller
 
     /**
      * Get transmission spool 
-     *
+     * 
      * @return Json
      */
     public function sysGetSpoolList(){
@@ -220,17 +220,19 @@ class SystemController extends Controller
         for ($i = "0" ; $i < count($output); $i++) {
             if(!empty($output[$i])) {
                 $fields = explode(" ", $output[$i]);
-                $spool[]  =  [
-                    //  '#' => $i,
-                    'id' => $fields[0],
-                    'dest' => $fields[1],
-                    'user' => $fields[2],
-                    'date' => $fields[3],
-                    'time' => $fields[4],
-                    'desc' => $fields[5] . ' ' .  $fields[6] . ' ' . $fields[7] . ' ' . 
-                              $fields[8] . ' '. $fields[9] . ' ' . $fields[10] 
+				if ( $fields[6] != "uuadmin"){
+                	$spool[]  =  [
+                    	//  '#' => $i,
+                    	'id' => $fields[0],
+                    	'dest' => $fields[1],
+                    	'user' => $fields[2],
+                    	'date' => $fields[3],
+                    	'time' => $fields[4],
+                    	'desc' => $fields[5] . ' ' .  $fields[6] . ' ' . $fields[7] . ' ' . 
+                              	$fields[8] . ' '. $fields[9] . ' ' . $fields[10] 
 
-                ];
+                	];
+				}
             }
         }
 
@@ -249,9 +251,9 @@ class SystemController extends Controller
         return response($output, 200);
     }
 
+	// Be Carefull!
     public function uucpKillJobs(){
-
-        $command = 'sudo killall -9 uucico && sudo killall -9 uuport'; //TODO check uuport
+        $command = 'sudo uustat -K '; 
         $output=exec_cli($command) or die;
         return response($output, 200);
     }
