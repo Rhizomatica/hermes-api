@@ -153,23 +153,6 @@ class SystemController extends Controller
         }
     }
 
-    /**
-     * Get info if system is running TODO parametro grupo
-     *
-     * @return table
-     */
-    public function queueErase(){
-        //$command = "sudo uustat -u www-data -K";
-        $command = "uustat -u www-data -K";
-        //TODO ? repeated?
-        //$command = "sudo uustat -u uucp -K";
-        $output = exec_cli($command);
-        //$command = "sudo uustat -u root -K";
-        $command = "uustat -u root -K";
-        $output2 = exec_cli($command);
-        //TODO
-        return [$output,$output2] ;
-    }
 
     /**
      * Get all Stations from uucp
@@ -221,15 +204,18 @@ class SystemController extends Controller
             if(!empty($output[$i])) {
                 $fields = explode(" ", $output[$i]);
 				if ( $fields[6] != "uuadmin"){
+					$uuid =  explode(".",$fields[0]);
                 	$spool[]  =  [
                     	//  '#' => $i,
-                    	'id' => $fields[0],
+						'uuidhost' => $uuid[0],
+						'uuiduucp' => $uuid[1], 
                     	'dest' => $fields[1],
                     	'user' => $fields[2],
                     	'date' => $fields[3],
                     	'time' => $fields[4],
-                    	'desc' => $fields[5] . ' ' .  $fields[6] . ' ' . $fields[7] . ' ' . 
-                              	$fields[8] . ' '. $fields[9] . ' ' . $fields[10] 
+						'type' => $fields[5] == "Executing" ? "Mail" : "HMP", 
+						'size' => $fields[5] == "Executing" ? $fields[9] : explode("(",$fields[7])[1],
+						'destpath' =>  $fields[5] == "Executing" ? null :  $fields[10] ,
 
                 	];
 				}
@@ -245,8 +231,18 @@ class SystemController extends Controller
         return response($output, 200);
     }
 
-    public function uucpKillJob($id){
-        $command = 'sudo uustat -k ' . $id; 
+    public function uucpKillJob($host, $id){
+		if ($host && $id){
+			$command = 'sudo uustat -k ' . $host . '.' . $id; 
+			$output=exec_cli($command) or die;
+			return response($output, 200);
+		}
+		return response($host . '.' . $id, 400);
+    }
+
+	// Be Carefull!
+    public function uucpKillJobs(){
+        $command = 'sudo uustat -K '; 
         $output=exec_cli($command) or die;
         return response($output, 200);
     }
@@ -257,12 +253,6 @@ class SystemController extends Controller
         return response($output, 200);
     }
 
-	// Be Carefull!
-    public function uucpKillJobs(){
-        $command = 'sudo uustat -K '; 
-        $output=exec_cli($command) or die;
-        return response($output, 200);
-    }
 
     //TODO convert to eloquent/flysystem
     // Open a directory, and read its contents
