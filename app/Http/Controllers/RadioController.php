@@ -107,8 +107,8 @@ class RadioController extends Controller
      */
     public function getRadioTXRXStatus()
     {
-        $cmd = $caduceu . "-c get_txrx_status";
-        return response("TODO getRadioMode ", 200);
+        $radio_frequency= explode("\n", exec_cli("get_txrx_status"))[0];
+        return response($radio_frequency, 200);
     }
 
     /**
@@ -116,17 +116,16 @@ class RadioController extends Controller
      *
      * @return Json
      */
-    public function setRadioPTT($mode)
+    public function setRadioPttOn()
     {
-        $paron=  "ptt_on";
-        if ($mode){
-            $par=  "ptt_off";
-        }
-        else{
-            $par=  "ptt_on";
-        }
-        $cmd = $caduceu + $par;
-        $output = exec_cli($cmd);
+        $output = exec_cli(ptt_on);
+        $output = explode("\n", $output)[0];
+        return response("TODO setRadioPTT: " , $output, 200);
+    }
+
+    public function setRadioPttOff()
+    {
+        $output = exec_cli(ptt_off);
         $output = explode("\n", $output)[0];
         return response("TODO setRadioPTT: " , $output, 200);
     }
