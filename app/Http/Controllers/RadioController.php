@@ -118,16 +118,16 @@ class RadioController extends Controller
      */
     public function setRadioPttOn()
     {
-        $output = exec_cli(ptt_on);
+        $output = exec_cli("ptt_on");
         $output = explode("\n", $output)[0];
-        return response("TODO setRadioPTT: " , $output, 200);
+        return response("setRadioPTTon: " . $output, 200);
     }
 
     public function setRadioPttOff()
     {
-        $output = exec_cli(ptt_off);
+        $output = exec_cli("ptt_off");
         $output = explode("\n", $output)[0];
-        return response("TODO setRadioPTT: " , $output, 200);
+        return response("setRadioPTToff: " . $output, 200);
     }
 
     /**
