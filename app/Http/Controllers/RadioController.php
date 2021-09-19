@@ -54,6 +54,10 @@ class RadioController extends Controller
         else if($radio_led == "LED_OFF" || !$radio_led){
             $radio_led=false;
         }
+		else {
+                return response('getradiostatus fail: ' );
+
+		}
 
         $radio_bfo= explode("\n", exec_cli("get_bfo"))[0];
         $radio_fwd= explode("\n", exec_cli("get_fwd"))[0];
@@ -154,7 +158,7 @@ class RadioController extends Controller
             return response($radio_frequency, 200);
         }
         else {
-            return response( "error: " . $command, 500);
+        	return response()->json(['message' => 'setRadioFreq error: ' . $command], 500);
             
         }
     }
@@ -184,9 +188,8 @@ class RadioController extends Controller
         elseif( $mode == "LSB"){
             $command= explode("\n", exec_cli("set_mode -a LSB"))[0];
         }
-            return response($command, 200);
-        /*else{
-            return response("setRadioMode invalid error: is not USB or LSB" . $command, 500);
+        else{
+        	return response()->json(['message' => 'setRadioMode invalid error: is not USB or LSB' . $command], 500);
         }
 
         if ($command== "OK"){
@@ -194,9 +197,9 @@ class RadioController extends Controller
             return response($radio_mode, 200);
         }
         else{
-            return response("test error: " . $radio_mode, 500);
+        	return response()->json(['message' => 'setRadioMode error: ' . $radio_mode ], 500);
 
-        }*/
+        }
     }
 
     /**
@@ -223,8 +226,7 @@ class RadioController extends Controller
             return response($radio_bfo , 200);
         }
         else {
-            return response( "error: " . $command, 500);
-            
+        	return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
         }
     }
 
@@ -238,7 +240,6 @@ class RadioController extends Controller
         $bfo= explode("\n", exec_cli("get_fwd"))[0];
         return response($bfo, 200);
     }
-
 
     /**
      * Get Radio Ref
@@ -287,7 +288,7 @@ class RadioController extends Controller
             return response($radio_fwd, 200);
         }
         else {
-            return response( "error: " . $command, 500);
+        	return response()->json(['message' => 'setRadioMasterCal error: ' . $command], 500);
             
         }
     }
@@ -303,10 +304,12 @@ class RadioController extends Controller
         if ($radio_protection == "PROTECTION_OFF"){
             return response( false, 200);
         }
-        else {
+        else  if ($radio_protection == "PROTECTION_ON"){
             return response( true, 200);
-
         }
+		else {
+        	return response()->json(['message' => 'setRadioMasterCal error: ' . $command], 500);
+		}
     }
 
     /**
@@ -323,7 +326,7 @@ class RadioController extends Controller
             $par = "set_led_status -a OFF";
         }
         else{
-            return response("setRadioLedStatus fail", 500 );
+        	return response()->json(['message' => 'setRadioLedStatus fail' . $command], 500);
         }
 
         $radio_led= exec_cli($par);
@@ -345,7 +348,7 @@ class RadioController extends Controller
             return response( false, 200);
         }
         else{
-            return response( "error", $radio_led, 500);
+        	return response()->json(['message' => 'getRadioLetSTatus fail' . $radio_led], 500);
         }
     }
 
@@ -364,7 +367,7 @@ class RadioController extends Controller
             return response( false, 200);
         }
         else{
-            return response( "error", $radio_bypass, 500);
+        	return response()->json(['message' => 'getRadiobyPassStatus fail' . $radio_bypass], 500);
         }
     }
 
@@ -382,7 +385,7 @@ class RadioController extends Controller
             $par = "set_bypass_status -a ON";
         }
         else{
-            return response("setRadioBypassStatus fail", 500 );
+        	return response()->json(['message' => 'setRadioByPassStatus fail: ' . $status], 500);
         }
         $radio_bypass= explode("\n", exec_cli($par))[0];
         return response( $status, 200);
@@ -400,7 +403,7 @@ class RadioController extends Controller
             return response( true, 200);
         }
         else{
-            return response( "error:  " . $radio_serial, 500);
+        	return response()->json(['message' => 'getRadioSerial fail: ' . $radio_serial], 500);
         }
     }
 
@@ -417,7 +420,7 @@ class RadioController extends Controller
             return response("setRadioSerial" . $serial, 200);
         }
         else{
-            return response("setRadioSerial fail", 500 );
+        	return response()->json(['message' => 'setRadioSerial fail: ' . $serial], 500);
         }
     }
     
@@ -428,12 +431,12 @@ class RadioController extends Controller
      */
     public function resetRadioProtection()
     {
-        $radio_serial = explode("\n", exec_cli("reset_protection"))[0];
-        if($radio_serial == "OK"){
+        $radio_prot = explode("\n", exec_cli("reset_protection"))[0];
+        if($radio_prot == "OK"){
             return response( true, 200);
         }
         else{
-            return response( "error: " . $radio_serial, 500);
+        	return response()->json(['message' => 'resetRadioProtection fail: ' . $radio_prot], 500);
         }
     }
 

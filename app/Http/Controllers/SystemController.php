@@ -51,11 +51,11 @@ class SystemController extends Controller
                 return response()->json($request->all() , 200);
             }
             else {
-                return response()->json('can\'t update', 500);
+				return response()->json(['message' => 'setSysConfig can not update' . $user], 500);
             }
         }
         else {
-            return response()->json('Error, does not have request data', 500);
+			return response()->json(['message' => 'setSysConfig does not have request data'], 500);
         }
     }
 
@@ -186,7 +186,7 @@ class SystemController extends Controller
             }
         }
 
-        return $sysnameslist;
+        return response()->json($sysnameslist, 200);
     }
 
     /**
@@ -216,7 +216,6 @@ class SystemController extends Controller
 						'type' => $fields[5] == "Executing" ? "Mail" : "HMP", 
 						'size' => $fields[5] == "Executing" ? $fields[9] : explode("(",$fields[7])[1],
 						'destpath' =>  $fields[5] == "Executing" ? null :  $fields[10] ,
-
                 	];
 				}
             }
@@ -233,11 +232,13 @@ class SystemController extends Controller
 
     public function uucpKillJob($host, $id){
 		if ($host && $id){
-			$command = 'sudo uustat -k ' . $host . '.' . $id; 
-			$output=exec_cli($command) or die;
+			$command = 'cat /usr/spool/uucp/' . $host . '/C./C.' . $id;
+			$output = $command;
+			////$command = 'sudo uustat -k ' . $host . '.' . $id; 
+			// $output=exec_cli($command) or die;
 			return response($output, 200);
 		}
-		return response($host . '.' . $id, 400);
+		return response(json(['message'=> $host . '.' . $id]), 400);
     }
 
 	// Be Carefull!

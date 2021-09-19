@@ -93,7 +93,16 @@ class UserController extends Controller
                     $request['password'] = hash('sha256', $request['password']);
                     $request['email_id'] = $mailuser_id;
                     if($user = User::create($request->all())){
-                        return response()->json($request, 201); //Created
+                		$command = "uux -j  'hermes.radio!k4!uuadm -a -m "  . $request['email'] . '@' . env('HERMES_DOMAIN') . '-n ' . $request['name']  . "'" ;
+                		if ($output = exec_cli($command) ){
+							//returns uucp job id
+							$output = explode("\n", $output)[0];
+                        	return response()->json($output, 201); //Created
+						}
+						else {
+                    		return response('Hermes create user: create user table and ispconfig but Error on uucp to advise: ' . $output . $command, 300);
+						}
+
                     } else{
                         return response()->json('create email but couldnt create user', 500); 
                     }

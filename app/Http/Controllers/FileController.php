@@ -60,7 +60,7 @@ class FileController extends Controller
             return response()->json( [ 'fileup', $filename, $timestamp], 200);
         }
         else{
-            return response()->json( [ 'Hermeserror - not a file?'], 500);
+        	return response()->json(['message' => 'Hermes File Controller error - not a file?'], 500);
         }
     }
 
