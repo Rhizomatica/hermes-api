@@ -201,7 +201,7 @@ class SystemController extends Controller
      */
     public function sysGetSpoolList(){
         $command = "uustat -a";
-        $output=exec_cli($command) or die;
+        $output=exec_cli($command) ;
         $output = explode("\n", $output);
         $spool=[];
 
@@ -226,7 +226,12 @@ class SystemController extends Controller
             }
         }
 
-        return response($spool, 200);
+		if (sizeof($spool) >= 1){
+			return response()->json($spool, 200);
+		}
+		else{
+			return response()->json(null, 200);
+		}
     }
 
     public function uucpRejuvenateJob($id){
