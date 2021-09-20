@@ -95,8 +95,8 @@ class MessageController extends Controller
 
             // UUCP -C Copy  (default) / -d create dirs
             if (Storage::disk('local')->exists('outbox/'.$message->id.'.hmp')) {
-                $command = 'uucp -r -j -C -d \'' .  $path . '\' ' . $message->dest . '!~/' . $message->orig . '-' . $message->id  ;
-                if ($output = exec_cli($command) ){
+                $command = 'uucp -r -j -C -d \'' .  $path . '\' \'' . $message->dest . '!~/' . $message->orig . '-' . $message->id . '\''; ;
+                if (!$output = exec_cli($command) ){
 					return response()->json(['message' => 'Hermes sendMessage - Error on uucp:  ' . $output . $command], 500);
                 }
                 $message['draft']=false;
