@@ -249,16 +249,15 @@ class SystemController extends Controller
 		}
    	}
 
-	// Be Carefull!
     public function uucpKillJobs(){
-        $command = 'sudo uustat -K '; 
+        $command = 'sudo uustat -Ka '; 
         $output=exec_cli($command) or die;
         return response($output, 200);
     }
 
     public function uucpCall(){
-        $command = 'sudo uucico -r1 ' . $id; 
-        $output=exec_cli($command) or die;
+        $command = 'sudo uucico -r1 ' ; 
+        $output=exec_cli($command);
         return response($output, 200);
     }
 
