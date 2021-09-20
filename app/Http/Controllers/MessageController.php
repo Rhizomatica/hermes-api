@@ -114,7 +114,7 @@ class MessageController extends Controller
         	return response()->json(['message' => 'Hermes pack message Error: can\'t create message in DB'], 500);
         }
 
-        return response(['Hermes sendMessage: DONE', $command,'output cli: '. $output, $message],200);
+        return response()->json(['message' => 'Hermes sendMessage: DONE', 'command' => $command  , 'output cli' => $output, 'content' => $message], 200);
     }
 
      /**
@@ -159,7 +159,7 @@ class MessageController extends Controller
     {
         Message::findOrFail($id)->delete();
         Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'delete message . '. $id  );
-        return response('Deleted Successfully', 200);
+        return response()->json(['message' => 'Delete sucessfully message: ' . $id], 200);
     }
 
     /**
@@ -238,7 +238,7 @@ class MessageController extends Controller
         	return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find HMP'], 500);
         }
         Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'unpack  '. $id  . ' - ' . $message .  ' from ' . $orig  );
-        return response( $message,200);
+        return response()->json(['message' => $message], 200);
     }
 
     /**

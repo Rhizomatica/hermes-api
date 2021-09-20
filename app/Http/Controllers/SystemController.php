@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use App\System;
 
 
-function exec_cli($command = "ls -l")
+function exec_cli($command )
 {
     ob_start();
     system($command , $return_var);
@@ -23,7 +23,12 @@ function exec_cli($command = "ls -l")
             return (explode("\n", $output));
             }*/
 
-    return ($output);
+	if ($return_var == 0) {
+		return $output;
+	}
+	else {
+		return false;
+	}
 }
 
 function exec_nodename(){
@@ -231,15 +236,18 @@ class SystemController extends Controller
     }
 
     public function uucpKillJob($host, $id){
-		if ($host && $id){
-			$command = 'cat /usr/spool/uucp/' . $host . '/C./C.' . $id;
-			$output = $command;
-			////$command = 'sudo uustat -k ' . $host . '.' . $id; 
-			// $output=exec_cli($command) or die;
-			return response($output, 200);
+		$command = 'sudo uustat -k ' . $host . '.' . $id; 
+    	ob_start();
+    	system($command , $return_var);
+    	$output = ob_get_contents();
+    	ob_end_clean();
+		if ($return_var == 0) {
+			return response()->json("uucp job killed: " . $host . '.' .$id, 200);
 		}
-		return response(json(['message'=> $host . '.' . $id]), 400);
-    }
+		else{
+			return response()->json("No job found", 404);
+		}
+   	}
 
 	// Be Carefull!
     public function uucpKillJobs(){
@@ -293,18 +301,17 @@ class SystemController extends Controller
         $output4 = exec_cli($command);
 
         //TODO
-        return json_encode([$output0,$output1,$output2,$output3,$output4,$output5]);
+        return response()->json([$output0,$output1,$output2,$output3,$output4,$output5],200);
     }
 
     function sysShutdown(){
-        $command = "sudo poweroff";
+        $command = "sudo halt";
         $output = exec_cli($command);
        return $output;
     }
 
     function sysReboot(){
         $command = "sudo reboot";
-        $output = exec_cli($command);
        return $output;
     }
 
