@@ -379,9 +379,9 @@ class RadioController extends Controller
     public function setRadioBypassStatus($status)
     {
         if ($status = "ON"){
-            $par = "set_bypass_status -a ON";
+            $par = "set_bypass_status -a OFF";
         }
-        elseif ($status = "ON"){
+        elseif ($status = "OFF"){
             $par = "set_bypass_status -a ON";
         }
         else{
@@ -417,7 +417,8 @@ class RadioController extends Controller
         $par = "set_serial " . $serial;
         $radio_bypass= explode("\n", exec_cli($par))[0];
         if($radio_bypass == "OK"){
-            return response("setRadioSerial" . $serial, 200);
+            return response("setRadioSerial -a " . $serial, 200);
+            return response()->json($serial, 200);
         }
         else{
         	return response()->json(['message' => 'setRadioSerial fail: ' . $serial], 500);
@@ -433,8 +434,8 @@ class RadioController extends Controller
     public function getRadioRefThreshold()
     {
         $radio_ref_threshold = explode("\n", exec_cli("get_ref_threshold"))[0];
-        if($radio_ref_threshold == "Serial"){
-            return response( true, 200);
+        if($radio_ref_threshold != "ERROR"){
+            return response()->json($radio_ref_threshold, 200);
         }
         else{
         	return response()->json(['message' => 'getRadioRefThreshold fail: ' . $radio_ref_threshold], 500);
@@ -448,8 +449,8 @@ class RadioController extends Controller
      */
     public function setRadioRefThreshold($value)
     {
-		if ($value < 0 || $value < 1023){
-        	$par = "set_ref_threshold" . $value;
+		if ($value > 0 && $value < 1023){
+        	$par = "set_ref_threshold -a " . $value;
         	$radio_ref_threshold = explode("\n", exec_cli($par))[0];
         	if($radio_ref_threshold == "OK"){
             	return response("set_ref_threshold" . $value, 200);
@@ -459,7 +460,7 @@ class RadioController extends Controller
         	}
 		}
 		else {
-			return response()->json(['message' => 'setRadioRefThreshold out of limit - 0 - 1023: ' . $value], 500);	
+			return response()->json(['message' => 'setRadioRefThreshold out of limit - 0...1023: ' . $value], 500);	
 		}
     }
 
