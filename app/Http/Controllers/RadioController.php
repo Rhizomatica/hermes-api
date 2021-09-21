@@ -423,6 +423,46 @@ class RadioController extends Controller
         	return response()->json(['message' => 'setRadioSerial fail: ' . $serial], 500);
         }
     }
+
+
+    /**
+     * Get Radio reflected threshold
+     *
+     * @return Json
+     */
+    public function getRadioRefThreshold()
+    {
+        $radio_ref_threshold = explode("\n", exec_cli("get_ref_threshold"))[0];
+        if($radio_ref_threshold == "Serial"){
+            return response( true, 200);
+        }
+        else{
+        	return response()->json(['message' => 'getRadioRefThreshold fail: ' . $radio_ref_threshold], 500);
+        }
+    }
+
+    /**
+     * Set Radio Reflected threshold
+     *
+     * @return Json
+     */
+    public function setRadioRefThreshold($value)
+    {
+		if ($value < 0 || $value < 1023){
+        	$par = "set_ref_threshold" . $value;
+        	$radio_ref_threshold = explode("\n", exec_cli($par))[0];
+        	if($radio_ref_threshold == "OK"){
+            	return response("set_ref_threshold" . $value, 200);
+        	}
+        	else{
+        		return response()->json(['message' => 'setRadioRefThreshold fail: ' . $radio_ref_threshold], 500);
+        	}
+		}
+		else {
+			return response()->json(['message' => 'setRadioRefThreshold out of limit - 0 - 1023: ' . $value], 500);	
+		}
+    }
+
     
     /**
      * Get Radio  serial
