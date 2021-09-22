@@ -451,7 +451,7 @@ class RadioController extends Controller
         	$par = "set_ref_threshold -a " . $value;
         	$radio_ref_threshold = explode("\n", exec_cli($par))[0];
         	if($radio_ref_threshold == "OK"){
-            	return response("set_ref_threshold" . $value, 200);
+            	return response($value, 200);
         	}
         	else{
         		return response()->json(['message' => 'setRadioRefThreshold fail: ' . $radio_ref_threshold], 500);
