@@ -9,23 +9,48 @@ use League\Flysystem\Adapter\Local;
 function exec_cli($command)
 {
     ob_start();
+    system($command , $return_var);
+	if ($return_var != 0) {
+    	$output = ob_get_contents();
+    	ob_end_clean();
+    	return ($output);
+	}
+	else {
+		return false;
+	}
+}
+
+function exec_uc($command)
+{
+    ob_start();
     $ubitx_client = "/usr/bin/ubitx_client -c ";
     $command = $ubitx_client . $command;
     system($command , $return_var);
     $output = ob_get_contents();
     ob_end_clean();
-
-    //or die;
-    /*if ($exploder==true){
-            return (explode("\n", $output));
-            }*/
     return ($output);
+}
+
+function exec_ucr($command)
+{
+    ob_start();
+    $ubitx_client = "/usr/bin/ubitx_client -c ";
+    $command = $ubitx_client . $command;
+    system($command , $return_var);
+    $output = ob_get_contents();
+    ob_end_clean();
+	if ($return_var != 0) {
+		return false;
+	}
+	else{
+    	return true;
+	}
 }
 
 function exec_nodename(){
 
     //$command = 'cat /etc/uucp/config|grep nodename|cut -f 2 -d " "';
-    $output = exec_cli($command);
+    $output = exec_uc($command);
     $output = explode("\n", $output)[0];
 
     return $output;
@@ -44,10 +69,10 @@ class RadioController extends Controller
     public function getRadioStatus()
     {
         //TODO copied from system status
-        //$pidtst = explode("\n", exec_cli(env('HERMES_TOOL') . " -c get_frequency"))[0];
-        $radio_frequency= explode("\n", exec_cli("get_frequency"))[0];
-        $radio_mode= explode("\n", exec_cli("get_mode"))[0];
-        $radio_led= explode("\n", exec_cli("get_led_status"))[0];
+        //$pidtst = explode("\n", exec_uc(env('HERMES_TOOL') . " -c get_frequency"))[0];
+        $radio_frequency= explode("\n", exec_uc("get_frequency"))[0];
+        $radio_mode= explode("\n", exec_uc("get_mode"))[0];
+        $radio_led= explode("\n", exec_uc("get_led_status"))[0];
         if ($radio_led== "LED_ON"){
             $radio_led=true;
         }
@@ -59,10 +84,10 @@ class RadioController extends Controller
 
 		}
 
-        $radio_bfo= explode("\n", exec_cli("get_bfo"))[0];
-        $radio_fwd= explode("\n", exec_cli("get_fwd"))[0];
-        $radio_ref= explode("\n", exec_cli("get_ref"))[0];
-        $radio_txrx= explode("\n", exec_cli("get_txrx_status"))[0];
+        $radio_bfo= explode("\n", exec_uc("get_bfo"))[0];
+        $radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
+        $radio_ref= explode("\n", exec_uc("get_ref"))[0];
+        $radio_txrx= explode("\n", exec_uc("get_txrx_status"))[0];
         if ($radio_txrx == "INRX"){
             $radio_rx =true;
             $radio_tx =false;
@@ -71,15 +96,15 @@ class RadioController extends Controller
             $radio_tx =true;
             $radio_rx =false;
         }
-        $radio_mastercal= explode("\n", exec_cli("get_mastercal"))[0];
-        $radio_protection= explode("\n", exec_cli("get_protection_status"))[0];
+        $radio_mastercal= explode("\n", exec_uc("get_mastercal"))[0];
+        $radio_protection= explode("\n", exec_uc("get_protection_status"))[0];
         if ($radio_protection == "PROTECTION_ON"){
             $radio_protection=true;
         }
         else if($radio_protection == "PROTECTION_OFF" || !$radio_protection){
             $radio_protection = false;
         }
-        $radio_bypass= explode("\n", exec_cli("get_bypass_status"))[0];
+        $radio_bypass= explode("\n", exec_uc("get_bypass_status"))[0];
         if ($radio_bypass== "BYPASS_ON"){
             $radio_bypass=true;
         }
@@ -105,43 +130,84 @@ class RadioController extends Controller
     }
 
     /**
+	 * 
      * Get TX RX Statustxrx_status
      *
      * @return Json
+	 * 
      */
     public function getRadioTXRXStatus()
     {
-        $radio_frequency= explode("\n", exec_cli("get_txrx_status"))[0];
+        $radio_frequency= explode("\n", exec_uc("get_txrx_status"))[0];
         return response($radio_frequency, 200);
     }
 
     /**
-     * Set PTT
-     *
+	 * 
+     * Set PTT On
+	 * 
      * @return Json
+	 * 
      */
     public function setRadioPttOn()
     {
-        $output = exec_cli("ptt_on");
+        $output = exec_uc("ptt_on");
         $output = explode("\n", $output)[0];
         return response()->json("setRadioPTTon: " . $output, 200);
     }
 
+	/**
+	 * 
+	 * Set PTT Off
+	 * 
+	 * @return Json
+	 * 
+	 */
     public function setRadioPttOff()
     {
-        $output = exec_cli("ptt_off");
+        $output = exec_uc("ptt_off");
         $output = explode("\n", $output)[0];
         return response()->json("setRadioPTToff: " . $output, 200);
     }
 
     /**
+	 * 
+     * Set test Tone On
+	 * 
+     * @return Json
+	 * 
+     */
+    public function setRadioToneOn()
+    {
+        $output = exec_cli("alsatonic &");
+        $output = explode("\n", $output)[0];
+        return response()->json("setRadioPTTon: " . $output, 200);
+    }
+
+	/**
+	 * 
+	 * Set test Tone Off
+	 * 
+	 * @return Json
+	 * 
+	 */
+    public function setRadioToneOff()
+    {
+        $output = exec_cl("killall alsatonic ");
+        $output = explode("\n", $output)[0];
+        return response()->json("setRadioToneOff: " . $output, 200);
+    }
+
+
+    /**
+	 * 
      * Get Radio Main Frequency Oscilator
      *
      * @return Json
      */
     public function getRadioFreq()
     {
-        $radio_frequency= explode("\n", exec_cli("get_frequency"))[0];
+        $radio_frequency= explode("\n", exec_uc("get_frequency"))[0];
         return response()->json($radio_frequency, 200);
     }
 
@@ -152,9 +218,9 @@ class RadioController extends Controller
      */
     public function setRadioFreq(int $freq)
     {
-        $command = explode("\n", exec_cli("set_frequency -a " . $freq))[0];
+        $command = explode("\n", exec_uc("set_frequency -a " . $freq))[0];
         if ($command == "OK"){
-            $radio_frequency = explode("\n", exec_cli("get_frequency"))[0];
+            $radio_frequency = explode("\n", exec_uc("get_frequency"))[0];
             return response()->json($radio_frequency, 200);
         }
         else {
@@ -170,7 +236,7 @@ class RadioController extends Controller
      */
     public function getRadioMode()
     {
-        $radio_mode= explode("\n", exec_cli("get_mode"))[0];
+        $radio_mode= explode("\n", exec_uc("get_mode"))[0];
         return response()->json($radio_mode, 200);
     }
 
@@ -182,18 +248,19 @@ class RadioController extends Controller
      */
     public function setRadioMode($mode)
     {
+		$radio_mode = "";
         if($mode == "USB"){
-            $command = explode("\n", exec_cli("set_mode -a USB"))[0];
+            $command = explode("\n", exec_uc("set_mode -a USB"))[0];
         }
         elseif( $mode == "LSB"){
-            $command= explode("\n", exec_cli("set_mode -a LSB"))[0];
+            $command= explode("\n", exec_uc("set_mode -a LSB"))[0];
         }
         else{
         	return response()->json(['message' => 'setRadioMode invalid error: is not USB or LSB' . $command], 500);
         }
 
         if ($command== "OK"){
-            $radio_mode= explode("\n", exec_cli("get_mode"))[0];
+            $radio_mode= explode("\n", exec_uc("get_mode"))[0];
             return response()->json($radio_mode, 200);
         }
         else{
@@ -209,7 +276,7 @@ class RadioController extends Controller
      */
     public function getRadioBfo()
     {
-        $bfo= explode("\n", exec_cli("get_bfo"))[0];
+        $bfo= explode("\n", exec_uc("get_bfo"))[0];
         return response()->json($bfo, 200);
     }
 
@@ -220,9 +287,9 @@ class RadioController extends Controller
      */
     public function setRadioBfo($freq)
     {
-        $command = explode("\n", exec_cli("set_bfo -a " . $freq))[0];
+        $command = explode("\n", exec_uc("set_bfo -a " . $freq))[0];
         if ($command == "OK"){
-            $radio_bfo = explode("\n", exec_cli("get_bfo"))[0];
+            $radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
             return response($radio_bfo , 200);
         }
         else {
@@ -237,7 +304,7 @@ class RadioController extends Controller
      */
     public function getRadioFwd()
     {
-        $bfo= explode("\n", exec_cli("get_fwd"))[0];
+        $bfo= explode("\n", exec_uc("get_fwd"))[0];
         return response()->json($bfo, 200);
     }
 
@@ -248,7 +315,7 @@ class RadioController extends Controller
      */
     public function getRadioRef()
     {
-        $radio_ref = explode("\n", exec_cli("get_ref"))[0];
+        $radio_ref = explode("\n", exec_uc("get_ref"))[0];
         return response()->json($radio_ref, 200);
     }
 
@@ -259,7 +326,7 @@ class RadioController extends Controller
      */
     public function getRadioTxrx()
     {
-        $radio_txrx = explode("\n", exec_cli("get_txrx"))[0];
+        $radio_txrx = explode("\n", exec_uc("get_txrx"))[0];
         return response()->json( $radio_txrx, 200);
     }
 
@@ -270,7 +337,7 @@ class RadioController extends Controller
      */
     public function getRadioMasterCal()
     {
-        $radio_mastercal= explode("\n", exec_cli("get_mastercal"))[0];
+        $radio_mastercal= explode("\n", exec_uc("get_mastercal"))[0];
         return response()->json($radio_mastercal, 200);
     }
 
@@ -281,9 +348,9 @@ class RadioController extends Controller
      */
     public function setRadioMasterCal($freq)
     {
-        $command = explode("\n", exec_cli("set_mastercal -a " . $freq))[0];
+        $command = explode("\n", exec_uc("set_mastercal -a " . $freq))[0];
         if ($command == "OK"){
-            $radio_fwd= explode("\n", exec_cli("get_mastercal"))[0];
+            $radio_fwd= explode("\n", exec_uc("get_mastercal"))[0];
             return response()->json($radio_fwd, 200);
         }
         else {
@@ -299,7 +366,7 @@ class RadioController extends Controller
      */
     public function getRadioProtection()
     {
-        $radio_protection = explode("\n", exec_cli("get_protection_status"))[0];
+        $radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
         if ($radio_protection == "PROTECTION_OFF"){
             return response()->json( false, 200);
         }
@@ -328,7 +395,7 @@ class RadioController extends Controller
         	return response()->json(['message' => 'setRadioLedStatus fail' . $command], 500);
         }
 
-        $radio_led= exec_cli($par);
+        $radio_led= exec_uc($par);
         return response("TODO setRadioLEDS : ", $radio_led, 200);
     }
 
@@ -339,7 +406,7 @@ class RadioController extends Controller
      */
     public function getRadioLedStatus()
     {
-        $radio_led= explode("\n", exec_cli("get_led_status"))[0];
+        $radio_led= explode("\n", exec_uc("get_led_status"))[0];
         if($radio_led == "LED_ON"){
             return response( true, 200);
         }
@@ -358,7 +425,7 @@ class RadioController extends Controller
      */
     public function getRadioBypassStatus()
     {
-        $radio_bypass= explode("\n", exec_cli("get_bypass_status"))[0];
+        $radio_bypass= explode("\n", exec_uc("get_bypass_status"))[0];
         if($radio_bypass== "BYPASS_ON"){
             return response( true, 200);
         }
@@ -386,7 +453,7 @@ class RadioController extends Controller
         else{
         	return response()->json(['message' => 'setRadioByPassStatus fail: ' . $status], 500);
         }
-        $radio_bypass= explode("\n", exec_cli($par))[0];
+        $radio_bypass= explode("\n", exec_uc($par))[0];
         return response()->json( $status, 200);
     }
 
@@ -397,7 +464,7 @@ class RadioController extends Controller
      */
     public function getRadioSerial()
     {
-        $radio_serial = explode("\n", exec_cli("get_serial"))[0];
+        $radio_serial = explode("\n", exec_uc("get_serial"))[0];
         if($radio_serial != "ERROR"){
             return response()->json(true, 200);
         }
@@ -414,7 +481,7 @@ class RadioController extends Controller
     public function setRadioSerial($serial)
     {
         $par = "set_serial -a " . $serial;
-        $radio_bypass= explode("\n", exec_cli($par))[0];
+        $radio_bypass= explode("\n", exec_uc($par))[0];
         if($radio_bypass == "OK"){
             return response()->json($serial, 200);
         }
@@ -431,7 +498,7 @@ class RadioController extends Controller
      */
     public function getRadioRefThreshold()
     {
-        $radio_ref_threshold = explode("\n", exec_cli("get_ref_threshold"))[0];
+        $radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold"))[0];
         if($radio_ref_threshold != "ERROR"){
             return response()->json($radio_ref_threshold, 200);
         }
@@ -449,7 +516,7 @@ class RadioController extends Controller
     {
 		if ($value > 0 && $value < 1023){
         	$par = "set_ref_threshold -a " . $value;
-        	$radio_ref_threshold = explode("\n", exec_cli($par))[0];
+        	$radio_ref_threshold = explode("\n", exec_uc($par))[0];
         	if($radio_ref_threshold == "OK"){
             	return response($value, 200);
         	}
@@ -463,13 +530,13 @@ class RadioController extends Controller
     }
 
     /**
-     * Get Radio  serial
+     * reset radio protection
      *
      * @return Json
      */
     public function resetRadioProtection()
     {
-        $radio_prot = explode("\n", exec_cli("reset_protection"))[0];
+        $radio_prot = explode("\n", exec_uc("reset_protection"))[0];
         if($radio_prot == "OK"){
             return response( true, 200);
         }
@@ -477,4 +544,22 @@ class RadioController extends Controller
         	return response()->json(['message' => 'resetRadioProtection fail: ' . $radio_prot], 500);
         }
     }
+
+	/**
+	 * Reset radio values to default
+	 * 
+	 * @return Json
+	 */
+	public function resetRadioDefaults()
+	{
+		print(exec_ucr("set_master_cal -a " . env('RADIO_MASTER_CAL', '0')) or die);
+		exec_ucr("set_bypass_status -a " . env('RADIO_BYPASS_STATUS', '0')) or die;
+		exec_ucr("set_led_status -a " . env('RADIO_LED_STATUS', '0')) or die;
+		exec_ucr("set_serial -a " . env('RADIO_SERIAL', '0')) or die;
+		exec_ucr("set_bfo -a " . env('RADIO_BFO', '0')) or die;
+		exec_ucr("set_mode -a " . env('RADIO_MODE', 'USB')) or die;
+		exec_ucr("set_freq -a " . env('RADIO_FREQ', '6940000')) or die;
+		exec_ucr("set_protection -a " . env('RADIO_PROT', '6940000')) or die;
+		return response()->json(['message' => 'resetRadioDefaults fail'], 500);
+	}
 }
