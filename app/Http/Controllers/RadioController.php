@@ -72,6 +72,22 @@ class RadioController extends Controller
         //$pidtst = explode("\n", exec_uc(env('HERMES_TOOL') . " -c get_frequency"))[0];
         $radio_frequency= explode("\n", exec_uc("get_frequency"))[0];
         $radio_mode= explode("\n", exec_uc("get_mode"))[0];
+        $radio_ref_threshold= explode("\n", exec_uc("get_ref_threshold"))[0];
+        $radio_bfo= explode("\n", exec_uc("get_bfo"))[0];
+        $radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
+        $radio_ref= explode("\n", exec_uc("get_ref"))[0];
+        $radio_mastercal= explode("\n", exec_uc("get_mastercal"))[0];
+
+        $radio_txrx= explode("\n", exec_uc("get_txrx_status"))[0];
+        if ($radio_txrx == "INRX"){
+            $radio_rx =true;
+            $radio_tx =false;
+        }
+        else if($radio_txrx== "INTX" || !$radio_txrx){
+            $radio_tx =true;
+            $radio_rx =false;
+        }
+
         $radio_led= explode("\n", exec_uc("get_led_status"))[0];
         if ($radio_led== "LED_ON"){
             $radio_led=true;
@@ -84,19 +100,6 @@ class RadioController extends Controller
 
 		}
 
-        $radio_bfo= explode("\n", exec_uc("get_bfo"))[0];
-        $radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
-        $radio_ref= explode("\n", exec_uc("get_ref"))[0];
-        $radio_txrx= explode("\n", exec_uc("get_txrx_status"))[0];
-        if ($radio_txrx == "INRX"){
-            $radio_rx =true;
-            $radio_tx =false;
-        }
-        else if($radio_txrx== "INTX" || !$radio_txrx){
-            $radio_tx =true;
-            $radio_rx =false;
-        }
-        $radio_mastercal= explode("\n", exec_uc("get_mastercal"))[0];
         $radio_protection= explode("\n", exec_uc("get_protection_status"))[0];
         if ($radio_protection == "PROTECTION_ON"){
             $radio_protection=true;
@@ -104,6 +107,7 @@ class RadioController extends Controller
         else if($radio_protection == "PROTECTION_OFF" || !$radio_protection){
             $radio_protection = false;
         }
+
         $radio_bypass= explode("\n", exec_uc("get_bypass_status"))[0];
         if ($radio_bypass== "BYPASS_ON"){
             $radio_bypass=true;
@@ -124,6 +128,7 @@ class RadioController extends Controller
             'rx' => $radio_rx,
             'mastercal' => $radio_mastercal,
             'protection' => $radio_protection,
+            'refthreshold' => $radio_ref_threshold,
             'bypass' =>  $radio_bypass,
         ];
         return response($status, 200);
