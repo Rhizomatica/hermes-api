@@ -34,8 +34,6 @@ $router->get('mock', function () {
     //
 }]);*/
 
-
-
 $router->get('help',  ['uses' => 'HelpController@showHelpMain']);
 //Users routes
 
@@ -86,8 +84,6 @@ $router->group(['prefix' => '/file'], function () use ($router) {
     $router->get('file/{id}', ['uses' => 'FileController@getImageHttp']);
 */
 
-
-
 // system commands
 $router->post('login', ['uses' => 'UserController@login']); //TODO remove
 
@@ -130,6 +126,8 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->get('ref',  ['uses' => 'RadioController@getRadioRef']);
 	$router->post('ptton', ['uses' => 'RadioController@setRadioPttOn']);
 	$router->post('pttoff', ['uses' => 'RadioController@setRadioPttOff']);
+	$router->post('toneon', ['uses' => 'RadioController@setRadioToneOn']);
+	$router->post('toneoff', ['uses' => 'RadioController@setRadioToneOff']);
     //$router->post('ref/{freq}',  ['uses' => 'RadioController@setRadioRef']);
     $router->get('txrx',  ['uses' => 'RadioController@getRadioTxrx']);
     $router->get('mastercal',  ['uses' => 'RadioController@getRadioMasterCal']);
@@ -141,6 +139,6 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('serial/{serial}',  ['uses' => 'RadioController@setRadioSerial']);
     $router->get('refthreshold',  ['uses' => 'RadioController@getRadioRefThreshold']);
     $router->post('refthreshold/{value}',  ['uses' => 'RadioController@setRadioRefThreshold']);
-
-    $router->post('reset',  ['uses' => 'RadioController@resetRadioProtection']);
+    $router->post('protection',  ['uses' => 'RadioController@resetRadioProtection']);
+    $router->post('reset',  ['uses' => 'RadioController@resetRadioDefaults']);
 });
