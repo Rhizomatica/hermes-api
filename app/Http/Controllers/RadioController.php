@@ -73,6 +73,7 @@ class RadioController extends Controller
         $radio_frequency= explode("\n", exec_uc("get_frequency"))[0];
         $radio_mode= explode("\n", exec_uc("get_mode"))[0];
         $radio_ref_threshold= explode("\n", exec_uc("get_ref_threshold"))[0];
+        $radio_serial = explode("\n", exec_uc("get_serial"))[0];
         $radio_bfo= explode("\n", exec_uc("get_bfo"))[0];
         $radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
         $radio_ref= explode("\n", exec_uc("get_ref"))[0];
@@ -130,6 +131,7 @@ class RadioController extends Controller
             'protection' => $radio_protection,
             'refthreshold' => $radio_ref_threshold,
             'bypass' =>  $radio_bypass,
+            'serial' =>  $radio_serial,
         ];
         return response($status, 200);
     }
@@ -149,30 +151,33 @@ class RadioController extends Controller
 
     /**
 	 * 
-     * Set PTT On
+     * Set PTT 
 	 * 
      * @return Json
 	 * 
      */
-    public function setRadioPttOn()
+    public function setRadioPtt($status)
     {
-        $output = exec_uc("ptt_on");
-        $output = explode("\n", $output)[0];
-        return response()->json("setRadioPTTon: " . $output, 200);
-    }
+		$command="";
+		if ($status == "ON"){
+			$command = "ptt_on";
+		}	
+		elseif ($status == "OFF"){
+			$command = "ptt_off";
+		}
+		else{
+			$command = "ptt_off";
+        	return response()->json("setRadioPTTon: invalid parameter: " . $status, 500);
+		}
 
-	/**
-	 * 
-	 * Set PTT Off
-	 * 
-	 * @return Json
-	 * 
-	 */
-    public function setRadioPttOff()
-    {
-        $output = exec_uc("ptt_off");
+        $output = exec_uc($command);
         $output = explode("\n", $output)[0];
-        return response()->json("setRadioPTToff: " . $output, 200);
+		if  ($output = "OK"){
+        	return response()->json("setRadioPTT: " . $status . " - " . $output, 200);
+		}
+		else{
+        	return response()->json("setRadioPTT ERROR: " . $output, 500);
+		}
     }
 
     /**
@@ -202,7 +207,6 @@ class RadioController extends Controller
         $output = explode("\n", $output)[0];
         return response()->json("setRadioToneOff: " . $output, 200);
     }
-
 
     /**
 	 * 
