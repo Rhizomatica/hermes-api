@@ -202,23 +202,24 @@ class RadioController extends Controller
      */
     public function setRadioTone($par)
     {
+        system("sudo killall alsatonic");
+
 	$command="";
 	switch ($par) {
 	case "600":
-		$command = "alsatonic -f 600 &";
+		$command = "sudo alsatonic -f 600 > /dev/null 2>&1 &";
 		break;
 	case "1500":
-		$command = "alsatonic -f 1500 &";
+		$command = "sudo alsatonic -f 1500 > /dev/null 2>&1 &";
 		break;
 	default:
-		$command = "killall alsatonic";
+		$command = "sudo killall alsatonic";
 		break;
 	}
-
-        $output = exec_cli("$command" . " &");
+        $output = system("$command");
         $output = explode("\n", $output)[0];
-	if ( $output) {
-		return response()->json("setRadioTone: " . $par , 200);
+	if ( !$output) {
+		return response()->json("setRadioTone: " . $par, 200);
 	}
 	else {
         	return response()->json(["message"=>"setRadioTone: Error - " . $output], 500);
@@ -595,7 +596,7 @@ class RadioController extends Controller
 	 */
 	public function resetRadioDefaults()
 	{
-		print(exec_ucr("set_master_cal -a " . env('RADIO_MASTER_CAL', '0')) or die);
+		exec_ucr("set_master_cal -a " . env('RADIO_MASTER_CAL', '0')) or die;
 		exec_ucr("set_bypass_status -a " . env('RADIO_BYPASS_STATUS', 'OFF')) or die;
 		exec_ucr("set_led_status -a " . env('RADIO_LED_STATUS', '0')) or die;
 		exec_ucr("set_serial -a " . env('RADIO_SERIAL', '0')) or die;
