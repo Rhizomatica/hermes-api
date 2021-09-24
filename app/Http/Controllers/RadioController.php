@@ -474,8 +474,8 @@ class RadioController extends Controller
         $command = explode("\n", exec_uc($par))[0];
 
         if ($command == "OK"){
-            $radio_led= explode("\n", exec_uc("get_led_status"))[0];
-        	return response( $radio_led, 200);
+            $radio_bypass= explode("\n", exec_uc("get_bypass_status"))[0];
+        	return response( $radio_bypass, 200);
         }
         else {
         	return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
