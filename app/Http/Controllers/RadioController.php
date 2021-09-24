@@ -78,6 +78,11 @@ class RadioController extends Controller
         $radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
         $radio_ref= explode("\n", exec_uc("get_ref"))[0];
         $radio_mastercal= explode("\n", exec_uc("get_mastercal"))[0];
+        $radio_test_tone = explode("\n", exec_uc("pgrep alsatonic"))[0];
+		if (! $radio_test_tone) {
+			$radio_test_tone = true;
+		}
+		else { $radio_test_tone = false; }
 
         $radio_txrx= explode("\n", exec_uc("get_txrx_status"))[0];
         if ($radio_txrx == "INRX"){
@@ -132,6 +137,7 @@ class RadioController extends Controller
             'refthreshold' => $radio_ref_threshold,
             'bypass' =>  $radio_bypass,
             'serial' =>  $radio_serial,
+            'testtone' =>  $radio_test_tone,
         ];
         return response($status, 200);
     }
@@ -182,30 +188,34 @@ class RadioController extends Controller
 
     /**
 	 * 
-     * Set test Tone On
+     * Set radio test Tone 
 	 * 
      * @return Json
 	 * 
      */
-    public function setRadioToneOn()
+    public function setRadioTone($par)
     {
-        $output = exec_cli("alsatonic &");
-        $output = explode("\n", $output)[0];
-        return response()->json("setRadioPTTon: " . $output, 200);
-    }
+		$command="";
+		switch ($par) {
+			case "600":
+				$command = "alsatonic -f 600";
+				break;
+			case "1500":
+				$command = "alsatonic -f 1500";
+				break;
+			default:
+				$command = "kilall alsatonic";
+			break;
+		}
 
-	/**
-	 * 
-	 * Set test Tone Off
-	 * 
-	 * @return Json
-	 * 
-	 */
-    public function setRadioToneOff()
-    {
-        $output = exec_cl("killall alsatonic ");
+        $output = exec_cli("$command" . " &");
         $output = explode("\n", $output)[0];
-        return response()->json("setRadioToneOff: " . $output, 200);
+		if ( $output) {
+			return response()->json("setRadioTone: " . $par , 200);
+		}
+		else {
+        	return response()->json(["message"=>"setRadioTone: Error - " . $output], 500);
+		}
     }
 
     /**
