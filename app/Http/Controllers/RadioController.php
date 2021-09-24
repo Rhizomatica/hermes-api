@@ -265,7 +265,7 @@ class RadioController extends Controller
             $command= explode("\n", exec_uc("set_mode -a LSB"))[0];
         }
         else{
-        	return response()->json(['message' => 'setRadioMode invalid error: is not USB or LSB' . $command], 500);
+        	return response()->json(['message' => 'setRadioMode invalid error: is not USB or LSB' . $mode], 500);
         }
 
         if ($command== "OK"){
@@ -394,6 +394,7 @@ class RadioController extends Controller
      */
     public function setRadioLedStatus($status)
     {
+		$par = '';
         if ($status = "ON"){
             $par = "set_led_status -a ON";
         }
@@ -404,8 +405,14 @@ class RadioController extends Controller
         	return response()->json(['message' => 'setRadioLedStatus fail' . $command], 500);
         }
 
-        $radio_led= exec_uc($par);
-        return response("TODO setRadioLEDS : ", $radio_led, 200);
+        $command= exec_uc($par);
+        if ($command == "OK"){
+            $radio_led= explode("\n", exec_uc("get_led_status"))[0];
+        	return response("TODO setRadioLEDS : ", $radio_led, 200);
+        }
+        else {
+        	return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
+        }
     }
 
     /**
@@ -444,6 +451,7 @@ class RadioController extends Controller
         else{
         	return response()->json(['message' => 'getRadiobyPassStatus fail' . $radio_bypass], 500);
         }
+
     }
 
     /**
@@ -453,17 +461,25 @@ class RadioController extends Controller
      */
     public function setRadioBypassStatus($status)
     {
+		$par = '';
         if ($status = "ON"){
-            $par = "set_bypass_status -a OFF";
+            $par = "set_bypass_status -a ON";
         }
         elseif ($status = "OFF"){
-            $par = "set_bypass_status -a ON";
+            $par = "set_bypass_status -a OFF";
         }
         else{
         	return response()->json(['message' => 'setRadioByPassStatus fail: ' . $status], 500);
         }
-        $radio_bypass= explode("\n", exec_uc($par))[0];
-        return response()->json( $status, 200);
+        $command = explode("\n", exec_uc($par))[0];
+
+        if ($command == "OK"){
+            $radio_led= explode("\n", exec_uc("get_led_status"))[0];
+        	return response( $radio_led, 200);
+        }
+        else {
+        	return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
+        }
     }
 
     /**
@@ -490,8 +506,8 @@ class RadioController extends Controller
     public function setRadioSerial($serial)
     {
         $par = "set_serial -a " . $serial;
-        $radio_bypass= explode("\n", exec_uc($par))[0];
-        if($radio_bypass == "OK"){
+        $radio_serial = explode("\n", exec_uc($par))[0];
+        if($radio_serial == "OK"){
             return response()->json($serial, 200);
         }
         else{
@@ -562,7 +578,7 @@ class RadioController extends Controller
 	public function resetRadioDefaults()
 	{
 		print(exec_ucr("set_master_cal -a " . env('RADIO_MASTER_CAL', '0')) or die);
-		exec_ucr("set_bypass_status -a " . env('RADIO_BYPASS_STATUS', '0')) or die;
+		exec_ucr("set_bypass_status -a " . env('RADIO_BYPASS_STATUS', 'OFF')) or die;
 		exec_ucr("set_led_status -a " . env('RADIO_LED_STATUS', '0')) or die;
 		exec_ucr("set_serial -a " . env('RADIO_SERIAL', '0')) or die;
 		exec_ucr("set_bfo -a " . env('RADIO_BFO', '0')) or die;
