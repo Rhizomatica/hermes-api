@@ -13,8 +13,6 @@
 |
 */
 
-
-
 $router->get('/',  ['uses' => 'HelpController@showHelpMain']);
 $router->get('/help',  ['uses' => 'HelpController@showHelpMain']);
 $router->get('/version', function () use ($router) {
@@ -124,8 +122,7 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->get('led',  ['uses' => 'RadioController@getRadioLedStatus']);
     $router->post('led/{status}',  ['uses' => 'RadioController@setRadioLedStatus']);
     $router->get('ref',  ['uses' => 'RadioController@getRadioRef']);
-	$router->post('ptton', ['uses' => 'RadioController@setRadioPttOn']);
-	$router->post('pttoff', ['uses' => 'RadioController@setRadioPttOff']);
+	$router->post('ptt/{status}', ['uses' => 'RadioController@setRadioPttOn']);
 	$router->post('toneon', ['uses' => 'RadioController@setRadioToneOn']);
 	$router->post('toneoff', ['uses' => 'RadioController@setRadioToneOff']);
     //$router->post('ref/{freq}',  ['uses' => 'RadioController@setRadioRef']);
