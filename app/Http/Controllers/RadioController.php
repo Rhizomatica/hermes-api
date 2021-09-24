@@ -175,11 +175,8 @@ class RadioController extends Controller
 		if  ($output == "OK"){
         	return response()->json("setRadioPTT: " . $status . " - " . $output, 200);
 		}
-		elseif ($output == "SWR" ){
-        	return response()->json("setRadioPTT: " . $status . " - " . $output, 500);
-		}
 		else{
-        	return response()->json("setRadioPTT ERROR: " . $output, 500);
+        	return response()->json(["message"=>"setRadioPTT: Error - " . $output], 500);
 		}
     }
 
