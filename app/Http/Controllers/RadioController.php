@@ -494,7 +494,15 @@ class RadioController extends Controller
 
         if ($command == "OK"){
             $radio_bypass= explode("\n", exec_uc("get_bypass_status"))[0];
-            return response()->json($radio_bypass, 200);
+        	if($radio_bypass== "BYPASS_ON"){
+            	return response( true, 200);
+        	}
+        	elseif($radio_bypass== "BYPASS_OFF"){
+            	return response( false, 200);
+        	}
+        	else{
+        		return response()->json(['message' => 'getRadiobyPassStatus fail' . $radio_bypass], 500);
+        	}
         }
         else {
         	return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
