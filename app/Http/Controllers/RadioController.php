@@ -6,18 +6,27 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 
-function exec_cli($command)
+function exec_cli2($command)
 {
     ob_start();
-    system($command , $return_var);
+	$output = system($command , $return_var);
 	if ($return_var != 0) {
-    	$output = ob_get_contents();
-    	ob_end_clean();
-    	return ($output);
+    		$output = ob_get_contents();
+    		ob_end_clean();
+    		return ($output);
 	}
 	else {
 		return false;
 	}
+}
+
+function exec_cli($command)
+{
+    ob_start();
+    system($command , $return_var);
+    $output = ob_get_contents();
+    ob_end_clean();
+    return ($output);
 }
 
 function exec_uc($command)
@@ -77,12 +86,12 @@ class RadioController extends Controller
         $radio_bfo= explode("\n", exec_uc("get_bfo"))[0];
         $radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
         $radio_ref= explode("\n", exec_uc("get_ref"))[0];
-        $radio_mastercal= explode("\n", exec_uc("get_mastercal"))[0];
-        $radio_test_tone = explode("\n", exec_uc("pgrep alsatonic"))[0];
-		if (! $radio_test_tone) {
-			$radio_test_tone = true;
-		}
-		else { $radio_test_tone = false; }
+        $radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
+        $radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep alsatonic -a"))[0]) ;
+	if (isset($radio_test_tone[3])){
+		$radio_test_tone=$radio_test_tone[3];
+	}
+	else{ $radio_test_tone = 0; }
 
         $radio_txrx= explode("\n", exec_uc("get_txrx_status"))[0];
 		$radio_rx=false;
@@ -103,10 +112,6 @@ class RadioController extends Controller
         else if($radio_led == "LED_OFF" || !$radio_led){
             $radio_led=false;
         }
-		else {
-                return response('getradiostatus fail: ' );
-
-		}
 
         $radio_protection= explode("\n", exec_uc("get_protection_status"))[0];
         if ($radio_protection == "PROTECTION_ON"){
@@ -139,9 +144,9 @@ class RadioController extends Controller
             'refthreshold' => $radio_ref_threshold,
             'bypass' =>  $radio_bypass,
             'serial' =>  $radio_serial,
-            'testtone' =>  $radio_test_tone,
+	    'testtone' => $radio_test_tone
         ];
-        return response($status, 200);
+        return response()->json($status, 200);
     }
 
     /**
@@ -197,27 +202,27 @@ class RadioController extends Controller
      */
     public function setRadioTone($par)
     {
-		$command="";
-		switch ($par) {
-			case "600":
-				$command = "alsatonic -f 600";
-				break;
-			case "1500":
-				$command = "alsatonic -f 1500";
-				break;
-			default:
-				$command = "kilall alsatonic";
-			break;
-		}
+	$command="";
+	switch ($par) {
+	case "600":
+		$command = "alsatonic -f 600 &";
+		break;
+	case "1500":
+		$command = "alsatonic -f 1500 &";
+		break;
+	default:
+		$command = "killall alsatonic";
+		break;
+	}
 
         $output = exec_cli("$command" . " &");
         $output = explode("\n", $output)[0];
-		if ( $output) {
-			return response()->json("setRadioTone: " . $par , 200);
-		}
-		else {
+	if ( $output) {
+		return response()->json("setRadioTone: " . $par , 200);
+	}
+	else {
         	return response()->json(["message"=>"setRadioTone: Error - " . $output], 500);
-		}
+	}
     }
 
     /**
