@@ -85,6 +85,8 @@ class RadioController extends Controller
 		else { $radio_test_tone = false; }
 
         $radio_txrx= explode("\n", exec_uc("get_txrx_status"))[0];
+		$radio_rx=false;
+		$radio_tx=true;
         if ($radio_txrx == "INRX"){
             $radio_rx =true;
             $radio_tx =false;
