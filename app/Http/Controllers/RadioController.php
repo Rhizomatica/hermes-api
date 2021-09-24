@@ -395,10 +395,10 @@ class RadioController extends Controller
     public function setRadioLedStatus($status)
     {
 		$par = '';
-        if ($status = "ON"){
+        if ($status == "ON"){
             $par = "set_led_status -a ON";
         }
-        elseif ($status = "OFF"){
+        elseif ($status == "OFF"){
             $par = "set_led_status -a OFF";
         }
         else{
@@ -408,7 +408,7 @@ class RadioController extends Controller
         $command= exec_uc($par);
         if ($command == "OK"){
             $radio_led= explode("\n", exec_uc("get_led_status"))[0];
-        	return response("setRadioLEDS : ", $radio_led, 200);
+        	return response()->json($radio_led, 200);
         }
         else {
         	return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
@@ -462,10 +462,10 @@ class RadioController extends Controller
     public function setRadioBypassStatus($status)
     {
 		$par = '';
-        if ($status = "ON"){
+        if ($status == "ON"){
             $par = "set_bypass_status -a ON";
         }
-        elseif ($status = "OFF"){
+        elseif ($status == "OFF"){
             $par = "set_bypass_status -a OFF";
         }
         else{
@@ -476,12 +476,7 @@ class RadioController extends Controller
 
         if ($command == "OK"){
             $radio_bypass= explode("\n", exec_uc("get_bypass_status"))[0];
-        	if($radio_bypass== "BYPASS_ON"){
-            	return response( true, 200);
-        	}
-        	elseif($radio_bypass== "BYPASS_OFF"){
-            	return response( false, 200);
-        	}
+            return response()->json($radio_bypass, 200);
         }
         else {
         	return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
