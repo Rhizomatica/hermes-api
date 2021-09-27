@@ -426,11 +426,16 @@ class RadioController extends Controller
         $command = explode("\n", exec_uc("get_led_status"))[0];
         if ($command == "OK"){
             $radio_led= explode("\n", exec_uc("get_led_status"))[0];
-			if ($radio_led = "LED_ON"){
+
+			if ($radio_led == "LED_ON"){
         		return response()->json(true, 200);
 			}
-			elseif($adio_led = "LED_OFF"){
+			elseif($adio_led == "LED_OFF"){
 				return responde()->json(false, 200);
+			}
+			else {
+        		return response()->json(['message' => 'setRadioBfo return error: ' . $command], 500);
+
 			}
         }
         else {
