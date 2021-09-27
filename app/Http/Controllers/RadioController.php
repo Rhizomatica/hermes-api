@@ -431,7 +431,7 @@ class RadioController extends Controller
         		return response()->json(true, 200);
 			}
 			elseif($radio_led == "LED_OFF"){
-				return responde()->json(false, 200);
+				return response()->json(false, 200);
 			}
 			else {
         		return response()->json(['message' => 'setRadioBfo return error: ' . $command], 500);
