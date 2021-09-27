@@ -566,7 +566,7 @@ class RadioController extends Controller
      */
     public function setRadioRefThreshold($value)
     {
-		if ($value > 0 && $value < 1023){
+		if ($value >= 0 && $value <= 1023){
         	$par = "set_ref_threshold -a " . $value;
         	$radio_ref_threshold = explode("\n", exec_uc($par))[0];
         	if($radio_ref_threshold == "OK"){
