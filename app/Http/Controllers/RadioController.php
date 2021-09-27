@@ -423,7 +423,7 @@ class RadioController extends Controller
         	return response()->json(['message' => 'setRadioLedStatus fail' . $command], 500);
         }
 
-        $command = explode("\n", exec_uc("get_led_status"))[0];
+        $command = explode("\n", exec_uc($par))[0];
         if ($command == "OK"){
             $radio_led= explode("\n", exec_uc("get_led_status"))[0];
 
