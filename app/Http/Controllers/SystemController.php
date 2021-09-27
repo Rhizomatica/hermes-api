@@ -102,7 +102,7 @@ class SystemController extends Controller
 
         $phpmemory = ( ! function_exists('memory_get_usage')) ? '0' : round(memory_get_usage()/1024/1024, 2).'MB';
         $status = [
-            'status' => $piduu && $pidmodem &&  $pidradio && $pidhmp && $piduu && $pidpf,
+            'status' => $piduu &&  $piduuardop && $pidmodem &&  $pidradio && $pidhmp && $piduu && $pidpf,
             'uname' => $uname,
             'nodename' => exec_nodename(),
 			'name' => env('HERMES_NAME'),
@@ -113,6 +113,7 @@ class SystemController extends Controller
             'wifich' => $wifich?$wifich:false,
             'interfaces' => $interfaces,
             'piduu' => $piduu?$piduu:false,
+            'piduuardop' => $piduuardop?$piduuardop:false,
             'pidmodem' => $pidmodem?$pidmodem:false,
             'pidradio' => $pidradio?$pidradio:false,
             'pidhmp' => $pidhmp?$pidhmp:false,
