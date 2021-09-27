@@ -430,7 +430,7 @@ class RadioController extends Controller
 			if ($radio_led == "LED_ON"){
         		return response()->json(true, 200);
 			}
-			elseif($adio_led == "LED_OFF"){
+			elseif($radio_led == "LED_OFF"){
 				return responde()->json(false, 200);
 			}
 			else {
