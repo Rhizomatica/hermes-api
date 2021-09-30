@@ -135,11 +135,15 @@ class SystemController extends Controller
     public function getMailDiskUsage()
     {
 		//print($users);
-		$disk_free_cmd = exec_cli("echo btrfs filesystem du -s --human-readable /var/vmail/" . env("HERMES_DOMAIN") . "/* > /tmp/du.sh");
-		$disk_free_cmd = exec_cli("chmod +x /tmp/du.sh");
-		$disk_free = exec_cli("sudo /tmp/du.sh");
-		print ($disk_free);
-        return response()->json($disk_free, 200);
+		$output = exec_cli("echo btrfs filesystem du -s --human-readable /var/vmail/" . env("HERMES_DOMAIN") . "/* | grep -v Total> /tmp/du.sh");
+		if (!$output){
+			$output = exec_cli("chmod +x /tmp/du.sh");
+			if (!$output){
+				$disk_free = explode("\n ", exec_cli("sudo /tmp/du.sh"));
+        			return response()->json($disk_free, 200);
+			}
+		}
+		return responde()->json("error",500);
     }
 
     /**

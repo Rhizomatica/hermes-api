@@ -612,16 +612,20 @@ class RadioController extends Controller
 	 * 
 	 * @return Json
 	 */
-	public function resetRadioDefaults()
+	public function resetRadioToDefaults()
 	{
-		exec_ucr("set_master_cal -a " . env('RADIO_MASTER_CAL', '0')) or die;
-		exec_ucr("set_bypass_status -a " . env('RADIO_BYPASS_STATUS', 'OFF')) or die;
-		exec_ucr("set_led_status -a " . env('RADIO_LED_STATUS', '0')) or die;
-		exec_ucr("set_serial -a " . env('RADIO_SERIAL', '0')) or die;
-		exec_ucr("set_bfo -a " . env('RADIO_BFO', '0')) or die;
-		exec_ucr("set_mode -a " . env('RADIO_MODE', 'USB')) or die;
-		exec_ucr("set_freq -a " . env('RADIO_FREQ', '6940000')) or die;
-		exec_ucr("set_protection -a " . env('RADIO_PROT', '6940000')) or die;
-		return response()->json(['message' => 'resetRadioDefaults fail'], 500);
+		exec_ucr("resettodefaults") or die;
+		return response()->json(['message' => 'resetRadioToDefaults fail'], 500);
+	}
+
+	/**
+	 * Set Defaults values 
+	 * 
+	 * @return Json
+	 */
+	public function setRadioDefaults()
+	{
+		exec_ucr("setdefaults ") or die;
+		return response()->json(['message' => 'setRadioDefaults fail'], 500);
 	}
 }
