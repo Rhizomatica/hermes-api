@@ -536,24 +536,6 @@ class RadioController extends Controller
     }
 
     /**
-     * Set Radio Serial
-     *
-     * @return Json
-     */
-    public function setRadioSerial($serial)
-    {
-        $par = "set_serial -a " . $serial;
-        $radio_serial = explode("\n", exec_uc($par))[0];
-        if($radio_serial == "OK"){
-            return response()->json($serial, 200);
-        }
-        else{
-        	return response()->json(['message' => 'setRadioSerial fail: ' . $serial], 500);
-        }
-    }
-
-
-    /**
      * Get Radio reflected threshold
      *
      * @return Json
