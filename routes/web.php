@@ -88,6 +88,7 @@ $router->post('login', ['uses' => 'UserController@login']); //TODO remove
 $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->post('login', ['uses' => 'UserController@login']); 
     $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
+    $router->get('maildu',  ['uses' => 'SystemController@getMailDiskUsage']);
     $router->get('config',  ['uses' => 'SystemController@getSysConfig']);
     $router->post('config',  ['uses' => 'SystemController@setSysConfig']);
     $router->get('',  ['uses' => 'SystemController@getSysStatus']); //double hit for status

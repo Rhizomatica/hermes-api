@@ -95,9 +95,9 @@ class SystemController extends Controller
         $wifich= explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep channel| cut -c9-"))[0];
         $ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''));
 		array_pop($ip);
+		$disk_free = exec_cli("df -h | grep -nvme0n1p2 | awk '{print $4}'");
         $interfaces= explode("\n", exec_cli('ip r'));
 		array_pop($interfaces);
-        //$memory = explode(" ", exec_cli("free | grep Mem|cut -f 8,13,19,25,31,37 -d \" \""));
         $memory = explode(" ", exec_cli("free --mega| grep Mem | awk '{print ($2\" \"$3\" \"$4)}'"));
 
         $phpmemory = ( ! function_exists('memory_get_usage')) ? '0' : round(memory_get_usage()/1024/1024, 2).'MB';
@@ -122,9 +122,24 @@ class SystemController extends Controller
  			'memtotal' => $memory[0]."MB",
             'memused' => $memory[1]."MB",
             'memfree' => explode("\n", $memory[2])[0]."MB",
-            'memfree' => explode("\n", $memory[2])[0]."MB",
+			'diskfree' => $disk_free?$disk_free:false,
         ];
-        return response($status, 200);
+        return response()->json($status, 200);
+    }
+
+    /**
+     * Get mail use on disk
+     *
+     * @return Table
+     */
+    public function getMailDiskUsage()
+    {
+		//print($users);
+		$disk_free_cmd = exec_cli("echo btrfs filesystem du -s --human-readable /var/vmail/" . env("HERMES_DOMAIN") . "/* > /tmp/du.sh");
+		$disk_free_cmd = exec_cli("chmod +x /tmp/du.sh");
+		$disk_free = exec_cli("sudo /tmp/du.sh");
+		print ($disk_free);
+        return response()->json($disk_free, 200);
     }
 
     /**
