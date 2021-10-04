@@ -569,7 +569,7 @@ class RadioController extends Controller
         	}
 		}
 		else {
-			return response()->json(['message' => 'setRadioRefThreshold out of limit - 0...1023: '] . $value, 500);	
+			return response()->json(['message' => 'setRadioRefThreshold out of limit - 0...1023: '. $value] , 500);	
 		}
     }
 
