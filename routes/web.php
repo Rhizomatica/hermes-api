@@ -135,6 +135,7 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->get('serial',  ['uses' => 'RadioController@getRadioSerial']);
     $router->get('refthreshold',  ['uses' => 'RadioController@getRadioRefThreshold']);
     $router->post('refthreshold/{value}',  ['uses' => 'RadioController@setRadioRefThreshold']);
+    $router->post('refthresholdv/{value}',  ['uses' => 'RadioController@setRadioRefThresholdV']);
     $router->post('protection',  ['uses' => 'RadioController@resetRadioProtection']);
     $router->post('resetdefaults',  ['uses' => 'RadioController@resetRadiotoDefaults']);
     $router->post('setdefaults',  ['uses' => 'RadioController@setRadioDefaults']);
