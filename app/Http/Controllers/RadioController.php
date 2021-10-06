@@ -82,9 +82,9 @@ class RadioController extends Controller
         $radio_frequency= explode("\n", exec_uc("get_frequency"))[0];
         $radio_mode= explode("\n", exec_uc("get_mode"))[0];
         $radio_ref_threshold= explode("\n", exec_uc("get_ref_threshold"))[0];
-	//rounding and convert threshold to volts
-	$fig = (int) str_pad('1', 3, '0');
-	$radio_ref_thresholdv = $radio_ref_threshold*4.5/1023;
+		//rounding and convert threshold to volts
+		$fig = (int) str_pad('1', 3, '0');
+		$radio_ref_thresholdv = $radio_ref_threshold*4.5/1023;
         $radio_ref_thresholdv = (floor($radio_ref_thresholdv*$fig)/$fig);
         $radio_serial = explode("\n", exec_uc("get_serial"))[0];
         $radio_bfo= explode("\n", exec_uc("get_bfo"))[0];
@@ -92,10 +92,10 @@ class RadioController extends Controller
         $radio_ref= explode("\n", exec_uc("get_ref"))[0];
         $radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
         $radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep alsatonic -a"))[0]) ;
-	if (isset($radio_test_tone[3])){
-		$radio_test_tone=$radio_test_tone[3];
-	}
-	else{ $radio_test_tone = 0; }
+		if (isset($radio_test_tone[3])){
+			$radio_test_tone=$radio_test_tone[3];
+		}
+		else{ $radio_test_tone = 0; }
 
         $radio_txrx= explode("\n", exec_uc("get_txrx_status"))[0];
 		$radio_rx=false;
