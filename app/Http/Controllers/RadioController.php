@@ -142,7 +142,7 @@ class RadioController extends Controller
             'mastercal' => $radio_mastercal,
             'protection' => $radio_protection,
             'refthreshold' => $radio_ref_threshold,
-            'refthresholdv' => 4.5/1023*$radio_ref_threshold,
+            'refthresholdv' => ceil(4.5/1023*$radio_ref_threshold,3),
             'bypass' =>  $radio_bypass,
             'serial' =>  $radio_serial,
 	    'testtone' => $radio_test_tone
@@ -594,7 +594,7 @@ class RadioController extends Controller
         	}
 		}
 		else {
-			return response()->json(['message' => 'setRadioRefThresholdV out of limit - 0...45: '. $value] , 500);	
+			return response()->json(['message' => 'setRadioRefThresholdV out of limit - 0...4.5: '. $value] , 500);	
 		}
     }
 
