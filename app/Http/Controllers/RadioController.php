@@ -594,7 +594,7 @@ class RadioController extends Controller
             	return response($value, 200);
         	}
         	else{
-        		return response()->json(['message' => 'setRadioRefThresholdV fail: ' . $radio_ref_threshold], 500);
+        		return response()->json(['message' => 'setRadioRefThresholdV fail: ' . $value], 500);
         	}
 		}
 		else {
