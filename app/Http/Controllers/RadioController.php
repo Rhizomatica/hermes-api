@@ -581,9 +581,9 @@ class RadioController extends Controller
      */
     public function setRadioRefThresholdV($value)
     {
-		if ($value >= 0 && $value <= 45){
+		if ($value >= 0 && $value <= 4.5){
 			$ratio = 4.5/1023;
-			$value = floor($value / $ratio);
+			$value = ceil($value / $ratio);
         	$par = "set_ref_threshold -a " . $value;
         	$radio_ref_threshold = explode("\n", exec_uc($par))[0];
         	if($radio_ref_threshold == "OK"){
