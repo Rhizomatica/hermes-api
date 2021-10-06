@@ -82,6 +82,8 @@ class RadioController extends Controller
         $radio_frequency= explode("\n", exec_uc("get_frequency"))[0];
         $radio_mode= explode("\n", exec_uc("get_mode"))[0];
         $radio_ref_threshold= explode("\n", exec_uc("get_ref_threshold"))[0];
+		$fig = (int) str_pad('1', 3, '0');
+        $radio_ref_thresholdv = (ceil($radio_ref_threshold*$fig)/$fig);
         $radio_serial = explode("\n", exec_uc("get_serial"))[0];
         $radio_bfo= explode("\n", exec_uc("get_bfo"))[0];
         $radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
@@ -142,7 +144,8 @@ class RadioController extends Controller
             'mastercal' => $radio_mastercal,
             'protection' => $radio_protection,
             'refthreshold' => $radio_ref_threshold,
-            'refthresholdv' => ceil(4.5/1023*$radio_ref_threshold,3),
+            //'refthresholdv' => ceil(4.5/1023*$radio_ref_threshold,3),
+			'refthresholdv'=> $radio_ref_thresholdv,
             'bypass' =>  $radio_bypass,
             'serial' =>  $radio_serial,
 	    'testtone' => $radio_test_tone
