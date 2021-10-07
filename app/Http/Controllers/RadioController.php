@@ -84,7 +84,7 @@ class RadioController extends Controller
         $radio_ref_threshold= explode("\n", exec_uc("get_ref_threshold"))[0];
 		//rounding and convert threshold to volts
 		$fig = (int) str_pad('1', 3, '0');
-		$radio_ref_thresholdv = $radio_ref_threshold*4.5/1023;
+		$radio_ref_thresholdv = $radio_ref_threshold*5/1023;
         $radio_ref_thresholdv = (floor($radio_ref_thresholdv*$fig)/$fig);
         $radio_serial = explode("\n", exec_uc("get_serial"))[0];
         $radio_bfo= explode("\n", exec_uc("get_bfo"))[0];
@@ -146,10 +146,10 @@ class RadioController extends Controller
             'mastercal' => $radio_mastercal,
             'protection' => $radio_protection,
             'refthreshold' => $radio_ref_threshold,
-	    'refthresholdv'=> $radio_ref_thresholdv,
+	        'refthresholdv'=> $radio_ref_thresholdv,
             'bypass' =>  $radio_bypass,
             'serial' =>  $radio_serial,
-	    'testtone' => $radio_test_tone
+	        'testtone' => $radio_test_tone
         ];
         return response()->json($status, 200);
     }
@@ -585,8 +585,8 @@ class RadioController extends Controller
      */
     public function setRadioRefThresholdV($value)
     {
-		if ($value >= 0 && $value <= 4.5){
-			$ratio = 4.5/1023;
+		if ($value >= 0 && $value <= 5){
+			$ratio = 5/1023;
 			$vvalue = ceil($value / $ratio);
         	$par = "set_ref_threshold -a " . $vvalue;
         	$radio_ref_threshold = explode("\n", exec_uc($par))[0];
@@ -598,7 +598,7 @@ class RadioController extends Controller
         	}
 		}
 		else {
-			return response()->json(['message' => 'setRadioRefThresholdV out of limit - 0...4.5: '. $value] , 500);	
+			return response()->json(['message' => 'setRadioRefThresholdV out of limit - 0...5: '. $value] , 500);	
 		}
     }
 
