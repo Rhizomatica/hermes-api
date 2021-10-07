@@ -567,7 +567,7 @@ class RadioController extends Controller
         	$par = "set_ref_threshold -a " . $value;
         	$radio_ref_threshold = explode("\n", exec_uc($par))[0];
         	if($radio_ref_threshold == "OK"){
-            	return response($value, 200);
+            	  return response($value, 200);
         	}
         	else{
         		return response()->json(['message' => 'setRadioRefThreshold fail: ' . $radio_ref_threshold], 500);
@@ -587,11 +587,11 @@ class RadioController extends Controller
     {
 		if ($value >= 0 && $value <= 4.5){
 			$ratio = 4.5/1023;
-			$value = ceil($value / $ratio);
-        	$par = "set_ref_threshold -a " . $value;
+			$vvalue = ceil($value / $ratio);
+        	$par = "set_ref_threshold -a " . $vvalue;
         	$radio_ref_threshold = explode("\n", exec_uc($par))[0];
         	if($radio_ref_threshold == "OK"){
-            	return response($value, 200);
+            		return response($value, 200);
         	}
         	else{
         		return response()->json(['message' => 'setRadioRefThresholdV fail: ' . $value], 500);
