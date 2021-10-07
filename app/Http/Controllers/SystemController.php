@@ -336,6 +336,7 @@ class SystemController extends Controller
 
     function sysReboot(){
         $command = "sudo reboot";
+        $output = exec_cli($command);
        return $output;
     }
 
