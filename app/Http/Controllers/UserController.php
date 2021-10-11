@@ -124,8 +124,8 @@ class UserController extends Controller
     public function update($id, Request $request)
     {
         //TODO? 
-        if($id == 'postmaster'){
-            return response()->json('Error: cant update postmaster', 504);
+        if($id == 'root'){
+            return response()->json('Error: cant update system user root', 504);
         }
         $username = env('HERMES_EMAILAPI_USER');
         $password = env('HERMES_EMAILAPI_PASS');
@@ -182,8 +182,8 @@ class UserController extends Controller
 
     public function delete($id)
     {
-        if($id == 'postmaster'){
-            return response()->json('Error: cant delete postmaster', 504);
+        if($id == 'root'){
+            return response()->json('Error: cant delete system user root', 504);
         }
         $username = env('HERMES_EMAILAPI_USER');
         $password = env('HERMES_EMAILAPI_PASS');

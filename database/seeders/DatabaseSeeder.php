@@ -17,9 +17,9 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         DB::table('users')->insert([
-            'email' => 'postmaster',
+            'email' => 'root',
             'name' => 'admin',
-            'password' => hash('sha256', 'secret'),
+            'password' => hash('sha256', 'caduceu'),
             'location' => 'local',
             'admin' => true
         ]);
