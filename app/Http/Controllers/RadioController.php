@@ -65,14 +65,6 @@ function exec_nodename(){
     return $output;
 }
 
-function tovolts($input){
-
-	$fig = (int) str_pad('1', 3, '0');
-	$tr = $input*5/1023;
-	$output = (floor($tr*$fig)/$fig);
-    return ($output);
-}
-
 //$username = env('HERMES_TOOL');
 
 
@@ -183,7 +175,6 @@ class RadioController extends Controller
         ];
         return response()->json($status, 200);
     }
-
 
     /**
 	 * 
