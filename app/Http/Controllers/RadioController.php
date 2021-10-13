@@ -65,6 +65,14 @@ function exec_nodename(){
     return $output;
 }
 
+function tovolts($input){
+
+	$fig = (int) str_pad('1', 3, '0');
+	$tr = $input*5/1023;
+	$output = (floor($tr*$fig)/$fig);
+    return ($output);
+}
+
 //$username = env('HERMES_TOOL');
 
 
@@ -82,14 +90,13 @@ class RadioController extends Controller
         $radio_frequency= explode("\n", exec_uc("get_frequency"))[0];
         $radio_mode= explode("\n", exec_uc("get_mode"))[0];
         $radio_ref_threshold= explode("\n", exec_uc("get_ref_threshold"))[0];
-		//rounding and convert threshold to volts
-		$fig = (int) str_pad('1', 3, '0');
-		$radio_ref_thresholdv = $radio_ref_threshold*5/1023;
-        $radio_ref_thresholdv = (floor($radio_ref_thresholdv*$fig)/$fig);
+		$radio_ref_thresholdv = tovolts($radio_ref_threshold);
         $radio_serial = explode("\n", exec_uc("get_serial"))[0];
-        $radio_bfo= explode("\n", exec_uc("get_bfo"))[0];
-        $radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
-        $radio_ref= explode("\n", exec_uc("get_ref"))[0];
+        $radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
+        $radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
+        $radio_fwdv = tovolts($radio_fwd);
+        $radio_ref = explode("\n", exec_uc("get_ref"))[0];
+        $radio_ref = tovolts($radio_ref);
         $radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
         $radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep alsatonic -a"))[0]) ;
 		if (isset($radio_test_tone[3])){
@@ -139,7 +146,9 @@ class RadioController extends Controller
             'led' => $radio_led,
             'bfo' => $radio_bfo,
             'fwd' => $radio_fwd,
+            'fwdv' => $radio_fwdv,
             'ref' => $radio_ref,
+            'refv' => $radio_refv,
             'txrx' => $radio_txrx,
             'tx' => $radio_tx,
             'rx' => $radio_rx,
@@ -153,6 +162,28 @@ class RadioController extends Controller
         ];
         return response()->json($status, 200);
     }
+
+    /**
+     * Get Radio tech status
+     *
+     * @return Json
+     */
+    public function getRadioPowerStatus()
+    {
+        $radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
+        $radio_fwdv= tovolts($radio_fwd);
+        $radio_ref= explode("\n", exec_uc("get_ref"))[0];
+        $radio_refv= tovolts($radio_ref);
+
+        $status = [
+            'fwd' => $radio_fwd,
+            'fwdv' => $radio_fwdv,
+            'ref' => $radio_ref,
+            'refv' => $radio_refv,
+        ];
+        return response()->json($status, 200);
+    }
+
 
     /**
 	 * 

@@ -112,6 +112,7 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
 
 $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->get('',  ['uses' => 'RadioController@getRadioStatus']);
+    $router->get('power',  ['uses' => 'RadioController@getRadioPowerStatus']);
     $router->get('mode',  ['uses' => 'RadioController@getRadioMode']);
     $router->post('mode/{mode}',  ['uses' => 'RadioController@setRadioMode']);
     $router->get('freq',  ['uses' => 'RadioController@getRadioFreq']);
