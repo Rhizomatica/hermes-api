@@ -59,6 +59,7 @@ class UserController extends Controller
                 //, 'phone', 'site', 'location', 'password', 'recoverphrase', 'recoveranswer', 'updated_at', 'created_at', 'admin'
                 //* Set the function parameters.
                 $client_id = 1;
+				$request['email'] = strtolower($request['email']);
                 $params = array(
                     'server_id' => 1,
                     'email' =>  $request['email'] . '@' . env('HERMES_DOMAIN'),
@@ -91,9 +92,10 @@ class UserController extends Controller
                 );
                 if($mailuser_id = $client->mail_user_add($session_id, $client_id, $params)){
                     $request['password'] = hash('sha256', $request['password']);
-                    $request['email_id'] = $mailuser_id;
+                    $request['emailid'] = $mailuser_id;
+
                     if($user = User::create($request->all())){
-                		$command = "uux -j  'hermes!k4!uuadm -a -m "  . $request['email'] . '@' . env('HERMES_DOMAIN') . '-n ' . $request['name']  . "'" ;
+                		$command = "uux -j '" . env('HERMES_ROUTE') . "!uuadm -a -m "  . $request['email'] . "@" . env('HERMES_DOMAIN') . " -n " . $request['name'] . "'" ;
                 		if ($output = exec_cli($command) ){
 							//returns uucp job id
 							$output = explode("\n", $output)[0];
@@ -123,10 +125,19 @@ class UserController extends Controller
 
     public function update($id, Request $request)
     {
-        //TODO? 
+		
+		//some tests
         if($id == 'root'){
-            return response()->json('Error: cant update system user root', 504);
-        }
+            return response()->json('Error: cant update root', 504);
+         }
+
+		if( $request['email']){
+			return response()->json('Error: cant change an existing login email', 504);
+		}
+
+		if (! $request[ 'name'] && ! $request[ 'password'] && ! $request[ 'phone']  && ! $request[ 'site'] && ! $request[ 'location'] && ! $request[ 'recoverphrase'] && ! $request[ 'recoveranswer'] && ! $request[ 'admin'] ){
+			return response()->json('Error: cant update without data form ', 504);
+		}
         $username = env('HERMES_EMAILAPI_USER');
         $password = env('HERMES_EMAILAPI_PASS');
         $soap_location = env('HERMES_EMAILAPI_LOC');
@@ -140,26 +151,42 @@ class UserController extends Controller
 
         try {
             if($session_id = $client->login($username, $password)) {
-                //* Parameters
-                $mailuser_id = 1;
+
+                // Get the email user record
+                $mail_user_record = $client->mail_user_get($session_id, $id);
+
+				if ($request['name']){
+                  	$mail_user_record['name'] = $request['name'];
+				}
+
+				if ($request['password']){
+                  	$mail_user_record['password'] = $request['password'];
+				}
+
+				if ($request['phone']){
+                  	$mail_user_record['phone'] = $request['phone'];
+				}
+
+
                 $client_id = 1;
+				//Update the email record
+				$affected_rows = $client->mail_user_update($session_id, $client_id, $id, $mail_user_record);
 
-                //* Get the email user record
-                $mail_user_record = $client->mail_user_get($session_id, $mailuser_id);
+				//disconnect SOAP
+                $client->logout($session_id);
+				$login = $mail_user_record['login'];
+                if ( $affected_rows > 0) {
+                    if(  $user = User::firstWhere('email', $login)){
+						if ($request['password']){
+                        	$request['password'] = hash('sha256', $request['password']);
+						}
 
-                //* Change the status to inactive
-                $mail_user_record['name'] = $request['name'];
-                $mail_user_record['password'] = $request['password'];
-
-                if ( $affected_rows = $client->mail_user_update($session_id, $client_id, $mailuser_id, $mail_user_record)){
-                    $client->logout($session_id);
-                    if(  $user = User::firstWhere('email', $id)){
-                        $request['password'] = hash('sha256', $request['password']);
-                        if (User::where('email', $id)->update($request->all())){
-                            return response()->json($id . ' updated', 200);
+                        if (User::where('email', $login)->update($request->all())){
+                    		$user = User::firstWhere('email', $login);
+                            return response()->json( $user, 200);
                         }
                         else {
-                            return response()->json('Error updating user database', 500);
+                            return response()->json('Update ISPCONFIG but error when update local database', 500);
                         }
                     }
                     else {
@@ -180,7 +207,7 @@ class UserController extends Controller
     }
 
 
-    public function delete($id)
+    public function delete($id,$mail)
     {
         if($id == 'root'){
             return response()->json('Error: cant delete system user root', 504);
@@ -196,35 +223,37 @@ class UserController extends Controller
                 'exceptions' => 1));
         try {
             if($session_id = $client->login($username, $password)) {
-                //* Parameters
-                $mailuser_id = 1;
-                $affected_rows = $client->mail_user_delete($session_id, $mailuser_id);
 
-                $command = "uux -j  . env('HERMES_ROUTE') . '!uuadm -d -m "  . $id . '@' . env('HERMES_DOMAIN') .  "'" ;
-                if (!$output = exec_cli($command) ){
-					//returns uucp job id
-					$output = explode("\n", $output)[0];
-                   	return response()->json($output, 203); //deleted
+                $affected_rows = $client->mail_user_delete($session_id, $id);
+                $client->logout($session_id);
+				if ($affected_rows > 0){
+                	if( User::firstWhere('email', $mail)){
+                    	if (User::where('email', $mail)->delete()){
+                			$command = "uux -j '" . env('HERMES_ROUTE') . "!uuadm -d -m "  . $mail . '@' . env('HERMES_DOMAIN') .  "'" ;
+                			if ($output = exec_cli($command) ){
+								//returns uucp job id
+								$uucp_job_id= explode("\n", $output)[0];
+                        		return response()->json($uucp_job_id , 200);
+							}
+							else {
+              					return response('Hermes delete user: create user and email. but has trouble to advise to central by uucp: ' . $output . $command, 300);
+							}
+                    	}
+                    	else {
+                        	return response()->json('can\'t delete', 500);
+                    	}
+                	}
+                	else {
+                    	return response()->json('can\'t find', 404);
+                	}
 				}
 				else {
-              		return response('Hermes delete user: create user table and ispconfig but Error on uucp to advise: ' . $output . $command, 300);
+                    	return response()->json('can\'t remove email from server', 404);
 				}
-                $client->logout($session_id);
 
-                if( User::firstWhere('email', $id)){
-                    if (User::where('email', $id)->delete()){
-                        return response()->json($id . ' deleted', 200);
-                    }
-                    else {
-                        return response()->json('can\'t delete', 500);
-                    }
-                }
-                else {
-                    return response()->json('can\'t find', 404);
-                }
             }
             else{
-                return response()->json('Error: login on ISP' + $id, 504);
+                return response()->json('Error: cant login on ISP' + $id, 504);
             }
         } catch (SoapFault $e) {
             echo $client->__getLastResponse();

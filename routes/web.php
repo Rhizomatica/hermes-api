@@ -40,7 +40,7 @@ $router->group(['prefix' => '/user'], function () use ($router) {
     $router->get('{id}', ['uses' => 'UserController@showOneUser']);
     $router->post('', ['uses' => 'UserController@create']);
     $router->post('{id}', ['uses' => 'UserController@update']);
-    $router->delete('{id}', ['uses' => 'UserController@delete']);
+    $router->delete('{id}/{mail}', ['uses' => 'UserController@delete']);
 });
 
 // Messages routes
