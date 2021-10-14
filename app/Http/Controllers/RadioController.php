@@ -58,14 +58,20 @@ function exec_ucr($command)
 
 function exec_nodename(){
 
-    //$command = 'cat /etc/uucp/config|grep nodename|cut -f 2 -d " "';
+    $command = 'cat /etc/uucp/config|grep nodename|cut -f 2 -d " "';
     $output = exec_uc($command);
     $output = explode("\n", $output)[0];
 
     return $output;
 }
 
-//$username = env('HERMES_TOOL');
+function tovolts($input){
+
+	$fig = (int) str_pad('1', 3, '0');
+	$tr = $input*5/1023;
+	$output = (floor($tr*$fig)/$fig);
+    return ($output);
+}
 
 
 class RadioController extends Controller
