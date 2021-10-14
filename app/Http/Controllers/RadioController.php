@@ -94,7 +94,7 @@ class RadioController extends Controller
         $radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
         $radio_fwdv = tovolts($radio_fwd);
         $radio_ref = explode("\n", exec_uc("get_ref"))[0];
-        $radio_ref = tovolts($radio_ref);
+        $radio_refv = tovolts($radio_ref);
         $radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
         $radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep alsatonic -a"))[0]) ;
 		if (isset($radio_test_tone[3])){
