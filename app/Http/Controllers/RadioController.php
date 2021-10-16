@@ -647,24 +647,35 @@ class RadioController extends Controller
     }
 
 	/**
-	 * Reset radio values to default
-	 * 
-	 * @return Json
-	 */
-	public function resetRadioToDefaults()
-	{
-		exec_ucr("resettodefaults") or die;
-		return response()->json(['message' => 'resetRadioToDefaults fail'], 500);
-	}
-
-	/**
-	 * Set Defaults values 
+	 * Set radio defaults
 	 * 
 	 * @return Json
 	 */
 	public function setRadioDefaults()
 	{
-		exec_ucr("setdefaults ") or die;
-		return response()->json(['message' => 'setRadioDefaults fail'], 500);
+        $output = explode("\n", exec_uc("set_radio_defaults"))[0];
+        if($output == "OK"){
+            return response( true, 200);
+        }
+        else{
+        	return response()->json(['message' => 'setRadioDefaults fail: ' . $output], 500);
+        }
 	}
+
+	/**
+	 * restore radio  defaults
+	 * 
+	 * @return Json
+	 */
+	public function restoreRadioDefaults()
+	{
+        $output = explode("\n", exec_uc("restore_radio_defaults"))[0];
+        if($output == "OK"){
+            return response( true, 200);
+        }
+        else{
+        	return response()->json(['message' => 'restoreRadioDefaults fail: ' . $output], 500);
+        }
+	}
+
 }
