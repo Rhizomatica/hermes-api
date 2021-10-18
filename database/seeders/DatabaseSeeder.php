@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
         }
         for($a=1; $a<=5; $a++){
             DB::table('messages')->insert([
-                'name' => 'send message seeded'.Str::random(10),
+                'name' => 'send message seeded'.Str::random(0),
                 'dest' => 'local',
                 'orig' => 'local',
                 'file' => null,

@@ -140,8 +140,6 @@ class MessageController extends Controller
                 $message->draft=false;
                 $message->update($message);
                 Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'sent message . '. $message->id  . ' - ' . $message   );
-                //$output = exec_cli($command);
-                //TODO test output for error
             }
             else{
         		return response()->json(['message' => 'Hermes send message Error: Cant find '.$message->id. '  HMP uucp'], 500);
@@ -155,7 +153,7 @@ class MessageController extends Controller
     }
 
      /**
-     * createMessage - createMessage on database
+     * createMessage - createMessage on database (DEPRECATED)
      * parameter: http request
      *
      * @return Json
@@ -169,7 +167,7 @@ class MessageController extends Controller
     }
 
     /**
-     * updateMessage - Send Hermes Message Pack
+     * updateMessage - update Hermes Message Pack (DEPRECATED)
      * parameter: id and http request
      *
      * @return Json
