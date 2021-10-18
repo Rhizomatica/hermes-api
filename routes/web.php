@@ -65,6 +65,7 @@ $router->group(['prefix' => '/inbox'], function () use ($router) {
     $router->get('delete/{id}', ['uses' => 'MessageController@deleteInboxMessage']);
     $router->get('hide/{id}', ['uses' => 'MessageController@hideInboxMessage']);
     $router->get('unhide/{id}', ['uses' => 'MessageController@unhideInboxMessage']);
+    $router->post('uncrypt/{id}', ['uses' => 'MessageController@unCrypt']);
 });
 
 

@@ -51,7 +51,6 @@ class SystemController extends Controller
     public function setSysConfig(Request $request)
     {
         if ($request->all()){
-            //TODO
               if (System::select()->update($request->all())){
                 return response()->json($request->all() , 200);
             }
@@ -162,23 +161,6 @@ class SystemController extends Controller
         $output =  explode("\n ", $output);
         return  $output;
     }
-
-    /**
-     * Get info if system is running
-     *
-     * @return Boolean
-     */
-    public function isRunning(){
-        //TODO
-        exec("pgrep -x uuardopd", $piduu);
-        exec("pgrep -x ardop", $pidar);
-        if(empty($piduu) || empty($pidar)){
-            return false; //we have a problem!;
-        } else {
-            return true; //system is working!;
-        }
-    }
-
 
     /**
      * Get all Stations from uucp

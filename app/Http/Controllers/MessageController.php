@@ -45,7 +45,7 @@ class MessageController extends Controller
                     $cryptout = $output; // redundant
                 }
                 else {
-        			return response()->json(['message' => 'Hermes send message Error: can\'t encrypt the message: ' . $output . $command], 500);
+        			return response()->json(['message' => 'sendHMP: can\'t encrypt the message: ' . $output . $command], 500);
                 }
                 $message->secure=true;
                 $message->text=bin2hex($cryptout);
@@ -60,7 +60,7 @@ class MessageController extends Controller
 
             // Write message file
             if (! Storage::disk('local')->put('tmp/' . $message->id . '/hmp.json'  , $message)){
-        		return response()->json(['message' => 'Hermes pack message Error: can\'t write message file'], 500);
+        		return response()->json(['message' => 'sendHMP Error: can\'t write message file'], 500);
             }
 
             // Has image?  - TODO change file for image in DB
@@ -320,35 +320,34 @@ class MessageController extends Controller
     }
 
     /**
-     * execDecrypt
-     * parameter: message id
+     * unCrypt message 
+     * parameter: message id, $request->pass
      * TODO ALL
      * @return Json
      */
-    public function execDecrypt($id){
-        //TODO path
-        $path = $_POST['path'];
-        $dec_subdir=dirname($path)."/dec/";
-        mkdir($dec_subdir, 0777, TRUE);
-        $outfile=$dec_subdir.basename($path,".gpg");
-        //TODO
-        $command = "decrypt.sh ".$path." ".$outfile." ".$_POST['password'];
-        $output = exec_cli($command);
+    public function unCrypt($id, Request $request){
+		if ($request->pass) {
+        	if ($message = Message::find($id)){
+				if ($message['secure'] ){
+                	$crypt = hex2bin($message['text']);
+            		if ( Storage::disk('local')->put('tmp/' . $message->id . '-uncrypt'  , $crypt)){
+						$path = Storage::disk('local')->path('tmp') . '/' . $message->id . '-uncrypt';
+						$command  = 'gpg -d --batch --passphrase "' .  $request->pass . '" --decrypt ' . $path  ;
+						$output = exec_cli($command);
+						return $output;
+					}
+				}
+				else{
+        			return response()->json(['message' => 'HMP uncrypt error: message is not secured'], 500);
+				}
 
-        if ($return_var == 0){
-            //TODO this path can't be here
-            $prefix = '/var/www/html/';
-
-            if (substr($outfile, 0, strlen($prefix)) == $prefix) {
-                $str = substr($outfile, strlen($prefix));
-            }
-            //correct password
-            //TODO  // basename($str);
-            return $str;
-        } else {
-            // wrong password
-            unlink($outfile);
-            return FALSE;
-        }
-    }
+			}
+			else{
+       			return response()->json(['message' => 'HMP uncrypt error: cant find message'], 500);
+			}
+		}
+		else{
+       			return response()->json(['message' => 'HMP uncrypt error: form pass is required'], 500);
+		}
+	}
 }
