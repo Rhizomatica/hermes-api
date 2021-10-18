@@ -38,18 +38,17 @@ class DatabaseSeeder extends Seeder
             'draft' => false 
         ]);
 
-        for($a=1; $a<=25; $a++){
-            DB::table('messages')->insert([
-                'name' => 'received test message '.Str::random(10),
-                'dest' => 'local',
-                'orig' => 'local',
-                'file' => null,
-                'text' => 'lorem ipsum',
-                'draft' => false ,
-                'inbox' => true
-            ]);
-        }
-        for($a=1; $a<=25; $a++){
+		db::table('messages')->insert([
+			'name' => 'bienvenido ',
+			'dest' => 'local',
+			'orig' => 'local',
+			'file' => null,
+			'text' => 'Bienvenido ao sistema Hermes',
+			'draft' => false ,
+			'inbox' => true
+		]);
+
+        for($a=1; $a<=5; $a++){
             DB::table('messages')->insert([
                 'name' => 'stuck test message '.Str::random(10),
                 'dest' => 'local',
@@ -59,7 +58,7 @@ class DatabaseSeeder extends Seeder
                 'draft' => true
             ]);
         }
-        for($a=1; $a<=25; $a++){
+        for($a=1; $a<=5; $a++){
             DB::table('messages')->insert([
                 'name' => 'send message seeded'.Str::random(10),
                 'dest' => 'local',
