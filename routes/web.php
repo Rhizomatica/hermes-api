@@ -46,6 +46,7 @@ $router->group(['prefix' => '/user'], function () use ($router) {
 // Messages routes
 $router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']);
 $router->get('/messages',  ['uses' => 'MessageController@showAllMessages']);
+$router->get('/messages/{type}',  ['uses' => 'MessageController@showAllMessagesByType']);
 
 $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('', ['uses' => 'MessageController@showAllMessages']);
