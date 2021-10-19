@@ -36,7 +36,7 @@ class MessageController extends Controller
 			return response()->json(Message::where('draft', '=', true)->get());
 		}
 		else{
-			return response()->json(Message::where('sent_at', '!=', null)->get());
+			return response()->json(Message::where('inbox', '!=', true)->where('draft', '!=', true)->get());
 		}
     }
 
@@ -113,10 +113,6 @@ class MessageController extends Controller
             //work path
             $path = Storage::disk('local')->path('outbox/'.$message->id.'.hmp');
 
-            /* // TODO test for draft
-            if($message['draft']){
-            }*/
-
             // UUCP -C Copy  (default) / -d create dirs
             if (Storage::disk('local')->exists('outbox/'.$message->id.'.hmp')) {
                 $command = 'uucp -r -j -C -d \'' .  $path . '\' \'' . $message->dest . '!~/' . $message->orig . '-' . $message->id . '.hmp\''; ;
@@ -137,8 +133,10 @@ class MessageController extends Controller
 					}
 				} 
 				//setting no draft
-                $message->draft=false;
-                $message->update($message);
+				if (! $message->update([ 'draft' => false])){
+					return response()->json(['message' => 'Hermes sendMessage - cant update no draft:  ' . $output . $command], 500);
+				}
+
                 Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'sent message . '. $message->id  . ' - ' . $message   );
             }
             else{
