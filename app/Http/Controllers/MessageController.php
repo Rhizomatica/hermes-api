@@ -115,23 +115,13 @@ class MessageController extends Controller
 
             // UUCP -C Copy  (default) / -d create dirs
             if (Storage::disk('local')->exists('outbox/'.$message->id.'.hmp')) {
+				//send message by uucp
                 $command = 'uucp -r -j -C -d \'' .  $path . '\' \'' . $message->dest . '!~/' . $message->orig . '-' . $message->id . '.hmp\''; ;
-				//TODO better way to do this
+				//TODO better way to do this?
                 //$command = "uucp -r -j -C -d '" .  $path . " '" . $message->dest . "!~/" . $message->orig . "-" . $message->id . ".hmp'" ;
-                $output = exec_cli($command);
-
-				// local delivery does not supply a job id
-				if ($message->dest == 'local'){
-                	if ($output){
-						return response()->json(['message' => 'Hermes sendMessage - Error on uucp to local delivery:  ' . $output . $command], 500);
-					}
-				}
-				else{
-					if (!$output){
+                if(!$output = exec_cli($command)){
 						return response()->json(['message' => 'Hermes sendMessage - Error on uucp:  ' . $output . $command], 500);
-
-					}
-				} 
+				}
 				//setting no draft
 				if (! $message->update([ 'draft' => false])){
 					return response()->json(['message' => 'Hermes sendMessage - cant update no draft:  ' . $output . $command], 500);
