@@ -117,14 +117,12 @@ class MessageController extends Controller
             if (Storage::disk('local')->exists('outbox/'.$message->id.'.hmp')) {
 				//send message by uucp
                 $command = 'uucp -r -j -C -d \'' .  $path . '\' \'' . $message->dest . '!~/' . $message->orig . '-' . $message->id . '.hmp\''; ;
-				//TODO better way to do this?
-                //$command = "uucp -r -j -C -d '" .  $path . " '" . $message->dest . "!~/" . $message->orig . "-" . $message->id . ".hmp'" ;
-                if(!$output = exec_cli($command)){
-						return response()->json(['message' => 'Hermes sendMessage - Error on uucp:  ' . $output . $command], 500);
+                if(!$output = exec_cli_no($command)){
+						return response()->json(['message' => 'Hermes sendMessage - Error on uucp:  ' . $output ], 500);
 				}
 				//setting no draft
 				if (! $message->update([ 'draft' => false])){
-					return response()->json(['message' => 'Hermes sendMessage - cant update no draft:  ' . $output . $command], 500);
+					return response()->json(['message' => 'Hermes sendMessage - cant update no draft:  ' . $output ], 500);
 				}
 
                 Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'sent message . '. $message->id  . ' - ' . $message   );
@@ -137,7 +135,7 @@ class MessageController extends Controller
         	return response()->json(['message' => 'Hermes pack message Error: can\'t create message in DB'], 500);
         }
 
-        return response()->json(['message' => 'Hermes sendMessage: DONE', 'command' => $command  , 'output cli' => $output, 'content' => $message], 200);
+        return response()->json(['message' => 'Hermes sendMessage: DONE', 'content' => $message], 200);
     }
 
      /**
@@ -244,7 +242,6 @@ class MessageController extends Controller
                 }
                 // TODO move audio and other files
             }
-
 
             if (Storage::disk('local')->exists('tmp/'.$id)){
                 if (!Storage::disk('local')->deleteDirectory('tmp/' .  $id)){
