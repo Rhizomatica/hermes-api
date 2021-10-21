@@ -70,7 +70,7 @@ class MessageController extends Controller
                     $cryptout = $output; // redundant
                 }
                 else {
-        			return response()->json(['message' => 'sendHMP: can\'t encrypt the message: ' . $output . $command], 500);
+        			return response()->json(['message' => 'sendHMP: can\'t encrypt the message: ' ], 500);
                 }
                 $message->secure=true;
                 $message->text=bin2hex($cryptout);
@@ -355,7 +355,7 @@ class MessageController extends Controller
 						$path = Storage::disk('local')->path('tmp') . '/' . $message->id . '-uncrypt';
 						$command  = 'gpg -d --batch --passphrase "' .  $request->pass . '" --decrypt ' . $path  ;
 						$output = exec_cli($command);
-						return $output;
+						return response()->json(['text' => $output], 200);
 					}
 				}
 				else{
