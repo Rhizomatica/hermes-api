@@ -45,7 +45,9 @@ class SystemController extends Controller
 
     public function getSysConfig()
     {
-        return response(System::first(),200);
+		$system = System::first();
+		$system->nodename = exec_nodename();
+        return response()->json($system,200);
     }
 
     public function setSysConfig(Request $request)
