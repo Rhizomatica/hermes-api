@@ -96,6 +96,7 @@ class UserController extends Controller
 
                     if($user = User::create($request->all())){
                 		$command = "uux -j '" . env('HERMES_ROUTE') . "!uuadm -a -m "  . $request['email'] . "@" . env('HERMES_DOMAIN') . " -n " . $request['name'] . "'" ;
+
                 		if ($output = exec_cli($command) ){
 							//returns uucp job id
 							$output = explode("\n", $output)[0];
@@ -223,8 +224,19 @@ class UserController extends Controller
                 'exceptions' => 1));
         try {
             if($session_id = $client->login($username, $password)) {
+                // Parameters
+                $mailuser_id = 1;
+                $affected_rows = $client->mail_user_delete($session_id, $mailuser_id);
 
-                $affected_rows = $client->mail_user_delete($session_id, $id);
+                $command = "uux -j  . env('HERMES_ROUTE') . '!uuadm -d -m "  . $id . '@' . env('HERMES_DOMAIN') .  "'" ;
+                if (!$output = exec_cli($command) ){
+					//returns uucp job id
+					$output = explode("\n", $output)[0];
+                   	return response()->json($output, 203); //deleted
+				}
+				else {
+              		return response('Hermes delete user: create user table and ispconfig but Error on uucp to advise: ' . $output . $command, 300);
+				}
                 $client->logout($session_id);
 				if ($affected_rows > 0){
                 	if( User::firstWhere('email', $mail)){
