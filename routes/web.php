@@ -72,10 +72,12 @@ $router->group(['prefix' => '/inbox'], function () use ($router) {
 
 //TODO double check
 $router->group(['prefix' => '/file'], function () use ($router) {
-    $router->get('', ['uses' => 'FileController@showAllFiles']);
-    $router->post('', ['uses' => 'FileController@uploadImage']);
-    $router->get('up/{id}', ['uses' => 'FileController@getImageUploadHttp']);
-    $router->get('down/{id}', ['uses' => 'FileController@getImageDownloadHttp']);
+    $router->get('{file}', ['uses' => 'FileController@downloadFile']);
+    // $router->get('{file}/profile', [  'as' => 'profile', 'uses' => 'FileController@downloadFile' ]);
+    $router->post('', ['uses' => 'FileController@uploadFile']);
+    // $router->get('', ['uses' => 'FileController@showAllFiles']);
+    // $router->get('up/{id}', ['uses' => 'FileController@getImageUploadHttp']);
+    // $router->get('down/{id}', ['uses' => 'FileController@getImageDownloadHttp']);
 });
 
 /*

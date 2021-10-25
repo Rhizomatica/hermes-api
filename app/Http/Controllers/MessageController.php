@@ -118,7 +118,7 @@ class MessageController extends Controller
 				//send message by uucp
                 $command = 'uucp -r -j -C -d \'' .  $path . '\' \'' . $message->dest . '!~/' . $message->orig . '-' . $message->id . '.hmp\''; ;
                 if(!$output = exec_cli_no($command)){
-						return response()->json(['message' => 'Hermes sendMessage - Error on uucp:  ' . $output ], 500);
+						return response()->json(['message' => 'Hermes sendMessage - Error on uucp:  ' . $output . ' - ' .$command], 500);
 				}
 				//setting no draft
 				if (! $message->update([ 'draft' => false])){
