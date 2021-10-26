@@ -5,22 +5,6 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Http\Request;
 
-
-function exec_cli($command = "ls -l")
-{
-    ob_start();
-    system($command , $return_var);
-    $output = ob_get_contents();
-    ob_end_clean();
-
-    //or die;
-    /*if ($exploder==true){
-            return (explode("\n", $output));
-            }*/
-
-    return ($output);
-}
-
 class UserController extends Controller
 {
 
@@ -168,7 +152,6 @@ class UserController extends Controller
                   	$mail_user_record['phone'] = $request['phone'];
 				}
 
-
                 $client_id = 1;
 				//Update the email record
 				$affected_rows = $client->mail_user_update($session_id, $client_id, $id, $mail_user_record);
@@ -206,7 +189,6 @@ class UserController extends Controller
             die('SOAP Error: '.$e->getMessage());
         }
     }
-
 
     public function delete($id,$mail)
     {
