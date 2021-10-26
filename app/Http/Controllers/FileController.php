@@ -24,7 +24,7 @@ class FileController extends Controller
         $this->validate($request, [
              'fileup' => 'required|file|max:' . env('MAX_FILE_SIZE') . '|mimes:jpg,png,ogg,mp3,mp4,wav',
              //'fileup' => 'required|file|image|max:102400|dimensions:max_width=1200,max_height=800',
-             'pass' => 'filled|min:4|max:20',
+             'pass' => 'min:4|max:20',
          ]);
 
         $timestamp=time();
@@ -125,11 +125,13 @@ class FileController extends Controller
 			'message' => 'API fileup OK',
 			// 'command' => $command,
 			'filename' => $filename,
+			'id' => $internalfilename,
+			'origpath' => $origpath,
 			'serverpath' => $path,
             'filesize' => $filesize,
 			'secure' => $secure,
 		], 200);
-    }
+    } // end uploadFile
 
    /**
      * downloadFile
