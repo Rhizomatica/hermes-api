@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\File;
 use Illuminate\Http\FileUploader;
 use Illuminate\Http\Validate;
 
@@ -21,11 +22,12 @@ class FileController extends Controller
      */
     public function uploadFile( Request $request)
     {
-        $this->validate($request, [
-             'fileup' => 'required|file|max:' . env('MAX_FILE_SIZE') . '|mimes:jpg,png,ogg,mp3,mp4,wav',
-             //'fileup' => 'required|file|image|max:102400|dimensions:max_width=1200,max_height=800',
-             'pass' => 'min:4|max:20',
-         ]);
+         $this->validate($request, [
+			 //TODO check if really need this
+             //'fileup' => 'required|file|max:' . env('MAX_FILE_SIZE') . '| mimes:jpg,png,ogg,mp3,mp4,wav',
+              'fileup' => 'required|file| mimes:jpg,png,ogg,mp3,mp4,wav',
+              'pass' => 'min:4|max:20',
+          ]);
 
         $timestamp=time();
         // get the file and info
