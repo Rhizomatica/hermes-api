@@ -11,35 +11,6 @@ use Illuminate\Http\Request;
 use App\System;
 
 
-function exec_cli($command )
-{
-    ob_start();
-    system($command , $return_var);
-    $output = ob_get_contents();
-    ob_end_clean();
-
-    //or die;
-    /*if ($exploder==true){
-            return (explode("\n", $output));
-            }*/
-
-	if ($return_var == 0) {
-		return $output;
-	}
-	else {
-		return false;
-	}
-}
-
-function exec_nodename(){
-
-    $command = 'cat /etc/uucp/config|grep nodename|cut -f 2 -d " "';
-    $output = exec_cli($command);
-    $output = explode("\n", $output)[0];
-
-    return $output;
-}
-
 class SystemController extends Controller
 {
 
@@ -314,7 +285,7 @@ class SystemController extends Controller
     }
 
     function sysShutdown(){
-        $command = "sudo halt";
+        $command = "sudo reboot";
         $output = exec_cli($command);
        return $output;
     }
@@ -332,10 +303,23 @@ class SystemController extends Controller
         return json_encode($output);
     }
 
-    function sysGetLog(){
-        $command = "uulog|tail -50";
+    function sysLogMail(){
+        $command = "sudo tail /var/log/mail.log -n 100000| sort -n ";
         $output=exec_cli($command);
         $output = explode("\n",$output);
-        return $output;
+        return response()->json($output,200);
+    }
+
+    function sysLogUucp(){
+        $command = "uulog -n 100000 | sort -n ";
+        $output=exec_cli($command);
+        $output = explode("\n",$output);
+        return response()->json($output,200);
+    }
+    function sysDebUucp(){
+        $command = "sudo tail /var/log/uucp/Debug -n 100000 | sort -n ";
+        $output=exec_cli($command);
+        $output = explode("\n",$output);
+        return response()->json($output,200);
     }
 }
