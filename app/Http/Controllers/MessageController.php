@@ -78,7 +78,7 @@ class MessageController extends Controller
             }
 
             //log
-            Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'create message . ' . $message  );
+			Log::info('creating message ' . $message);
             //find the message in database
             // Assures to delete the working path
             Storage::deleteDirectory('tmp/'.$message->id);
@@ -88,7 +88,7 @@ class MessageController extends Controller
         		return response()->json(['message' => 'sendHMP Error: can\'t write message file'], 500);
             }
 
-            // Has image?  - TODO change file for image in DB
+            // Has image?  
             if (Storage::disk('local')->exists('uploads/'.$message->id)) {
                 // TODO testing purposes -  change for move
                 // if (!$image = Storage::disk('local')->move('uploads/' . $id , 'tmp/'. $id . '/image' )){
@@ -104,17 +104,17 @@ class MessageController extends Controller
             }
 
             // Clean outbox destination and move the package
-            if (! Storage::disk('local')->move('tmp/'.$message->id.'.hmp', 'outbox/'.$message->id.'.hmp')){
+            if (! Storage::disk('local')->move('tmp/'.$message->id.'.hmp', env('HERMES_OUTBOX').'/'.$message->id.'.hmp')){
         		return response()->json(['message' => 'Hermes pack message Error: cant package the files' . $output . $command], 500);
             }
             //$message = @json_decode(json_encode($messagefile), true);
             Storage::disk('local')->deleteDirectory('tmp/'.$message->id);
 
             //work path
-            $path = Storage::disk('local')->path('outbox/'.$message->id.'.hmp');
+            $path = Storage::disk('local')->path(env('HERMES_OUTBOX') . '/'.$message->id.'.hmp');
 
             // UUCP -C Copy  (default) / -d create dirs
-            if (Storage::disk('local')->exists('outbox/'.$message->id.'.hmp')) {
+            if (Storage::disk('local')->exists(env('HERMES_OUTBOX').'/'.$message->id.'.hmp')) {
 				//send message by uucp
                 $command = 'uucp -r -j -C -d \'' .  $path . '\' \'' . $message->dest . '!~/' . $message->orig . '-' . $message->id . '.hmp\''; ;
                 if(!$output = exec_cli_no($command)){
@@ -125,7 +125,7 @@ class MessageController extends Controller
 					return response()->json(['message' => 'Hermes sendMessage - cant update no draft:  ' . $output ], 500);
 				}
 
-                Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'sent message . '. $message->id  . ' - ' . $message   );
+				Log::info('sent message ' . $message->id);
             }
             else{
         		return response()->json(['message' => 'Hermes send message Error: Cant find '.$message->id. '  HMP uucp'], 500);
@@ -138,19 +138,6 @@ class MessageController extends Controller
         return response()->json(['message' => 'Hermes sendMessage: DONE', 'content' => $message], 200);
     }
 
-     /**
-     * createMessage - createMessage on database (DEPRECATED)
-     * parameter: http request
-     *
-     * @return Json
-     */
-    public function createMessage(Request $request)
-    {
-        $request->inbox=false;
-        $message = Message::create($request->all());
-        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'create message . ' . $message  );
-        return response()->json($message, 201);
-    }
 
     /**
      * updateMessage - update Hermes Message Pack (DEPRECATED)
@@ -162,11 +149,12 @@ class MessageController extends Controller
     {
         if($message = Message::findOrFail($id)){
             $message->update($request->all());
-            Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'update message . '. $id  .  ' -> ' . $remote  );
+			Log::info('update message ' . id);
             return response()->json($user, 200);
         }
         else{
-        	return response()->json(['message' => 'cant find ' . $user], 404);
+			Log::warning('update message cant find ' . $id);
+        	return response()->json(['message' => 'cant find ' . $id], 404);
         }
     }
 
@@ -179,7 +167,7 @@ class MessageController extends Controller
     public function deleteMessage($id)
     {
         Message::findOrFail($id)->delete();
-        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'delete message . '. $id  );
+		Log::info('delete message ' . $id);
         return response()->json(['message' => 'Delete sucessfully message: ' . $id], 200);
     }
 
@@ -258,7 +246,8 @@ class MessageController extends Controller
         else {
         	return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find HMP'], 500);
         }
-        Storage::append('hermes.log', date('Y-m-d H:i:s' ) . 'unpack  '. $id  . ' - ' . $message .  ' from ' . $orig  );
+        Log::info('hermes.log', date('Y-m-d H:i:s' ) . 'unpack  '. $id  . ' - ' . $message .  ' from ' . $orig  );
+
         return response()->json(['message' => $message], 200);
     }
 
@@ -325,7 +314,8 @@ class MessageController extends Controller
     public function hideInboxMessage($id)
     {
         \Storage::move('inbox/' . $id, 'inbox/.' . $id);
-        return response('hide ' . $id . ' Successfully', 200);
+        log::info('hide message ' . $id);
+		return response()->json(['hide messag ' . $id . 'Sucessfully'], 200);
     }
 
     /**
@@ -337,7 +327,7 @@ class MessageController extends Controller
     public function unhideInboxMessage($id)
     {
         \Storage::move('inbox/.' . $id, 'inbox/' . $id);
-        return response('unhide ' . $id . ' Successfully', 200);
+		return response()->json(['unhide' . $id . 'Sucessfully'], 200);
     }
 
     /**
