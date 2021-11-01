@@ -346,10 +346,13 @@ class MessageController extends Controller
 						$path = Storage::disk('local')->path('tmp') . '/' . $message->id . '-uncrypt';
 						$command  = 'gpg -d --batch --passphrase "' .  $request->pass . '" --decrypt ' . $path  ;
 						$output = exec_cli($command);
+
+						Log::info('message unCrypt  '. $id  . ' - ' . $output );
 						return response()->json(['text' => $output], 200);
 					}
 				}
 				else{
+					Log::warning('message unCrypt message is not secure '. $id  . ' - ' . $output );
         			return response()->json(['message' => 'HMP uncrypt error: message is not secured'], 500);
 				}
 
