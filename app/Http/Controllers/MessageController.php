@@ -61,6 +61,7 @@ class MessageController extends Controller
     public function sendHMP(Request $request)
     {
         $request->inbox=false;
+		$request->orig = explode("\n", exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
 
         if($message = Message::create($request->all())){
             if($request->pass){
