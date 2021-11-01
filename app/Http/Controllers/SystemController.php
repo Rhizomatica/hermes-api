@@ -17,7 +17,7 @@ class SystemController extends Controller
     public function getSysConfig()
     {
 		$system = System::first();
-		$system->nodename = exec_nodename();
+		$system->nodename = explode("\n", exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
         return response()->json($system,200);
     }
 
@@ -68,7 +68,7 @@ class SystemController extends Controller
         $wifich= explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep channel| cut -c9-"))[0];
         $ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''));
 		array_pop($ip);
-		$disk_free = exec_cli("df -h | grep -nvme0n1p2 | awk '{print $4}'");
+		$disk_free = explode("\n", exec_cli("df  | grep nvme0n1p2 | awk '{print $4}'"))[0];
         $interfaces= explode("\n", exec_cli('ip r'));
 		array_pop($interfaces);
         $memory = explode(" ", exec_cli("free --mega| grep Mem | awk '{print ($2\" \"$3\" \"$4)}'"));
@@ -308,19 +308,51 @@ class SystemController extends Controller
         $command = "sudo tail /var/log/mail.log -n 100000| sort -n ";
         $output=exec_cli($command);
         $output = explode("\n",$output);
-        return response()->json($output,200);
+
+        $log=[];
+
+        for ($i = "0" ; $i < count($output); $i++) {
+            if(!empty($output[$i])) {
+                $log[]  =  [
+                    'line' => $i,
+                    'content' => $output[$i],
+                ];
+            }
+        }
+        return response()->json($log,200);
     }
 
     function sysLogUucp(){
         $command = "uulog -n 100000 | sort -n ";
         $output=exec_cli($command);
         $output = explode("\n",$output);
-        return response()->json($output,200);
+
+        $log=[];
+
+        for ($i = "0" ; $i < count($output); $i++) {
+            if(!empty($output[$i])) {
+                $log[]  =  [
+                    'line' => $i,
+                    'content' => $output[$i],
+                ];
+            }
+        }
+        return response()->json($log,200);
     }
     function sysDebUucp(){
         $command = "sudo tail /var/log/uucp/Debug -n 100000 | sort -n ";
         $output=exec_cli($command);
         $output = explode("\n",$output);
-        return response()->json($output,200);
+        $log=[];
+
+        for ($i = "0" ; $i < count($output); $i++) {
+            if(!empty($output[$i])) {
+                $log[]  =  [
+                    'line' => $i,
+                    'content' => $output[$i],
+                ];
+            }
+        }
+        return response()->json($log,200);
     }
 }
