@@ -19,15 +19,13 @@ class CreateMessagesTable extends Migration
             $table->string('orig');
             $table->string('dest');
             $table->string('file')->nullable(true);
-            $table->string('image')->nullable(true);
-            $table->string('audio')->nullable(true);
+            $table->string('fileid')->nullable(true);
             $table->text('text');
             $table->string('sent_at')->nullable(true);
             $table->boolean('draft')->default(true);
             $table->boolean('inbox')->default(false);
             $table->boolean('secure')->default(false);
             $table->timestamps();
-
         });
     }
 

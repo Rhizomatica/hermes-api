@@ -48,7 +48,7 @@ class DatabaseSeeder extends Seeder
 			'inbox' => true
 		]);
 
-        for($a=1; $a<=5; $a++){
+        for($a=1; $a<=2; $a++){
             DB::table('messages')->insert([
                 'name' => 'stuck test message '.Str::random(10),
                 'dest' => 'local',
@@ -58,7 +58,7 @@ class DatabaseSeeder extends Seeder
                 'draft' => true
             ]);
         }
-        for($a=1; $a<=5; $a++){
+        for($a=1; $a<=2; $a++){
             DB::table('messages')->insert([
                 'name' => 'send message seeded'.Str::random(0),
                 'dest' => 'local',
