@@ -62,29 +62,19 @@ $router->group(['prefix' => '/message'], function () use ($router) {
 $router->group(['prefix' => '/inbox'], function () use ($router) {
     $router->get('', ['uses' => 'MessageController@showAllInboxMessages']);
     $router->get('{id}', ['uses' => 'MessageController@showOneInboxMessage']);
-    $router->get('image/{id}', ['uses' => 'MessageController@showOneInboxMessageImage']);
     $router->get('delete/{id}', ['uses' => 'MessageController@deleteInboxMessage']);
     $router->get('hide/{id}', ['uses' => 'MessageController@hideInboxMessage']);
     $router->get('unhide/{id}', ['uses' => 'MessageController@unhideInboxMessage']);
     $router->post('uncrypt/{id}', ['uses' => 'MessageController@unCrypt']);
 });
 
-
-//TODO double check
+// file upload, download, crypt, compress, uncompress
 $router->group(['prefix' => '/file'], function () use ($router) {
     $router->get('{file}', ['uses' => 'FileController@downloadFile']);
-    // $router->get('{file}/profile', [  'as' => 'profile', 'uses' => 'FileController@downloadFile' ]);
     $router->post('', ['uses' => 'FileController@uploadFile']);
+	//TODO 
     // $router->get('', ['uses' => 'FileController@showAllFiles']);
-    // $router->get('up/{id}', ['uses' => 'FileController@getImageUploadHttp']);
-    // $router->get('down/{id}', ['uses' => 'FileController@getImageDownloadHttp']);
 });
-
-/*
-    $router->get('files', ['uses' => 'FileController@showAllFiles']);
-    $router->post('file', ['uses' => 'FileController@uploadImage']);
-    $router->get('file/{id}', ['uses' => 'FileController@getImageHttp']);
-*/
 
 // system commands
 $router->post('login', ['uses' => 'UserController@login']); //TODO remove
