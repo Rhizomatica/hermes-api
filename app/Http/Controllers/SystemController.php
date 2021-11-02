@@ -243,26 +243,6 @@ class SystemController extends Controller
         return response($output, 200);
     }
 
-
-    //TODO convert to eloquent/flysystem
-    // Open a directory, and read its contents
-    public function systemDirList(){
-
-        if (is_dir($cfg['path_files'])){
-            if ($dh = opendir($cfg['path_files'])){
-                while (($file = readdir($dh)) !== false){
-                    if ($file == '.' || $file == '..') {
-                        continue;
-                    }
-
-                    //TODO to array
-                    echo "Arquivo:" . $file . "<br />";
-                }
-                closedir($dh);
-            }
-        }
-    }
-
     //port script restart_system.sh
     public function sysRestart() {
         $command = "sudo systemctl stop uuardopd";
@@ -271,7 +251,6 @@ class SystemController extends Controller
         $command = "sudo systemctl stop ardop";
         $output1 = exec_cli($command);
 
-        //TODO sleep php
         $command = "sleep 1";
         $output2 = exec_cli($command);
 
@@ -281,7 +260,6 @@ class SystemController extends Controller
         $command = "sudo systemctl start uuardopd" ;
         $output4 = exec_cli($command);
 
-        //TODO
         return response()->json([$output0,$output1,$output2,$output3,$output4,$output5],200);
     }
 

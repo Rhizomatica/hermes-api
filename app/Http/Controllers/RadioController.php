@@ -83,8 +83,6 @@ class RadioController extends Controller
      */
     public function getRadioStatus()
     {
-        //TODO copied from system status
-        //$pidtst = explode("\n", exec_uc(env('HERMES_TOOL') . " -c get_frequency"))[0];
         $radio_frequency= explode("\n", exec_uc("get_frequency"))[0];
         $radio_mode= explode("\n", exec_uc("get_mode"))[0];
         $radio_ref_threshold= explode("\n", exec_uc("get_ref_threshold"))[0];

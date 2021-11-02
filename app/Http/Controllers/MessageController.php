@@ -64,8 +64,7 @@ class MessageController extends Controller
 		$request->orig = explode("\n", exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
 
         if($message = Message::create($request->all())){
-            if($request->pass){
-                //TODO deal with input
+            if($request->pass && $request->pass!='' && $request->pass!='undefined'){
                 $command = 'echo "'. $request->text . '"| gpg -o - -c -t --cipher-algo AES256 --utf8-strings --batch --passphrase "' . $request->pass. '"  --yes -';
                 $cryptout = "";
                 if ($output = exec_cli($command) ){
@@ -300,9 +299,7 @@ class MessageController extends Controller
     }
 
     /**
-     * hideInboxMessage
      * parameter: message id
-     * TODO deal with files
      * @return Json
      */
     public function hideInboxMessage($id)
@@ -327,7 +324,6 @@ class MessageController extends Controller
     /**
      * unCrypt text message 
      * parameter: message id, $request->pass
-     * TODO ALL
      * @return Json
      */
     public function unCrypt($id, Request $request){

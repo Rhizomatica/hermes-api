@@ -73,7 +73,6 @@ class FileController extends Controller
 				elseif (preg_match("/\baudio\b/i", $filetype)) {
 					$command = 'compress_audio.sh ' . $path . ' ' . $path.$audioout;; 
             		$path = Storage::disk('local')->path($origpath);
-                    //TODO check if is ok
 					$filesize = explode(":", explode("\n",$output)[5])[1];
 
 					// delete original file 
@@ -149,8 +148,6 @@ class FileController extends Controller
    /**
      * downloadFile
      * parameter: message id
-     * TODO ALL
-     * TODO crypt
      * @return Json
      */
      public static function downloadFile($file)
@@ -173,7 +170,12 @@ class FileController extends Controller
         }
 
         // set path
-        $origpath = 'downloads/' . $file;
+		if ($message->inbox){
+        	$origpath = 'downloads/' . $file;
+		}
+		else{
+        	$origpath = 'uploads/' . $file;
+		}
 
         // get file path
         $path = Storage::disk('local')->path($origpath);
@@ -201,7 +203,7 @@ class FileController extends Controller
             $fullpath = $fullpathroot . $origpath;
             // decompress image
             $command = 'decompress_image.sh ' . $fullpath . ' ' . $fullpath . $decompressext; 
-            // print "DEBUG TODO uncompress command: " . $command. "\n";
+            // print "DEBUG uncompress command: " . $command. "\n";
             if( exec_cli_no($command)){
                 $origpath = $origpath . $decompressext;
                 $path = Storage::disk('local')->path($origpath);
@@ -251,42 +253,4 @@ class FileController extends Controller
             return response($content,200);
         }
     }
-
-   /**
-     * responseRequestSuccess
-     * parameter: image id
-     * TODO? out of use
-     * @return Json
-     */
-    protected function responseRequestSuccess($ret)
-    {
-        return response()->json(['status' => 'success', 'data' => $ret], 200)
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    }
-
-    /**
-     * responseRequestError
-     * parameter: image id
-     * TODO? out of use
-     * @return Json
-     */
-    protected function responseRequestError($message = 'Bad request', $statusCode = 200)
-    {
-        return response()->json(['status' => 'error', 'error' => $message], $statusCode)
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    }
-
-    /**
-     * Clues to lumen
-     * parameter: message id
-     * TODO remove
-     * Storage::disk('s3')->exists('file.jpg')
-     * Storage::download('file.jpg');
-     * Storage::download('file.jpg', $name, $headers);
-     * Storage::disk('local')->missing('file.jpg')
-     *
-     * @return Void
-     */
 }
