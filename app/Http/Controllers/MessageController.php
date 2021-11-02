@@ -90,12 +90,10 @@ class MessageController extends Controller
         		return response()->json(['message' => 'sendHMP Error: can\'t write message file'], 500);
             }
 
-            // Has image?  
-            if (Storage::disk('local')->exists('uploads/'.$message->id)) {
-                // TODO testing purposes -  change for move
-                // if (!$image = Storage::disk('local')->move('uploads/' . $id , 'tmp/'. $id . '/image' )){
-                if (! Storage::disk('local')->copy('uploads/' . $message->id , 'tmp/' . $message->id . '/image' )){
-        			return response()->json(['message' => 'Hermes send message Error: can\'t move image file'], 500);
+            // Has file?  
+            if ($message->fileid && Storage::disk('local')->exists('uploads/'.$message->fileid)) {
+                if (! Storage::disk('local')->move('uploads/' . $message->fileid, 'tmp/' . $message->id . '/' .$message->fileid )){
+        			return response()->json(['message' => 'Hermes send message Error: can\'t move file'], 500);
                 }
             }
 
@@ -204,7 +202,9 @@ class MessageController extends Controller
             if (Storage::disk('local')->exists('tmp/'.$id.'/hmp.json')){
                 $messagefile = json_decode(Storage::disk('local')->get('tmp/'. $id . '/hmp.json'));
                 $message = @json_decode(json_encode($messagefile), true);
+				// force reset id to get the next from db
                 $message['id'] = null;
+				// force inbox flag
                 $message['inbox'] = true;
             }
             else {
@@ -217,29 +217,34 @@ class MessageController extends Controller
             }
 
             // Move attached files
-            if (Storage::disk('local')->exists('tmp/'.$id.'/image')){
-                // Test and create download folder if it doesn't exists
-                if (! Storage::disk('local')->exists('downloads')){
-                    if(!Storage::disk('local')->makeDirectory('downloads')){
-        				return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find or create downloads dir'], 500);
-                    }
-                }
-                // move image
-                if (Storage::disk('local')->copy('tmp/' . $id . '/image', 'downloads/' . $message['id']. '.image' )){
-                }
-                else{
-        			return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t move imagefile'], 500);
-                }
-                // TODO move audio and other files
-            }
+			// test for field file and fileid in message
+			if($message['file'] && $message['fileid'])
+			{
+				// test if file exists 
+            	if (Storage::disk('local')->exists('tmp/'.$id.'/' . $message['fileid'])){
+                	// Test and create download folder if it doesn't exists
+                	if (! Storage::disk('local')->exists('downloads')){
+                    	if(!Storage::disk('local')->makeDirectory('downloads')){
+        					return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find or create downloads dir'], 500);
+                    	}
+                	}
+                	// movefile 
+                	if (! Storage::disk('local')->move('tmp/' . $id .'/' .  $message['fileid'] , 'downloads/' . $message['fileid'] )){
+        				return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t move imagefile'], 500);
+                	}
+                	// TODO move audio and other files
+            	}
+
+			}
 
             if (Storage::disk('local')->exists('tmp/'.$id)){
                 if (!Storage::disk('local')->deleteDirectory('tmp/' .  $id)){
         			return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t delete tmp dir'], 500);
                 }
-                if (!Storage::disk('local')->delete('inbox/' . $orig . '-' . $message['id'] . '.hmp' )){
-        			return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t delete orig file'], 500);
-                }
+				//TODO error 
+                // if (!Storage::disk('local')->delete('inbox/' . $orig . '-' . $message['id'] . '.hmp' )){
+        		// 	return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t delete orig file'], 500);
+                // }
             }
             else{
         		return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t create message on database'], 500);
@@ -248,7 +253,7 @@ class MessageController extends Controller
         else {
         	return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find HMP'], 500);
         }
-        Log::info('hermes.log', date('Y-m-d H:i:s' ) . 'unpack  '. $id  . ' - ' . $message .  ' from ' . $orig  );
+        Log::info('API unpack  '. $id  . ' - ' . $message .  ' from ' . $orig  );
 
         return response()->json(['message' => $message], 200);
     }
@@ -294,19 +299,6 @@ class MessageController extends Controller
         return response()->json($output);
     }
 
-   /**
-     * showOneInboxMessageImage
-     * parameter: message id
-     * TODO deal with files
-     * @return Json
-     */
-    public function showOneInboxMessageImage($id)
-    {
-        $file = \Storage::get('inbox/' . $id);
-        $output = explode('}', $file);
-        return response($output[1],200);
-    }
-
     /**
      * hideInboxMessage
      * parameter: message id
@@ -333,13 +325,13 @@ class MessageController extends Controller
     }
 
     /**
-     * unCrypt message 
+     * unCrypt text message 
      * parameter: message id, $request->pass
      * TODO ALL
      * @return Json
      */
     public function unCrypt($id, Request $request){
-		if ($request->pass) {
+		if ($request->pass && $request->pass != '') {
         	if ($message = Message::find($id)){
 				if ($message['secure'] ){
                 	$crypt = hex2bin($message['text']);
