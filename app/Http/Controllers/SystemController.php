@@ -304,6 +304,8 @@ class SystemController extends Controller
         return json_encode($output);
     }
 
+	//TODO check if all syslog is ok to frontend
+
     function sysLogMail(){
         $command = "sudo tail /var/log/mail.log -n 100000| sort -n ";
         $output=exec_cli($command);
