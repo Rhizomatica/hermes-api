@@ -152,8 +152,9 @@ class FileController extends Controller
      */
      public static function downloadFile($file)
     {
-		$message = Message::where('fileid', '=', $file)->first();
-
+		$count = Message::where('fileid', '=', $file)->count();
+		// $message = Message::where('fileid', '=', $file)->get($count-1);
+		 $message = Message::where('fileid', '=', $file)->latest('id')->first();
 
         // get timestamp
         $timestamp = explode('.', $file)[0];
@@ -253,4 +254,34 @@ class FileController extends Controller
             return response($content,200);
         }
     }
+
+   /**
+     * cleanLostFiles
+     * parameter: message id
+     * @return Json
+     */
+     public static function deleteLostFiles()
+    {
+
+		// list files on upload 
+		$list = ['uploads', 'downloads'];
+
+		foreach ($list as $path){
+
+			$files = Storage::disk('local')->files($path);
+			foreach ($files as $file){
+		 		if (! Message::where('fileid', '=', explode($path . '/', $file)[1])->first()){
+					$output[] = $file;
+					Storage::disk('local')->delete($file);
+				 }
+
+				print "\n";
+			}
+		}
+		Storage::disk('local')->deleteDirectory('outbox');
+		Storage::disk('local')->deleteDirectory('tmp');
+
+        return response()->json(['message' => 'delete Lost files, outbox and tmp' .  $path], 200);
+	}
+
 }
