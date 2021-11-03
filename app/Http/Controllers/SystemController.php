@@ -102,6 +102,23 @@ class SystemController extends Controller
     }
 
     /**
+     * Get sensors
+     *
+     * @return Table
+     */
+    public function getSensors()
+    {
+		$command = "sensors -ju | jq -cM";
+		$output = exec_cli($command);
+		//$output = str_replace("\r\n","",$output);
+        $output = @json_decode($output);
+        return response()->json($output, 200);
+
+
+	}
+
+
+    /**
      * Get mail use on disk
      *
      * @return Table

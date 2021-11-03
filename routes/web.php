@@ -94,6 +94,7 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('list',  ['uses' => 'SystemController@systemDirList']);
     $router->get('queueerase',  ['uses' => 'SystemController@queueErase']);
     $router->get('stations',  ['uses' => 'SystemController@getSysStations']);
+    $router->get('sensors',  ['uses' => 'SystemController@getSensors']);
     $router->get('uuls',  ['uses' => 'SystemController@sysGetSpoolList']);
     $router->delete('uuka',  ['uses' => 'SystemController@uucpKillJobs']);
     $router->delete('uuk/{host}/{id}',  ['uses' => 'SystemController@uucpKillJob']);
