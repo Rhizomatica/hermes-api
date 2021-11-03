@@ -27,7 +27,7 @@ class FileController extends Controller
          $this->validate($request, [
 			 //TODO check if really need this
              //'fileup' => 'required|file|max:' . env('MAX_FILE_SIZE') . '| mimes:jpg,png,ogg,mp3,mp4,wav',
-              'fileup' => 'required|file| mimes:jpg,png,ogg,mp3,mp4,wav',
+              'fileup' => 'required|file',
               'pass' => 'min:4|max:20',
           ]);
 
@@ -35,7 +35,7 @@ class FileController extends Controller
         // get the file and info
 		$file = $request->file('fileup');
 		$filename = $file->getClientOriginalName();
-		$filetype = $file->getMimeType();
+		$mimetype = $file->getMimeType();
 
         // set internal path
 		$origpath = 'tmp/'.$timestamp;
@@ -54,7 +54,7 @@ class FileController extends Controller
 
 				// check for file types
                 // compress image
-				if (preg_match("/\bimage\b/i", $filetype)) {
+				if (preg_match("/\bimage\b/i", $mimetype)) {
 					$command = 'compress_image.sh ' . $path . ' ' . $path.$imageout; 
 					$output = exec_cli($command);
 					$filesize = explode(":", explode("\n",$output)[5])[1];
@@ -70,7 +70,7 @@ class FileController extends Controller
                     
 				}
 				// compress audio - script supports  wav mp3 or acc
-				elseif (preg_match("/\baudio\b/i", $filetype)) {
+				elseif (preg_match("/\baudio\b/i", $mimetype)) {
 					$command = 'compress_audio.sh ' . $path . ' ' . $path.$audioout;; 
             		$path = Storage::disk('local')->path($origpath);
 					$filesize = explode(":", explode("\n",$output)[5])[1];
@@ -138,6 +138,7 @@ class FileController extends Controller
 			// 'command' => $command,
 			'filename' => $filename,
 			'id' => $internalfilename,
+			'mimetype' => $mimetype,
 			//'origpath' => $origpath,
 			//'serverpath' => $path,
             'filesize' => $filesize,
