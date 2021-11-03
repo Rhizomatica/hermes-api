@@ -72,6 +72,7 @@ $router->group(['prefix' => '/inbox'], function () use ($router) {
 $router->group(['prefix' => '/file'], function () use ($router) {
     $router->get('{file}', ['uses' => 'FileController@downloadFile']);
     $router->post('', ['uses' => 'FileController@uploadFile']);
+    $router->delete('', ['uses' => 'FileController@deleteLostFiles']);
 	//TODO 
     // $router->get('', ['uses' => 'FileController@showAllFiles']);
 });
