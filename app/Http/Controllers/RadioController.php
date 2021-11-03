@@ -233,21 +233,28 @@ class RadioController extends Controller
      */
     public function setRadioTone($par)
     {
-        system("sudo killall alsatonic");
+    system("sudo killall alsatonic");
 
-	$command="";
 	switch ($par) {
+	  case "0":
+		  $command = "sudo alsatonic -f 300 > /dev/null 2>&1 &";
+          $output = system("$command");
+		  $command = "sudo alsatonic -f 2700 > /dev/null 2>&1 &";
+          $output = system("$command");
+		  break;
 	  case "600":
 		  $command = "sudo alsatonic -f 600 > /dev/null 2>&1 &";
+          $output = system("$command");
 		  break;
 	  case "1500":
 		  $command = "sudo alsatonic -f 1500 > /dev/null 2>&1 &";
+          $output = system("$command");
 		  break;
 	  default:
 		  $command = "sudo killall alsatonic";
+          $output = system("$command");
 		  break;
 	  }
-          $output = system("$command");
           $output = explode("\n", $output)[0];
 	  if ( !$output) {
 		  return response()->json($par, 200);
