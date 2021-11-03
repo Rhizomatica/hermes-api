@@ -20,6 +20,7 @@ class CreateMessagesTable extends Migration
             $table->string('dest');
             $table->string('file')->nullable(true);
             $table->string('fileid')->nullable(true);
+            $table->string('mimetype')->nullable(true);
             $table->text('text');
             $table->string('sent_at')->nullable(true);
             $table->boolean('draft')->default(true);
