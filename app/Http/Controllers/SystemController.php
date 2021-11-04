@@ -318,7 +318,7 @@ class SystemController extends Controller
     }
 
     function sysLogUucp(){
-        $command = "uulog -n 100000 | sort -n ";
+        $command = "sudo uulog -n 100000 | sort -n ";
         $output=exec_cli($command);
         $output = explode("\n",$output);
 
@@ -335,7 +335,7 @@ class SystemController extends Controller
         return response()->json($log,200);
     }
     function sysDebUucp(){
-        $command = "sudo tail /var/log/uucp/Debug -n 100000 | sort -n ";
+        $command = "sudo uulog -d -n 100000 | sort -n ";
         $output=exec_cli($command);
         $output = explode("\n",$output);
         $log=[];
