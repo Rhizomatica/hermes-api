@@ -162,8 +162,11 @@ class FileController extends Controller
         // get timestamp
         $timestamp = explode('.', $file)[0];
 
-        if (!$fileext = '.'. explode('.', $file)[1]){
+        if (! isset(explode('.', $file)[1])){
 			$fileext = '';
+		}
+		else{
+			$fileext = '.' . explode('.', $file)[1];
 		}
 
         $decompressext = explode('.', $message->file)[1];
@@ -259,7 +262,11 @@ class FileController extends Controller
         else {
             // $fullpath = $fullpathroot . $origpath;
             $content = Storage::disk('local')->get($origpath);
-            return response($content,200);
+             return response($content)
+                 ->header('Content-Type', $message->mimetype)
+                 ->header('Pragma','public')
+                 ->header('Content-Disposition','inline; filename="'. $message->file)
+                 ->header('Cache-Control','max-age=60, must-revalidate');
         }
     }
 
