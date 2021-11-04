@@ -113,8 +113,6 @@ class SystemController extends Controller
 		//$output = str_replace("\r\n","",$output);
         $output = @json_decode($output);
         return response()->json($output, 200);
-
-
 	}
 
 

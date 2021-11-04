@@ -72,8 +72,10 @@ class FileController extends Controller
 				// compress audio - script supports  wav mp3 or acc
 				elseif (preg_match("/\baudio\b/i", $mimetype)) {
 					$command = 'compress_audio.sh ' . $path . ' ' . $path.$audioout;; 
+					$output = exec_cli($command);
             		$path = Storage::disk('local')->path($origpath);
-					$filesize = explode(":", explode("\n",$output)[5])[1];
+
+					$filesize = explode(":", explode("\n",$output)[0])[1];
 
 					// delete original file 
 					if ( Storage::disk('local')->delete($origpath) ) {
@@ -159,7 +161,11 @@ class FileController extends Controller
 
         // get timestamp
         $timestamp = explode('.', $file)[0];
-        $fileext = '.'. explode('.', $file)[1];
+
+        if (!$fileext = '.'. explode('.', $file)[1]){
+			$fileext = '';
+		}
+
         $decompressext = explode('.', $message->file)[1];
         $crypt = false;
         $fullpathroot = Storage::disk('local')->path('/');
@@ -219,7 +225,7 @@ class FileController extends Controller
             // delete generated file
             Storage::disk('local')->delete($origpath);
             return response($content)
-                 ->header('Content-Type','image/'.$fileext)
+                 ->header('Content-Type',$message->mimetype)
                  ->header('Pragma','public')
                  ->header('Content-Disposition','inline; filename="'. $message->file)
                  ->header('Cache-Control','max-age=60, must-revalidate');
@@ -228,12 +234,12 @@ class FileController extends Controller
 		elseif (preg_match("/\blpcnet\b/i", $file)) {
             $fullpath = $fullpathroot . $origpath;
             // mount command to decompress image
-            $command = 'decompress_audio.sh ' . $fullpath . ' ' . $fullpath . $decompressext; 
+            $command = 'decompress_audio.sh ' . $fullpath . ' ' . $fullpath . '.' . $decompressext; 
+			$fullpath .= '.' . $decompressext;
 
-            // print "DEBUG TODO uncompress command: " . $command. "\n";
 			// decompress audio 
             if( exec_cli_no($command)){
-                $origpath = $origpath . $decompressext;
+                $origpath = $origpath . '.' . $decompressext;
                 $path = Storage::disk('local')->path($origpath);
             }
             else{
@@ -245,12 +251,13 @@ class FileController extends Controller
             Storage::disk('local')->delete($origpath);
             // return response($content);
              return response($content)
-                 ->header('Content-Type','audio/'.$fileext)
+                 ->header('Content-Type', $message->mimetype)
                  ->header('Pragma','public')
                  ->header('Content-Disposition','inline; filename="'. $message->file)
                  ->header('Cache-Control','max-age=60, must-revalidate');
         }
         else {
+            // $fullpath = $fullpathroot . $origpath;
             $content = Storage::disk('local')->get($origpath);
             return response($content,200);
         }
