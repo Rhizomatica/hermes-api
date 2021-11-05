@@ -60,14 +60,11 @@ class FileController extends Controller
 					$filesize = explode(":", explode("\n",$output)[5])[1];
 
 					// delete original file 
-					if ( Storage::disk('local')->delete($origpath) ) {
-            		    $origpath= $origpath.$imageout;
-            	        $path = Storage::disk('local')->path($origpath);
-					}
-                    else{
+					if ( !Storage::disk('local')->delete($origpath) ) {
         				return response()->json(['message' => 'API: fileup error on delete original image file ' .  $path], 500);
                     }   
-                    
+            		$origpath= $origpath.$imageout;
+            	    $path = Storage::disk('local')->path($origpath);
 				}
 				// compress audio - script supports  wav mp3 or acc
 				elseif (preg_match("/\baudio\b/i", $mimetype)) {
@@ -97,7 +94,7 @@ class FileController extends Controller
 
         // secure the file 
         if ($request->pass &&  $request->pass != 'undefined'){
-            $command = 'gpg -o '. $path . '.gpg -c -t --cipher-algo AES256 --utf8-strings --symmetric --batch --passphrase "' . $request->pass. '"  --yes ' . $path;
+            $command = 'gpg -o '. $path . '.gpg -c  --cipher-algo AES256 --symmetric --batch --passphrase "' . $request->pass. '"  --yes ' . $path;
             if ($output = exec_cli_no($command) ){
 				if ( ! Storage::disk('local')->delete($origpath) ) {
         			return response()->json(['message' => 'API: fileup error on delete original file ' .  $path], 500);
@@ -155,13 +152,16 @@ class FileController extends Controller
      */
      public static function downloadFile($file)
     {
-		$count = Message::where('fileid', '=', $file)->count();
-		// $message = Message::where('fileid', '=', $file)->get($count-1);
-		 $message = Message::where('fileid', '=', $file)->latest('id')->first();
+		// check for password
+		request()->has('i') ? $pass=request()->i : null;
+
+		//get message from file
+		$message = Message::where('fileid', '=', $file)->latest('id')->first();
 
         // get timestamp
         $timestamp = explode('.', $file)[0];
 
+		// handle real file extensions
         if (! isset(explode('.', $file)[1])){
 			$fileext = '';
 		}
@@ -169,16 +169,16 @@ class FileController extends Controller
 			$fileext = '.' . explode('.', $file)[1];
 		}
 
-        $decompressext = explode('.', $message->file)[1];
-        $crypt = false;
-        $fullpathroot = Storage::disk('local')->path('/');
-        if ($fileext == '.gpg'){
-        	// fail if no name
-        	if ( ! $pass= app('request')->input('pass')){
-            	return response()->json(['message' => 'API: downloadFile error no name'], 500);
-        	}
-            $fileext = '';
-        }
+		// handle file nameextension
+		$countdot = count(explode('.', $message->file));
+		if ($countdot > 1){
+			if ($countdot > 1){
+				$decompressext = '.' . explode('.', $message->file)[$countdot-1];
+			}
+			else {
+				$decompressext = '.' . explode('.', $message->file)[1];
+			}
+		}
 
         // set path
 		if ($message->inbox){
@@ -190,23 +190,18 @@ class FileController extends Controller
 
         // get file path
         $path = Storage::disk('local')->path($origpath);
+        $fullpathroot = Storage::disk('local')->path('/');
 
         // verify if file is GPG cryptedj
-		if (preg_match("/\bgpg\b/i", $file)) {
-            
-            //test for pass 
-            $fullpath = $fullpathroot . 'tmp/' . $timestamp.$fileext ;
-            if ($pass = app('request')->input('pass')){
-                $gppath = Storage::disk('local')->path('/');
-                 $command = 'gpg -o  '. $fullpath. ' -d --batch --passphrase "' . $pass . '"  --yes ' . $path;
-                 // print "DEBUG - gpg: : " . $command. "\n";
-                 exec_cli_no($command);
-                 $crypt = true;
-                 $origpath = 'tmp/' . $timestamp .  $fileext;
-            }
-             else {
-        	   return response()->json(['message' => 'API: download error, is encrypted, needs pass: ' ], 500);
-            }
+        $crypt = false;
+		// teste if message is secure and pass (i) exists
+        if ( $message->secure  && $pass ){
+            $fullpath = $fullpathroot . 'tmp/' . $timestamp . $fileext;
+            $gppath = Storage::disk('local')->path('/');
+            $command = 'gpg -o  '. $fullpath . ' -d --batch --passphrase "' . $pass . '"  --yes ' . $path;
+            exec_cli_no($command);
+            $crypt = true;
+            $origpath = 'tmp/' . $timestamp .$fileext;
         }
 
         // verify if file is image and decompress
@@ -233,21 +228,23 @@ class FileController extends Controller
                  ->header('Content-Disposition','inline; filename="'. $message->file)
                  ->header('Cache-Control','max-age=60, must-revalidate');
         }
-        // verify if file is audio and decompress
+        // verify if file is audio  - LPCNET and decompress
 		elseif (preg_match("/\blpcnet\b/i", $file)) {
             $fullpath = $fullpathroot . $origpath;
-            // mount command to decompress image
-            $command = 'decompress_audio.sh ' . $fullpath . ' ' . $fullpath . '.' . $decompressext; 
-			$fullpath .= '.' . $decompressext;
+			// decompress audio
+			// mount command to decompress audio
+			$command = 'decompress_audio.sh ' . $fullpath . ' ' . $fullpath . $decompressext;; 
+			$fullpath .= $decompressext;
 
 			// decompress audio 
-            if( exec_cli_no($command)){
-                $origpath = $origpath . '.' . $decompressext;
-                $path = Storage::disk('local')->path($origpath);
-            }
-            else{
-        	   return response()->json(['message' => 'API: download uncompres audio error: ' ], 500);
-            }
+			if( exec_cli_no($command)){
+				$origpath = $origpath .  $decompressext;
+				$path = Storage::disk('local')->path($origpath);
+			}
+			else{
+				return response()->json(['message' => 'API: download uncompres audio error: ' ], 500);
+			}
+
             // get content of file
             $content = Storage::disk('local')->get($origpath);
             // delete generated file
