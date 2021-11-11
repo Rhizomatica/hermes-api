@@ -209,10 +209,10 @@ class MessageController extends Controller
             }
         }
         // Test for HMP file and unpack it
-         if (Storage::disk('local')->exists('inbox/'. $orig  . '-' . $id . '.hmp')){
+         if (Storage::disk('local')->exists('inbox/'. $orig  . '_' . $id . '.hmp')){
             // Get path, unpack into tmp and read message data
             $path = Storage::disk('local')->path('');
-            $command  = 'tar xvfz ' .  $path . 'inbox/' . $orig .'-' . $id  . '.hmp' . ' -C ' . $path . 'tmp/'  ;
+            $command  = 'tar xvfz ' .  $path . 'inbox/' . $orig .'_' . $id  . '.hmp' . ' -C ' . $path . 'tmp/'  ;
             $output = exec_cli($command);
             $files[] = explode(' ', $output);
 
@@ -260,7 +260,7 @@ class MessageController extends Controller
         			return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t delete tmp dir'], 500);
                 }
 				//TODO error 
-            	$fullpath = Storage::disk('local')->path('inbox/'. $orig . '-' . $message['id'] . '.hmp');
+            	$fullpath = Storage::disk('local')->path('inbox/'. $orig . '_' . $message['id'] . '.hmp');
 				$command = 'sudo rm -f ' . $fullpath;
 				if (! exec_cli_no($command)){
         		 	return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t delete orig file'], 500);
