@@ -97,19 +97,39 @@ class MessageController extends Controller
                 }
             }
 
-            $path = Storage::disk('local')->path('tmp');
-            $command  = 'tar cfz ' . $path . '/' . $message->id . '.hmp -C '.  $path . ' ' . $message->id  ;
+            $pathtmp = Storage::disk('local')->path('tmp');
+            $command  = 'tar cfz ' . $pathtmp . '/' . $message->id . '.hmp -C '.  $pathtmp . ' ' . $message->id  ;
             if ($output = exec_cli($command) ){
         		return response()->json(['message' => 'Hermes send message Error: cant move image file' . $output . $command], 500);
             }
+			$origpath = 'tmp/' . $message->id . '.hmp';
+
+			
+			// check file size 
+			if (Storage::disk('local')->size($origpath) > env('HERMES_MAX_FILE')){
+				$path = Storage::disk('local')->delete($origpath);
+        		return response()->json(['message' => 'HMP error: larger than ' . env('HERMES_MAX_FILE')], 500);
+			}
+
+			//check spool file
+			$command = "uustat -a | grep '. env('HERMES_NAME') . ' egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
+
+			$output = exec_cli($command);
+			if ($output > env('HERMES_MAX_SPOOL')){
+				$path = Storage::disk('local')->delete($origpath);
+        		return response()->json(['message' => 'HMP error: spool larger than ' . env('HERMES_MAX_SPOOL') .' bytes ' ], 500);
+				
+			}
+
+			// set new origpath on outbox
+			$origpath = env('HERMES_OUTBOX') . '/' . $message->id . '.hmp';
+            $path = Storage::disk('local')->path($origpath);
 
             //work path
 			if (!env('HERMES_OUTBOX')){
         		return response()->json(['message' => 'Hermes pack message Error: cant package the file' . $path], 500);
 			}
 
-			$origpath = env('HERMES_OUTBOX') . '/' . $message->id . '.hmp';
-            $path = Storage::disk('local')->path($origpath);
 
             // Clean outbox destination and move the package
             if (! Storage::disk('local')->move('tmp/'.$message->id.'.hmp', $origpath)){
