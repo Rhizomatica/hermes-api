@@ -84,16 +84,63 @@ class RadioController extends Controller
     public function getRadioStatus()
     {
         $radio_frequency= explode("\n", exec_uc("get_frequency"))[0];
+        if(isset($radio_frequency)){
+            $radio_frequency = tovolts($radio_frequency);
+        }
+        else{
+            $radio_frequency = 0;
+        }
         $radio_mode= explode("\n", exec_uc("get_mode"))[0];
         $radio_ref_threshold= explode("\n", exec_uc("get_ref_threshold"))[0];
-		$radio_ref_thresholdv = tovolts($radio_ref_threshold);
+        if(isset($radio_ref_threshold)){
+            $radio_ref_threshold = tovolts($radio_ref_threshold);
+        }
+        else{
+            $radio_ref_threshold = 0;
+        }
         $radio_serial = explode("\n", exec_uc("get_serial"))[0];
         $radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
+        if(isset($radio_bfo)){
+            $radio_bfo = tovolts($radio_bfo);
+        }
+        else{
+            $radio_bfo = 0;
+        }
         $radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
+        if(isset($radio_fwd)){
+            $radio_fwd = tovolts($radio_fwd);
+        }
+        else{
+            $radio_fwd = 0;
+        }
         $radio_fwdv = tovolts($radio_fwd);
+        if(isset($radio_fwdv)){
+            $radio_fwdv = tovolts($radio_fwdv);
+        }
+        else{
+            $radio_fwdv = 0;
+        }
         $radio_ref = explode("\n", exec_uc("get_ref"))[0];
+        if (isset($radio_ref)){
+            $radio_ref = tovolts($radio_ref);
+        }
+        else{
+            $radio_ref = 0;
+        }
         $radio_refv = tovolts($radio_ref);
+        if(isset($radio_refv)){
+            $radio_refv = tovolts($radio_refv);
+        }
+        else{
+            $radio_refv = 0;
+        }
         $radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
+        if(isset($radio_mastercal)){
+            $radio_mastercal = tovolts($radio_mastercal);
+        }
+        else{
+            $radio_mastercal = 0;
+        }
         $radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep alsatonic -a"))[0]) ;
 		if (isset($radio_test_tone[3])){
 			$radio_test_tone=$radio_test_tone[3];
@@ -101,8 +148,8 @@ class RadioController extends Controller
 		else{ $radio_test_tone = 0; }
 
         $radio_txrx= explode("\n", exec_uc("get_txrx_status"))[0];
-		$radio_rx=false;
-		$radio_tx=true;
+		$radio_rx=true;
+		$radio_tx=false;
         if ($radio_txrx == "INRX"){
             $radio_rx =true;
             $radio_tx =false;
@@ -167,9 +214,19 @@ class RadioController extends Controller
     public function getRadioPowerStatus()
     {
         $radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
-        $radio_fwdv= tovolts($radio_fwd);
+        if(isset($radio_fwd)){
+            $radio_fwdv = tovolts($radio_fwd);
+        }
+        else{
+            $radio_fwdv = 0;
+        }
         $radio_ref= explode("\n", exec_uc("get_ref"))[0];
-        $radio_refv= tovolts($radio_ref);
+        if(isset($radio_ref)){
+            $radio_refv = tovolts($radio_ref);
+        }
+        else{
+            $radio_refv = 0;
+        }
 
         $status = [
             'fwd' => $radio_fwd,
