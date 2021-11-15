@@ -79,7 +79,7 @@ class UserController extends Controller
                     $request['emailid'] = $mailuser_id;
 
                     if($user = User::create($request->all())){
-                		$command = "uux -j '" . env('HERMES_ROUTE') . "!uuadm -a -m "  . $request['email'] . "@" . env('HERMES_DOMAIN') . " -n " . $request['name'] . "'" ;
+                		$command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -a -m "  . $request['email'] . "@" . env('HERMES_DOMAIN') . " -n " . $request['name'] . "'" ;
 
                 		if ($output = exec_cli($command) ){
 							//returns uucp job id
@@ -210,7 +210,7 @@ class UserController extends Controller
                 $mailuser_id = 1;
                 $affected_rows = $client->mail_user_delete($session_id, $mailuser_id);
 
-                $command = "uux -j  . env('HERMES_ROUTE') . '!uuadm -d -m "  . $id . '@' . env('HERMES_DOMAIN') .  "'" ;
+                $command = "uux -j -r . env('HERMES_ROUTE') . '!uuadm -d -m "  . $id . '@' . env('HERMES_DOMAIN') .  "'" ;
                 if (!$output = exec_cli($command) ){
 					//returns uucp job id
 					$output = explode("\n", $output)[0];
@@ -223,7 +223,7 @@ class UserController extends Controller
 				if ($affected_rows > 0){
                 	if( User::firstWhere('email', $mail)){
                     	if (User::where('email', $mail)->delete()){
-                			$command = "uux -j '" . env('HERMES_ROUTE') . "!uuadm -d -m "  . $mail . '@' . env('HERMES_DOMAIN') .  "'" ;
+                			$command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -d -m "  . $mail . '@' . env('HERMES_DOMAIN') .  "'" ;
                 			if ($output = exec_cli($command) ){
 								//returns uucp job id
 								$uucp_job_id= explode("\n", $output)[0];
