@@ -20,7 +20,7 @@ class UserController extends Controller
          }
          else
          {
-            return response()->json('Error: cant find user ', 500);
+        	return response()->json(['message' => 'API showoneuser error, cant find'], 404);
          }
     }
 
@@ -87,14 +87,14 @@ class UserController extends Controller
                         	return response()->json($output, 201); //Created
 						}
 						else {
-                    		return response('Hermes create user: create user table and ispconfig but Error on uucp to advise: ' . $output . $command, 300);
+        					return response()->json(['message' => 'API create user error: cant advise to central'], 500);
 						}
 
                     } else{
-                        return response()->json('create email but couldnt create user', 500); 
+        				return response()->json(['message' => 'API create user error: cant create user'], 500);
                     }
                 } else{
-                        return response()->json('can\´t create email', 500); 
+        				return response()->json(['message' => 'API create user error: cant create email'], 500);
 
                 }
                 //$mailuser_id = $client->mail_user_add($session_id, $client_id, $params);
@@ -207,18 +207,8 @@ class UserController extends Controller
         try {
             if($session_id = $client->login($username, $password)) {
                 // Parameters
-                $mailuser_id = 1;
-                $affected_rows = $client->mail_user_delete($session_id, $mailuser_id);
+                $affected_rows = $client->mail_user_delete($session_id, $id);
 
-                $command = "uux -j -r . env('HERMES_ROUTE') . '!uuadm -d -m "  . $id . '@' . env('HERMES_DOMAIN') .  "'" ;
-                if (!$output = exec_cli($command) ){
-					//returns uucp job id
-					$output = explode("\n", $output)[0];
-                   	return response()->json($output, 203); //deleted
-				}
-				else {
-              		return response('Hermes delete user: create user table and ispconfig but Error on uucp to advise: ' . $output . $command, 300);
-				}
                 $client->logout($session_id);
 				if ($affected_rows > 0){
                 	if( User::firstWhere('email', $mail)){
@@ -227,27 +217,37 @@ class UserController extends Controller
                 			if ($output = exec_cli($command) ){
 								//returns uucp job id
 								$uucp_job_id= explode("\n", $output)[0];
+
+                				$command = "uux -j -r . env('HERMES_ROUTE') . '!uuadm -d -m "  . $id . '@' . env('HERMES_DOMAIN') .  "'" ;
+                				if (!$output = exec_cli($command) ){
+									//returns uucp job id
+									$output = explode("\n", $output)[0];
+                   					return response()->json('uucp' . $command . ' - output: ' .  $output, 203); //deleted
+								}
+								else {
+        							return response()->json(['message' => 'API user create but fail to advise central'], 300);
+								}
                         		return response()->json($uucp_job_id , 200);
+
 							}
 							else {
-              					return response('Hermes delete user: create user and email. but has trouble to advise to central by uucp: ' . $output . $command, 300);
+        						return response()->json(['message' => 'API user delete error on uux'], 300);
 							}
                     	}
                     	else {
-                        	return response()->json('can\'t delete', 500);
+        					return response()->json(['message' => 'API user delete error '], 500);
                     	}
                 	}
                 	else {
-                    	return response()->json('can\'t find', 404);
+        				return response()->json(['message' => 'API user delete error - cant find user'], 404);
                 	}
 				}
 				else {
-                    	return response()->json('can\'t remove email from server', 404);
+        			return response()->json(['message' => 'API user delete error - cant remove email from server'], 405);
 				}
-
             }
             else{
-                return response()->json('Error: cant login on ISP' + $id, 504);
+        		return response()->json(['message' => 'API user delete error - cant login on ISP'], 500);
             }
         } catch (SoapFault $e) {
             echo $client->__getLastResponse();
@@ -269,16 +269,16 @@ class UserController extends Controller
                     return response()->json($user, 200);
                 }
                 else{//fail
-                    return response()->json('wrong password', 500);
+        			return response()->json(['message' => 'API user login - wrong password'], 500);
                 }
             }
             else{ //fail
-                return response()->json('wrong user', 404);
+        		return response()->json(['message' => 'API user login - wrong user'], 500);
             }
         }
         else //fail
         {
-            return response()->json('lack parameters', 500);
+        	return response()->json(['message' => 'API user login - lack parameters'], 500);
         }
     }
 }
