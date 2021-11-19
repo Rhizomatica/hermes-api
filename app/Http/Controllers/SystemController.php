@@ -192,7 +192,7 @@ class SystemController extends Controller
      * @return Json
      */
     public function sysGetSpoolList(){
-        $command = "uustat -a";
+        $command = "uustat -a| grep -v uuadm";
         $output=exec_cli($command) ;
         $output = explode("\n", $output);
         $spool=[];
