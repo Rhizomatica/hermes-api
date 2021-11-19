@@ -233,7 +233,7 @@ class SystemController extends Controller
     }
 
     public function uucpKillJob($host, $id){
-		$command = 'sudo uustat -k ' . $host . '.' . $id; 
+		$command = 'sudo mailkill.sh ' . $host . '.' . $id; 
     	ob_start();
     	system($command , $return_var);
     	$output = ob_get_contents();
