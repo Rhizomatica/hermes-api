@@ -111,8 +111,8 @@ class MessageController extends Controller
         		return response()->json(['message' => 'HMP error: larger than ' . env('HERMES_MAX_FILE')], 500);
 			}
 
-			//check spool file
-			$command = "uustat -a | grep '. env('HERMES_NAME') . ' egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
+			//check spool size 
+			$command = "uustat -a | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
 
 			$output = exec_cli($command);
 			if ($output > env('HERMES_MAX_SPOOL')){
