@@ -53,7 +53,7 @@ class UserController extends Controller
                     'uid' => 5000,
                     'gid' => 5000,
                     'maildir' => '/var/vmail/' . $request['email'],
-                    'quota' => 1048576,
+                    'quota' => 0,
                     'cc' => '',
                     'homedir' => '/var/vmail',
                     'autoresponder' => 'n',
