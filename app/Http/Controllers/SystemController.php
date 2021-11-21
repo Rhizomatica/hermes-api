@@ -60,7 +60,7 @@ class SystemController extends Controller
         $pidmodem = explode("\n", exec_cli("pgrep -x VARA.exe"))[0];
         $pidradio = explode("\n", exec_cli("pgrep -x ubitx_controlle"))[0];
 		$nodename = explode("\n", exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
-        $pidhmp = explode("\n", exec_cli("pgrep -x inotifywait"))[0];
+        $pidhmp = explode("\n", exec_cli("pgrep -x iwatch"))[0];
         $piddb = explode("\n", exec_cli("pgrep -x mariadbd"))[0];
         $pidpf = explode("\n", exec_cli("pgrep -x master"))[0];
 		$pidvnc = explode("\n", exec_cli("pgrep -x Xtigervnc"))[0];
