@@ -165,10 +165,6 @@ class SystemController extends Controller
         $output2 = exec_cli($command2);
         $sysnames2 = explode("\n", $output2);
 
-        $command3 = "egrep -v '^\s*#' /etc/uucp/sys | grep address | cut -f 2 -d \" \"";
-        $output3 = exec_cli($command3);
-        $sysnames3 = explode("\n", $output3);
-
         $sysnameslist=[];
 
         for ($i = "0" ; $i < count($sysnames); $i++) {
@@ -178,7 +174,6 @@ class SystemController extends Controller
                     'id' => $i,
                     'name' => $sysnames[$i],
                     'alias' => $sysnames2[$i],
-                    'location' => $sysnames3[$i]
                 ];
             }
         }
