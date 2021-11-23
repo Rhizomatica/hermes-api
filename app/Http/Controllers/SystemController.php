@@ -279,15 +279,15 @@ class SystemController extends Controller
     }
 
     function sysShutdown(){
-        $command = "sudo reboot";
+        $command = "sudo halt";
         $output = exec_cli($command);
-       return $output;
+        return $output;
     }
 
     function sysReboot(){
         $command = "sudo reboot";
         $output = exec_cli($command);
-       return $output;
+        return $output;
     }
 
     function sysRestore(){
