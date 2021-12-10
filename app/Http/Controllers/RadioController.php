@@ -31,7 +31,7 @@ class RadioController extends Controller
         $radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
 
         if(isset($radio_fwd)){
-            $radio_fwdv = adc2volts($radio_fwd);
+            $radio_fwdv = adc2watts($radio_fwd);
         }
         else{
             $radio_fwdv = 0;
@@ -109,6 +109,75 @@ class RadioController extends Controller
         return response()->json($status, 200);
     }
 
+    /**
+     * Get ptt / swr
+     *
+     * @return Json
+     */
+    public function getRadioPttSwr()
+    {
+        $radio_txrx= explode("\n", exec_uc("get_txrx_status"))[0];
+		$radio_rx=true;
+		$radio_tx=false;
+        if ($radio_txrx == "INRX"){
+            $radio_rx =true;
+            $radio_tx =false;
+        }
+        else if($radio_txrx== "INTX" || !$radio_txrx){
+            $radio_tx =true;
+            $radio_rx =false;
+        }
+        $radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
+        if(isset($radio_fwd)){
+            $radio_fwd = adc2watts($radio_fwd);
+        }
+        else{
+            $radio_fwd = 0;
+        }
+        $radio_ref = explode("\n", exec_uc("get_ref"))[0];
+        if (isset($radio_ref)){
+            $radio_ref = adc2volts($radio_ref);
+        }
+        else{
+            $radio_ref = 0;
+        }
+
+        $radio_led= explode("\n", exec_uc("get_led_status"))[0];
+        if ($radio_led== "LED_ON"){
+            $radio_led=true;
+        }
+        else if($radio_led == "LED_OFF" || !$radio_led){
+            $radio_led=false;
+        }
+
+        $radio_protection= explode("\n", exec_uc("get_protection_status"))[0];
+        if ($radio_protection == "PROTECTION_ON"){
+            $radio_protection=true;
+        }
+        else if($radio_protection == "PROTECTION_OFF" || !$radio_protection){
+            $radio_protection = false;
+        }
+
+        $radio_bypass= explode("\n", exec_uc("get_bypass_status"))[0];
+        if ($radio_bypass== "BYPASS_ON"){
+            $radio_bypass=true;
+        }
+        else if($radio_bypass == "BYPASS_OFF" || !$radio_bypass){
+            $radio_bypass = false;
+        }
+
+        $status = [
+            'txrx' => $radio_txrx,
+            'tx' => $radio_tx,
+            'rx' => $radio_rx,
+            'led' => $radio_led,
+            'fwdinwatts' => $radio_fwd,
+            'refinvolts' => $radio_ref,
+            'protection' => $radio_protection,
+            'bypass' =>  $radio_bypass,
+        ];
+        return response()->json($status, 200);
+    }
     /**
      * Get Radio tech status
      *
