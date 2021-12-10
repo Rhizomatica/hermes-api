@@ -87,10 +87,6 @@ function adc2volts($rawadc){
 * k is output in is power in W, x is what we read (raw) from arduino
 */
 function adc2watts($rawadc){
-	if ($rawadc == 1023) {
-		$rawadc=1022.999;
-	}
-
-	$wattsb  =   5397489 + ( 0.6261549 - 5397489 )/( 1 + (( 0.004882813 * $rawadc ) / 3520.472 ) ^1.950248);
-	return ($watts);
+	$wattsb  =   5397489 + ( 0.6261549 - 5397489 )/( 1 + (( 0.004882813 * -$rawadc ) / 3520.472 ) ^1.950248);
+	return ($rawadc);
 }
