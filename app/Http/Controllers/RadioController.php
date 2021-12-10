@@ -6,72 +6,6 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 
-function exec_cli2($command)
-{
-    ob_start();
-	$output = system($command , $return_var);
-	if ($return_var != 0) {
-    		$output = ob_get_contents();
-    		ob_end_clean();
-    		return ($output);
-	}
-	else {
-		return false;
-	}
-}
-
-function exec_cli($command)
-{
-    ob_start();
-    system($command , $return_var);
-    $output = ob_get_contents();
-    ob_end_clean();
-    return ($output);
-}
-
-function exec_uc($command)
-{
-    ob_start();
-    $ubitx_client = "/usr/bin/ubitx_client -c ";
-    $command = $ubitx_client . $command;
-    system($command , $return_var);
-    $output = ob_get_contents();
-    ob_end_clean();
-    return ($output);
-}
-
-function exec_ucr($command)
-{
-    ob_start();
-    $ubitx_client = "/usr/bin/ubitx_client -c ";
-    $command = $ubitx_client . $command;
-    system($command , $return_var);
-    $output = ob_get_contents();
-    ob_end_clean();
-	if ($return_var != 0) {
-		return false;
-	}
-	else{
-    	return true;
-	}
-}
-
-function exec_nodename(){
-
-    $command = 'cat /etc/uucp/config|grep nodename|cut -f 2 -d " "';
-    $output = exec_uc($command);
-    $output = explode("\n", $output)[0];
-
-    return $output;
-}
-
-function tovolts($input){
-
-	$fig = (int) str_pad('1', 3, '0');
-	$tr = $input*5/1023;
-	$output = (floor($tr*$fig)/$fig);
-    return ($output);
-}
 
 
 class RadioController extends Controller
@@ -87,7 +21,7 @@ class RadioController extends Controller
         $radio_mode= explode("\n", exec_uc("get_mode"))[0];
         $radio_ref_threshold= explode("\n", exec_uc("get_ref_threshold"))[0];
         if(isset($radio_ref_threshold)){
-            $radio_ref_thresholdv = tovolts($radio_ref_threshold);
+            $radio_ref_thresholdv = adc2volts($radio_ref_threshold);
         }
         else{
             $radio_ref_thresholdv = 0;
@@ -97,14 +31,14 @@ class RadioController extends Controller
         $radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
 
         if(isset($radio_fwd)){
-            $radio_fwdv = tovolts($radio_fwd);
+            $radio_fwdv = adc2volts($radio_fwd);
         }
         else{
             $radio_fwdv = 0;
         }
         $radio_ref = explode("\n", exec_uc("get_ref"))[0];
         if (isset($radio_ref)){
-            $radio_refv = tovolts($radio_ref);
+            $radio_refv = adc2volts($radio_ref);
         }
         else{
             $radio_refv = 0;
@@ -184,14 +118,14 @@ class RadioController extends Controller
     {
         $radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
         if(isset($radio_fwd)){
-            $radio_fwdv = tovolts($radio_fwd);
+            $radio_fwdv = adc2volts($radio_fwd);
         }
         else{
             $radio_fwdv = 0;
         }
         $radio_ref= explode("\n", exec_uc("get_ref"))[0];
         if(isset($radio_ref)){
-            $radio_refv = tovolts($radio_ref);
+            $radio_refv = adc2volts($radio_ref);
         }
         else{
             $radio_refv = 0;

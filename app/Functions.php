@@ -75,11 +75,18 @@ function exec_nodename(){
     return $output;
 }
 
-function tovolts($input){
-
+function adc2volts($rawadc){
 	$fig = (int) str_pad('1', 3, '0');
 	$tr = $input*5/1023;
 	$output = (floor($tr*$fig)/$fig);
     return ($output);
 }
 
+/* to watts
+* x = 5397489 + (0.6261549 - 5397489)/(1 + (x/3520.472)^1.950248)
+* k is output in is power in W, x is what we read (raw) from arduino
+*/
+function adc2watts($rawadc){
+	 $wattsb  =   5397489 + ( 0.6261549 - 5397489 )/( 1 + (( 0.004882813 * $rawadc ) / 3520.472 ) ^1.950248);
+	 return ($watts);
+}
