@@ -77,7 +77,7 @@ function exec_nodename(){
 
 function adc2volts($rawadc){
 	$fig = (int) str_pad('1', 3, '0');
-	$tr = $input*5/1023;
+	$tr = $rawadc*5/1023;
 	$output = (floor($tr*$fig)/$fig);
     return ($output);
 }
