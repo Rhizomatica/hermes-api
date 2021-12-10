@@ -88,5 +88,5 @@ function adc2volts($rawadc){
 */
 function adc2watts($rawadc){
 	$wattsb  =   5397489 + ( 0.6261549 - 5397489 )/( 1 + (( 0.004882813 * -$rawadc ) / 3520.472 ) ^1.950248);
-	return ($rawadc);
+	return ($wattsb);
 }
