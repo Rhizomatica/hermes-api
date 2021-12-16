@@ -1,6 +1,5 @@
 <?php
 
-
 function exec_cli($command)
 {
     ob_start();
@@ -91,5 +90,5 @@ function adc2watts($rawadc){
 		return 0;
 	}
 	$watts = 5397489 + ( 0.6261549 - 5397489 ) /  ( 1 + pow( ( ( 0.004882813 * $rawadc ) / 3520.472 ), 1.950248));
-	return ($watts);
+	return (round($watts, 4));
 }
