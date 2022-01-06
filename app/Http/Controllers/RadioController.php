@@ -265,18 +265,18 @@ class RadioController extends Controller
     system("sudo killall alsatonic");
 
 	switch ($par) {
-	  case "0":
-		  $command = "sudo alsatonic -f 300 > /dev/null 2>&1 &";
-          $output = system("$command");
-		  $command = "sudo alsatonic -f 2700 > /dev/null 2>&1 &";
-          $output = system("$command");
-		  break;
 	  case "600":
 		  $command = "sudo alsatonic -f 600 > /dev/null 2>&1 &";
           $output = system("$command");
 		  break;
 	  case "1500":
 		  $command = "sudo alsatonic -f 1500 > /dev/null 2>&1 &";
+          $output = system("$command");
+		  break;
+	  case "3000":
+		  $command = "sudo alsatonic -f 300 > /dev/null 2>&1 &";
+          $output = system("$command");
+		  $command = "sudo alsatonic -f 2700 > /dev/null 2>&1 &";
           $output = system("$command");
 		  break;
 	  default:
