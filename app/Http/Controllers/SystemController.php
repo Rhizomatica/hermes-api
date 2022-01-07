@@ -274,15 +274,20 @@ class SystemController extends Controller
     }
 
     function sysShutdown(){
+		// set led status OFF on cabinet
+        exec_uc("set_led_status -a OFF");
+		sleep(1);
+
+		// linux shutdown
         $command = "sudo halt";
-        $output = exec_cli($command);
-        return $output;
+        exec_cli($command);
+        return json_encode("halted");
     }
 
     function sysReboot(){
         $command = "sudo reboot";
         $output = exec_cli($command);
-        return $output;
+        return json_encode("rebooted");
     }
 
     function sysRestore(){
