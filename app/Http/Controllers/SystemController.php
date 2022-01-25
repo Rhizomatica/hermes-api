@@ -36,6 +36,31 @@ class SystemController extends Controller
         }
     }
 
+    /**
+     * returns if station is a gateway
+     *
+     * @return string
+     */
+    public function getSysGw()
+    {
+		$gateway = env('HERMES_GATEWAY') ;
+        return response()->json($gateway,200);
+    }
+
+    /**
+     * set gw schedule
+     *
+     * @return string
+     */
+    public function setSysGwSched(Request $request)
+    {
+        if ($request->all()){
+			return response()->json(['message' => 'setSysGw TODO'], 200);
+        }
+        else {
+			return response()->json(['message' => 'setSysConfig does not have request data'], 500);
+        }
+    }
 
     /**
      * Get Name station from uucp
@@ -81,6 +106,7 @@ class SystemController extends Controller
 			'name' => env('HERMES_NAME'),
 			'network' => env('HERMES_NETWORK'),
 			'domain' => env('HERMES_DOMAIN'),
+			'gateway' => env('HERMES_GATEWAY'),
             'ip' => $ip,
             'interfaces' => $interfaces,
             'wifiessid' => $wifiessid?$wifiessid:false,
