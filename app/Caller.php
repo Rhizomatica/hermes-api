@@ -24,4 +24,7 @@ class Caller extends Model
     protected $hidden = [
         'updated_at', 'created_at'
     ];
+
+    protected $table = 'caller';
 }
+
