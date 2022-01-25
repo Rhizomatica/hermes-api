@@ -111,7 +111,7 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
 
 $router->group(['prefix' => '/caller'], function () use ($router) {
     $router->get('',  ['uses' => 'CallerController@showAll']);
-    $router->post('{id}', ['uses' => 'CallerController@createSched']);
+    $router->post('', ['uses' => 'CallerController@createSched']);
     $router->put('{id}', ['uses' => 'CallerController@updateSched']);
     $router->get('{id}', ['uses' => 'CallerController@showSched']);
     $router->delete('{id}', ['uses' => 'CallerController@deleteSched']);
