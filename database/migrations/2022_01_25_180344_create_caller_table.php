@@ -16,8 +16,9 @@ class CreateCallerTable extends Migration
         Schema::create('caller', function (Blueprint $table) {
             $table->increments('id')->unique();
             $table->string('station')->nullable(true);
-            $table->boolean('starttime')->default(true);
-            $table->boolean('stoptime')->default(false);
+            $table->time('starttime')->default(true);
+            $table->time('stoptime')->default(false);
+            $table->time('delay')->default(false);
             $table->boolean('enable')->default(false);
             $table->timestamps();
         });
