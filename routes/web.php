@@ -85,7 +85,6 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('config',  ['uses' => 'SystemController@getSysConfig']);
     $router->post('config',  ['uses' => 'SystemController@setSysConfig']);
     $router->get('gw',  ['uses' => 'SystemController@getSysGw']);
-    $router->post('gwsched',  ['uses' => 'SystemController@setSysGwSched']);
     $router->get('nodename',  ['uses' => 'SystemController@getSysNodeName']);
     $router->get('queueerase',  ['uses' => 'SystemController@queueErase']);
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
@@ -108,6 +107,14 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('restart',  ['uses' => 'SystemController@sysRestart']);
     $router->get('reboot',  ['uses' => 'SystemController@sysReboot']);
     $router->get('restore',  ['uses' => 'SystemController@sysRestore']);
+});
+
+$router->group(['prefix' => '/caller'], function () use ($router) {
+    $router->get('',  ['uses' => 'CallerController@showAll']);
+    $router->post('{id}', ['uses' => 'CallerController@createSched']);
+    $router->put('{id}', ['uses' => 'CallerController@updateSched']);
+    $router->get('{id}', ['uses' => 'CallerController@showSched']);
+    $router->delete('{id}', ['uses' => 'CallerController@deleteSched']);
 });
 
 $router->group(['prefix' => '/radio'], function () use ($router) {
