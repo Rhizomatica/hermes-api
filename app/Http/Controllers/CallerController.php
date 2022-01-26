@@ -63,13 +63,13 @@ class CallerController extends Controller
      */
     public function updateSched($id, Request $request)
     {
-        if($schedule = Sched::findOrFail($id)){
+        if($schedule = Caller::findOrFail($id)){
         	$schedule->update($request->all());
-		Log::info('update schedule' . id);
-        	return response()->json($user, 200);
+			Log::info('update schedule' . $id);
+        	return response()->json($request, 200);
         }
         else{
-		Log::warning('schedule cant find to update' . $id);
+			Log::warning('schedule cant find to update' . $id);
         	return response()->json(['message' => 'cant find  schedule' . $id], 404);
         }
     }
@@ -83,7 +83,7 @@ class CallerController extends Controller
     {
 	$schedule = Caller::findOrFail($id);
         Caller::findOrFail($id)->delete();
-	Log::info('delete schedule ' . $id);
+		Log::info('delete schedule ' . $id);
         return response()->json(['message' => 'Delete sucessfully schedule: ' . $id], 200);
     }
 
