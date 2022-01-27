@@ -40,7 +40,7 @@ class CallerController extends Controller
     public function createSched(Request $request)
     {
 
-	if ( ! $request->station || ! $request->starttime || ! $request->stoptime || ! $request->enable || ! $request->delay){
+	if ( ! $request->title || ! $request->starttime || ! $request->stoptime || ! $request->enable ){
         	return response()->json(['message' => 'caller: require all fields ' ], 500);
 	}
 

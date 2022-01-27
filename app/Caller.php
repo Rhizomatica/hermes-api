@@ -13,8 +13,12 @@ class Caller extends Model
      * @var array
      */
     protected $fillable = [
-        'id', 'station', 'starttime', 'stoptime', 'delay', 'enable'
+        'id', 'title', 'stations', 'starttime', 'stoptime',  'enable'
     ];
+	
+	protected $casts = [
+		'stations' => 'array',
+	];
 
     /**
      * The attributes excluded from the model's JSON form.
