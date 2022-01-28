@@ -97,7 +97,7 @@ class CallerController extends Controller
     {
 	$schedule = Caller::findOrFail($id);
         Caller::findOrFail($id)->delete();
-		Log::info('delete schedule ' . $id);
+	Log::info('delete schedule ' . $id);
         return response()->json(['message' => 'Delete sucessfully schedule: ' . $id], 200);
     }
 
