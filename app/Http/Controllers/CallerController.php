@@ -71,7 +71,7 @@ class CallerController extends Controller
     public function updateSched($id, Request $request)
     {
 	$this->validate($request, [
-        'title' => 'required|unique:caller',
+        'title' => 'required',
         'stations' => 'required|array', 
 		'starttime' => 'required|date_format:H:i:s|before:stoptime',
 		'stoptime' => 'required|date_format:H:i:s|after:starttime',
