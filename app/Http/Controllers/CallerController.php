@@ -39,6 +39,13 @@ class CallerController extends Controller
      */
     public function createSched(Request $request)
     {
+	$this->validate($request, [
+        'title' => 'required|unique:caller',
+        'stations' => 'required|array', 
+		'starttime' => 'required|date_format:H:i:s|before:stoptime',
+		'stoptime' => 'required|date_format:H:i:s|after:starttime',
+		'enable' => 'required|boolean'
+    	]);
 
 	if ( ! $request->title || ! $request->starttime || ! $request->stoptime || ! $request->enable ){
         	return response()->json(['message' => 'caller: require all fields ' ], 500);
@@ -63,13 +70,20 @@ class CallerController extends Controller
      */
     public function updateSched($id, Request $request)
     {
+	$this->validate($request, [
+        'title' => 'required|unique:caller',
+        'stations' => 'required|array', 
+		'starttime' => 'required|date_format:H:i:s|before:stoptime',
+		'stoptime' => 'required|date_format:H:i:s|after:starttime',
+		'enable' => 'required|boolean'
+    	]);
         if($schedule = Caller::findOrFail($id)){
         	$schedule->update($request->all());
-			Log::info('update schedule' . $id);
+		Log::info('update schedule' . $id);
         	return response()->json($request, 200);
         }
         else{
-			Log::warning('schedule cant find to update' . $id);
+		Log::warning('schedule cant find to update' . $id);
         	return response()->json(['message' => 'cant find  schedule' . $id], 404);
         }
     }
@@ -97,7 +111,4 @@ class CallerController extends Controller
    {
 		// return response()->json(['unhide' . $id . 'Sucessfully'], 200);
     }
-
 }
-
-        // log::info('hide schedule ' . $id);
