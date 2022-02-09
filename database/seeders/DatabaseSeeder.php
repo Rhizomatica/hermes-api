@@ -62,5 +62,15 @@ class DatabaseSeeder extends Seeder
                 'draft' => false
             ]);
         }
+
+		DB::table('caller')->insert([
+			'title' => 'default',
+			'stations' => '["local"]',
+			'starttime' => '00:00:00',
+			'stoptime' => '24:00:00',
+			'enable' => false
+		]);
+
+
     }
 }
