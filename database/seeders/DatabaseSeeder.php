@@ -31,16 +31,16 @@ class DatabaseSeeder extends Seeder
 
         DB::table('messages')->insert([
             'name' => 'send test message ',
-            'dest' => 'local',
-            'orig' => ['local'],
+            'orig' => 'local',
+            'dest' => ['local'],
             'text' => 'lorem ipsum',
             'draft' => false 
         ]);
 
 		db::table('messages')->insert([
 			'name' => 'bienvenido ',
-			'dest' => 'local',
-            'orig' => ['local'],
+            'orig' => 'local',
+            'dest' => ['local'],
 			'text' => 'Bienvenido ao sistema Hermes',
 			'draft' => false,
 			'inbox' => true
@@ -56,8 +56,8 @@ class DatabaseSeeder extends Seeder
         for($a=1; $a<=2; $a++){
             DB::table('messages')->insert([
                 'name' => 'send message seeded'.Str::random(0),
-                'dest' => 'local',
-            	'orig' => ['local'],
+            	'orig' => 'local',
+            	'dest' => ['local'],
                 'text' => 'lorem ipsum',
                 'draft' => false
             ]);
