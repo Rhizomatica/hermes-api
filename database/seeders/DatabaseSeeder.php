@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
 		db::table('messages')->insert([
 			'name' => 'bienvenido ',
 			'dest' => 'local',
-			'orig' => 'local',
+            'orig' => ['local'],
 			'text' => 'Bienvenido ao sistema Hermes',
 			'draft' => false,
 			'inbox' => true
@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
         DB::table('messages')->insert([
             'name' => 'stuck test message '.Str::random(10),
             'dest' => 'local',
-            'orig' => 'local',
+            'orig' => ['local'],
             'text' => 'lorem ipsum',
             'draft' => true
         ]);
@@ -57,7 +57,7 @@ class DatabaseSeeder extends Seeder
             DB::table('messages')->insert([
                 'name' => 'send message seeded'.Str::random(0),
                 'dest' => 'local',
-                'orig' => 'local',
+            	'orig' => ['local'],
                 'text' => 'lorem ipsum',
                 'draft' => false
             ]);
