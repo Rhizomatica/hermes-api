@@ -253,7 +253,7 @@ class SystemController extends Controller
         return response($output, 200);
     }
 
-    public function uucpKillJob($host, $id){
+    public function uucpKillEmail($host, $id){
 		$command = 'sudo mailkill.sh es gui ' . $host . '.' . $id; 
     	ob_start();
     	system($command , $return_var);
@@ -266,6 +266,13 @@ class SystemController extends Controller
 			return response()->json("No job found", 404);
 		}
    	}
+
+    public function uucpKillJob($host, $id){
+		$command = 'sudo uustat -k ' . $host . '.' . $id; 
+        $output=exec_cli($command) or die;
+		return response()->json("uucp job killed: " . $host . '.' .$id, 200);
+   	}
+
 
     public function uucpKillJobs(){
         $command = 'sudo uustat -Ka '; 
