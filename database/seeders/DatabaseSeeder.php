@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
         DB::table('messages')->insert([
             'name' => 'send test message ',
             'dest' => 'local',
-            'orig' => 'local',
+            'orig' => ['local'],
             'text' => 'lorem ipsum',
             'draft' => false 
         ]);

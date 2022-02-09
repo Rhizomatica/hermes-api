@@ -17,7 +17,7 @@ class CreateMessagesTable extends Migration
             $table->increments('id')->unique();
             $table->string('name');
             $table->string('orig');
-            $table->string('dest');
+            $table->json('dest')->nullable(false);
             $table->string('file')->nullable(true);
             $table->string('fileid')->nullable(true);
             $table->string('mimetype')->nullable(true);
