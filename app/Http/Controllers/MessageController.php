@@ -143,7 +143,7 @@ class MessageController extends Controller
             if (Storage::disk('local')->exists($origpath)) {
 				//send message by uucp
         		foreach ($message->dest as $dest){
-                	$command = 'uucp -j -C -d \'' .  $path . '\' \'' . $dest . '!~/' . $message->orig . '_' . $message->id . '.hmp\''; 
+                	$command = 'uucp -r -j -C -d \'' .  $path . '\' \'' . $dest . '!~/' . $message->orig . '_' . $message->id . '.hmp\''; 
                 	if(!$output = exec_cli_no($command)){
 							return response()->json(['message' => 'Hermes sendMessage - Error on uucp:  ' . $output . ' - ' .$command], 500);
 					}
