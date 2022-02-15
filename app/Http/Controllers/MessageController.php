@@ -106,19 +106,10 @@ class MessageController extends Controller
 
 			
 			// check file size 
-			if (Storage::disk('local')->size($origpath) > env('HERMES_MAX_FILE')){
+			$hmpsize = Storage::disk('local')->size($origpath);
+			if ( $hmpsize > env('HERMES_MAX_FILE')){
 				$path = Storage::disk('local')->delete($origpath);
         		return response()->json(['message' => 'HMP error: larger than ' . env('HERMES_MAX_FILE')], 500);
-			}
-
-			//check spool size 
-			$command = "uustat -a | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
-
-			$output = exec_cli($command);
-			if ($output > env('HERMES_MAX_SPOOL')){
-				$path = Storage::disk('local')->delete($origpath);
-        		return response()->json(['message' => 'HMP error: spool larger than ' . env('HERMES_MAX_SPOOL') .' bytes ' ], 500);
-				
 			}
 
 			// set new origpath on outbox
@@ -129,7 +120,6 @@ class MessageController extends Controller
 			if (!env('HERMES_OUTBOX')){
         		return response()->json(['message' => 'Hermes pack message Error: cant package the file' . $path], 500);
 			}
-
 
             // Clean outbox destination and move the package
             if (! Storage::disk('local')->move('tmp/'.$message->id.'.hmp', $origpath)){
@@ -143,6 +133,14 @@ class MessageController extends Controller
             if (Storage::disk('local')->exists($origpath)) {
 				//send message by uucp
         		foreach ($message->dest as $dest){
+					//check spool size 
+					$command = "uustat -s " . $dest . " -a www-data  | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
+					$destspoolsize = exec_cli($command);
+					if ($destspoolsize + $hmpsize > env('HERMES_MAX_SPOOL')){
+						$path = Storage::disk('local')->delete($origpath);
+						return response()->json(['message' => 'HMP error: spool larger than ' . env('HERMES_MAX_SPOOL') .' bytes ' ], 500);
+					}
+
                 	$command = 'uucp -r -j -C -d \'' .  $path . '\' \'' . $dest . '!~/' . $message->orig . '_' . $message->id . '.hmp\''; 
                 	if(!$output = exec_cli_no($command)){
 							return response()->json(['message' => 'Hermes sendMessage - Error on uucp:  ' . $output . ' - ' .$command], 500);
