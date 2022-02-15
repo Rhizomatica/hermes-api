@@ -136,7 +136,7 @@ class MessageController extends Controller
 					//check spool size 
 					$command = "uustat -s " . $dest . " -u www-data  | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
 					$destspoolsize = exec_cli($command);
-					$destspoolsize += $hmpsize;
+					$destspoolsize = $hmpsize + intval($destspoolsize);
 					if ($destspoolsize > env('HERMES_MAX_SPOOL')){
 						$path = Storage::disk('local')->delete($origpath);
 						return response()->json(['message' => 'HMP error: spool larger than ' . env('HERMES_MAX_SPOOL') .' bytes ' ], 500);
