@@ -134,9 +134,10 @@ class MessageController extends Controller
 				//send message by uucp
         		foreach ($message->dest as $dest){
 					//check spool size 
-					$command = "uustat -s " . $dest . " -a www-data  | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
+					$command = "uustat -s " . $dest . " -u www-data  | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
 					$destspoolsize = exec_cli($command);
-					if ($destspoolsize + $hmpsize > env('HERMES_MAX_SPOOL')){
+					$destspoolsize += $hmpsize;
+					if ($destspoolsize > env('HERMES_MAX_SPOOL')){
 						$path = Storage::disk('local')->delete($origpath);
 						return response()->json(['message' => 'HMP error: spool larger than ' . env('HERMES_MAX_SPOOL') .' bytes ' ], 500);
 					}
