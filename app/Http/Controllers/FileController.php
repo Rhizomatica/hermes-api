@@ -27,9 +27,9 @@ class FileController extends Controller
 		 $this->validate($request, [
 			 //TODO check if really need this
 			 //'fileup' => 'required|file|max:' . env('MAX_FILE_SIZE') . '| mimes:jpg,png,ogg,mp3,mp4,wav',
-			  'fileup' => 'required|file',
-			  'pass' => 'min:4|max:20',
-		  ]);
+				'fileup' => 'required|file',
+				'pass' => 'min:4|max:20',
+			]);
 
 		$timestamp=time();
 		// get the file and info
@@ -99,7 +99,7 @@ class FileController extends Controller
 				if ( ! Storage::disk('local')->delete($origpath) ) {
 					return response()->json(['message' => 'API: fileup error on delete original file ' .  $path], 500);
 				}
-		   		$origpath= $origpath.$gpgout;
+			 		$origpath= $origpath.$gpgout;
 			}
 			else {
 				return response()->json(['message' => 'API: fileup error on encrypt the file: ' ], 500);
@@ -145,7 +145,7 @@ class FileController extends Controller
 		], 200);
 	} // end uploadFile
 
-   /**
+	 /**
 	 * downloadFile
 	 * parameter: message id
 	 * @return Json
@@ -215,7 +215,7 @@ class FileController extends Controller
 				$path = Storage::disk('local')->path($origpath);
 			}
 			else{
-			   return response()->json(['message' => 'API: download uncompres image error: ' ], 500);
+				 return response()->json(['message' => 'API: download uncompres image error: ' ], 500);
 			}
 			// get content of file
 			$content = Storage::disk('local')->get($origpath);
@@ -267,7 +267,7 @@ class FileController extends Controller
 		}
 	}
 
-   /**
+	 /**
 	 * cleanLostFiles
 	 * parameter: message id
 	 * @return Json
