@@ -31,17 +31,18 @@ class RadioController extends Controller
 		$radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
 
 		if(isset($radio_fwd)){
-			$radio_fwdv = adc2watts($radio_fwd);
+			$radio_fwd_watts = adc2watts($radio_fwd);
 		}
 		else{
-			$radio_fwdv = 0;
+			$radio_fwd_watts = 0;
 		}
 		$radio_ref = explode("\n", exec_uc("get_ref"))[0];
 		if (isset($radio_ref)){
-			$radio_refv = adc2volts($radio_ref);
+			$radio_ref_volts = adc2volts($radio_ref);
 		}
 		else{
-			$radio_refv = 0;
+			$radio_ref_volts = 0;
+			$radio_ref = 0;
 		}
 		$radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
 		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep alsatonic -a"))[0]) ;
@@ -91,10 +92,10 @@ class RadioController extends Controller
 			'mode' => $radio_mode,
 			'led' => $radio_led,
 			'bfo' => $radio_bfo,
-			'fwd' => $radio_fwd,
-			'fwdv' => $radio_fwdv,
-			'ref' => $radio_ref,
-			'refv' => $radio_refv,
+			'fwd_raw' => $radio_fwd,
+			'fwd_watts' => $radio_fwd_watts,
+			'ref_raw' => $radio_ref,
+			'ref_volts' => $radio_ref_volts,
 			'txrx' => $radio_txrx,
 			'tx' => $radio_tx,
 			'rx' => $radio_rx,
