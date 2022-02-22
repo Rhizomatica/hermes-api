@@ -38,7 +38,7 @@ class FileController extends Controller
 		$mimetype = $file->getMimeType();
 
 		// set internal path
-		$origpath = '/tmp/'.$timestamp;
+		$origpath = 'tmp/'.$timestamp;
 
 		// set external path
 		$path = '';
@@ -95,7 +95,7 @@ class FileController extends Controller
 		// secure the file 
 		if ($request->pass &&  $request->pass != 'undefined'){
 			$command = 'gpg -o '. $path . '.gpg -c  --cipher-algo AES256 --symmetric --batch --passphrase "' . $request->pass. '"  --yes ' . $path;
-			if ($output = exec_cli2($command) ){
+			if ($output = exec_cli_no($command) ){
 				if ( ! Storage::disk('local')->delete($origpath) ) {
 					return response()->json(['message' => 'API: fileup error on delete original file ' .  $path], 500);
 				}
