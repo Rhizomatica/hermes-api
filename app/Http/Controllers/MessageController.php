@@ -217,9 +217,9 @@ class MessageController extends Controller
      * @return Json
      */
     public function unpackInboxMessage($arg){
-        $arg = explode('_', $arg);
-        $orig = $arg[0];
-        $id = $arg[1];
+        $arga = explode('_', $arg);
+        $orig = $arga[0];
+        $id = $arga[1];
         $id = explode('.', $id)[0];
 
         $message='';
@@ -280,8 +280,8 @@ class MessageController extends Controller
                 if (!Storage::disk('local')->deleteDirectory('tmp/' .  $id)){
         			return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t delete tmp dir'], 500);
                 }
-				//TODO error 
-            	$fullpath = Storage::disk('local')->path('inbox/'. $orig . '_' . $message['id'] . '.hmp');
+            	// $fullpath = Storage::disk('local')->path('inbox/'. $orig . '_' . $message['id'] . '.hmp');
+            	$fullpath = Storage::disk('local')->path('inbox/'. $arg);
 				$command = 'sudo rm -f ' . $fullpath;
 				if (! exec_cli_no($command)){
         		 	return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t delete orig file'], 500);
