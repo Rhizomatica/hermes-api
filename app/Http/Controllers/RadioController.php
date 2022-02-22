@@ -114,7 +114,7 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioPttSwr()
+	public function getRadioPowerStatus()
 	{
 		$radio_txrx= explode("\n", exec_uc("get_txrx_status"))[0];
 		$radio_rx=true;
@@ -129,17 +129,19 @@ class RadioController extends Controller
 		}
 		$radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
 		if(isset($radio_fwd)){
-			$radio_fwd = adc2watts($radio_fwd);
+			$radio_fwd_watts = adc2watts($radio_fwd);
 		}
 		else{
 			$radio_fwd = 0;
+			$radio_fwd_watts = 0;
 		}
 		$radio_ref = explode("\n", exec_uc("get_ref"))[0];
 		if (isset($radio_ref)){
-			$radio_ref = adc2volts($radio_ref);
+			$radio_ref_volts = adc2volts($radio_ref);
 		}
 		else{
 			$radio_ref = 0;
+			$radio_ref_volts = 0;
 		}
 
 		$radio_led= explode("\n", exec_uc("get_led_status"))[0];
@@ -167,44 +169,16 @@ class RadioController extends Controller
 		}
 
 		$status = [
-			'txrx' => $radio_txrx,
+			// 'txrx' => $radio_txrx,
 			'tx' => $radio_tx,
 			'rx' => $radio_rx,
 			'led' => $radio_led,
-			'fwdinwatts' => $radio_fwd,
-			'refinvolts' => $radio_ref,
+			'fwd_raw' => $radio_fwd,
+			'fwd_watts' => $radio_fwd_watts,
+			'ref_raw' => $radio_ref,
+			'ref_volts' => $radio_ref_volts,
 			'protection' => $radio_protection,
 			'bypass' =>  $radio_bypass,
-		];
-		return response()->json($status, 200);
-	}
-	/**
-	 * Get Radio tech status
-	 *
-	 * @return Json
-	 */
-	public function getRadioPowerStatus()
-	{
-		$radio_fwd= explode("\n", exec_uc("get_fwd"))[0];
-		if(isset($radio_fwd)){
-			$radio_fwdv = adc2volts($radio_fwd);
-		}
-		else{
-			$radio_fwdv = 0;
-		}
-		$radio_ref= explode("\n", exec_uc("get_ref"))[0];
-		if(isset($radio_ref)){
-			$radio_refv = adc2volts($radio_ref);
-		}
-		else{
-			$radio_refv = 0;
-		}
-
-		$status = [
-			'fwd' => $radio_fwd,
-			'fwdv' => $radio_fwdv,
-			'ref' => $radio_ref,
-			'refv' => $radio_refv,
 		];
 		return response()->json($status, 200);
 	}
