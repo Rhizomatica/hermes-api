@@ -443,7 +443,7 @@ class RadioController extends Controller
 			return response()->json( true, 200);
 		}
 		else {
-			return response()->json(['message' => 'setRadioMasterCal error: ' . $command], 500);
+			return response()->json(['message' => 'setRadioMasterCal error: ' ], 500);
 		}
 	}
 
@@ -462,7 +462,7 @@ class RadioController extends Controller
 			$par = "set_led_status -a OFF";
 		}
 		else{
-			return response()->json(['message' => 'setRadioLedStatus fail' . $command], 500);
+			return response()->json(['message' => 'setRadioLedStatus fail' ], 500);
 		}
 
 		$command = explode("\n", exec_uc($par))[0];

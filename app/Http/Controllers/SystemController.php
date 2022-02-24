@@ -28,7 +28,7 @@ class SystemController extends Controller
 								return response()->json($request->all() , 200);
 						}
 						else {
-				return response()->json(['message' => 'setSysConfig can not update' . $user], 500);
+				return response()->json(['message' => 'setSysConfig can not update' ], 500);
 						}
 				}
 				else {
@@ -158,7 +158,7 @@ class SystemController extends Controller
 							return response()->json($disk_free, 200);
 			}
 		}
-		return responde()->json("error",500);
+		return response()->json("error",500);
 		}
 
 		/**
@@ -303,7 +303,7 @@ class SystemController extends Controller
 				$command = "sudo systemctl start uuardopd" ;
 				$output4 = exec_cli($command);
 
-				return response()->json([$output0,$output1,$output2,$output3,$output4,$output5],200);
+				return response()->json([$output0,$output1,$output2,$output3,$output4],200);
 		}
 
 		function sysShutdown(){
