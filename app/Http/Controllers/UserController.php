@@ -293,7 +293,7 @@ class UserController extends Controller
 	 * @return Json
 	 */
 	
-	public function recover(Request $request)
+	public function recoverPassword(Request $request)
 	{
 		$user = new User;
 		if ($request->email){

@@ -6,11 +6,6 @@
 |--------------------------------------------------------------------------
 | Application Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
-|
 */
 
 $router->get('/',  ['uses' => 'HelpController@showHelpMain']);
@@ -18,28 +13,21 @@ $router->get('/help',  ['uses' => 'HelpController@showHelpMain']);
 $router->get('/version', function () use ($router) {
     return $router->app->version()  ; 
 });
-
-$router->get('say/{id}', function ($id) {
-    return 'say: '.$id;
-});
-
-$router->get('mock', function () {
-    $table = [ 1,2 ];
-    return $table;
-});
+$router->post('login', ['uses' => 'UserController@login']); //TODO remove
 
 /*$router->get('admin/profile', ['middleware' => 'auth', function () {
     //
 }]);*/
 
 $router->get('help',  ['uses' => 'HelpController@showHelpMain']);
-//Users routes
 
+//Users routes
 $router->group(['prefix' => '/user'], function () use ($router) {
     $router->get('', ['uses' => 'UserController@showAllUsers']);
     $router->get('{id}', ['uses' => 'UserController@showOneUser']);
     $router->post('', ['uses' => 'UserController@create']);
     $router->post('{id}', ['uses' => 'UserController@update']);
+    $router->post('recover', ['uses' => 'UserController@recoverPassword']); 
     $router->delete('{id}/{mail}', ['uses' => 'UserController@delete']);
 });
 
@@ -51,12 +39,12 @@ $router->get('/messages/{type}',  ['uses' => 'MessageController@showAllMessagesB
 $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('', ['uses' => 'MessageController@showAllMessages']);
     $router->get('list',  ['uses' => '@showAllMessages']);
-    $router->post('', ['uses' => 'MessageController@sendHMP']);
-    $router->delete('{id}', ['uses' => 'MessageController@deleteMessage']);
-    $router->post('{id}', ['uses' => 'MessageController@update']);
     $router->get('{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('image/{id}', ['uses' => 'FileController@get']);
     $router->get('send/{id}',  ['uses' => 'MessageController@sendMessage']);
+    $router->post('', ['uses' => 'MessageController@sendHMP']);
+    $router->post('{id}', ['uses' => 'MessageController@update']);
+    $router->delete('{id}', ['uses' => 'MessageController@deleteMessage']);
 });
 
 $router->group(['prefix' => '/inbox'], function () use ($router) {
@@ -78,7 +66,6 @@ $router->group(['prefix' => '/file'], function () use ($router) {
 });
 
 // system commands
-$router->post('login', ['uses' => 'UserController@login']); //TODO remove
 
 $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('',  ['uses' => 'SystemController@getSysStatus']); //double hit for status
@@ -90,7 +77,6 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
     $router->get('list',  ['uses' => 'SystemController@systemDirList']);
     $router->post('login', ['uses' => 'UserController@login']); 
-    $router->post('recover', ['uses' => 'UserController@recoverPassword']); 
     $router->get('maildu',  ['uses' => 'SystemController@getMailDiskUsage']);
     $router->get('maillog',  ['uses' => 'SystemController@sysLogMail']);
     $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']);
