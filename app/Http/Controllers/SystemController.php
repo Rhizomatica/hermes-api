@@ -329,55 +329,31 @@ class SystemController extends Controller
 
 	//TODO check if all syslog is ok to frontend
 	public function sysLogMail(){
-		$command = "sudo tail /var/log/mail.log -n 100000| sort -n ";
+		$command = "sudo tail /var/log/mail.log -n 1000| sort -n ";
 		$output=exec_cli($command);
 		$output = explode("\n",$output);
+		ob_clean();
+		ob_start();
 
-		$log=[];
-
-		for ($i = "0" ; $i < count($output); $i++) {
-				if(!empty($output[$i])) {
-						$log[]  =  [
-								'line' => $i,
-								'content' => $output[$i],
-						];
-				}
-		}
-		return response()->json($log,200);
+		return response()->json($output,200);
 	}
 
 	public function sysLogUucp(){
-		$command = "sudo uulog -n 100000 | sort -n ";
+		$command = "sudo uulog -n 1000 | sort -n ";
 		$output=exec_cli($command);
 		$output = explode("\n",$output);
 
-		$log=[];
-
-		for ($i = "0" ; $i < count($output); $i++) {
-			if(!empty($output[$i])) {
-				$log[]  =  [
-					'line' => $i,
-					'content' => $output[$i],
-				];
-			}
-		}
-		return response()->json($log,200);
+		ob_clean();
+		ob_start();
+		return response()->json($output,200);
 	}
 
 	public function sysDebUucp(){
-		$command = "sudo uulog -d -n 100000 | sort -n ";
+		$command = "sudo uulog -D -n 1000 | sort -n ";
 		$output=exec_cli($command);
 		$output = explode("\n",$output);
-		$log=[];
-
-		for ($i = "0" ; $i < count($output); $i++) {
-				if(!empty($output[$i])) {
-						$log[]  =  [
-								'line' => $i,
-								'content' => $output[$i],
-						];
-				}
-		}
-		return response()->json($log,200);
+		ob_clean();
+		ob_start();
+		return response()->json($output,200);
 	}
 }
