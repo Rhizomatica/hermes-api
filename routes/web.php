@@ -90,6 +90,7 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
     $router->get('list',  ['uses' => 'SystemController@systemDirList']);
     $router->post('login', ['uses' => 'UserController@login']); 
+    $router->post('recover', ['uses' => 'UserController@recoverPassword']); 
     $router->get('maildu',  ['uses' => 'SystemController@getMailDiskUsage']);
     $router->get('maillog',  ['uses' => 'SystemController@sysLogMail']);
     $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']);
