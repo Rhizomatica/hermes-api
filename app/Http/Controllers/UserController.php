@@ -255,6 +255,11 @@ class UserController extends Controller
 		}
 	}
 
+	 /**
+	 * login
+	 * parameter: $request with email and password
+	 * @return Json
+	 */
 	public function login(Request $request)
 	{
 		$user = new User;
@@ -269,16 +274,49 @@ class UserController extends Controller
 					return response()->json($user, 200);
 				}
 				else{//fail
-					return response()->json(['message' => 'API user login - wrong password'], 500);
+					return response()->json(['message' => 'API user login - wrong password'], 420);
 				}
 			}
 			else{ //fail
-				return response()->json(['message' => 'API user login - wrong user'], 500);
+				return response()->json(['message' => 'API user login - wrong user'], 404);
 			}
 		}
 		else //fail
 		{
-			return response()->json(['message' => 'API user login - lack parameters'], 500);
+			return response()->json(['message' => 'API user login - lack parameters'], 412);
+		}
+	}
+
+	 /**
+	 * recover password 
+	 * parameter: $request with email and recoveranswer 
+	 * @return Json
+	 */
+	
+	public function recover(Request $request)
+	{
+		$user = new User;
+		if ($request->email){
+			if ($user = User::firstWhere('email', $request->email)){
+				if ($user['recoveranswer'] == $request->recoveranswer){ //sucessfull 
+					// unset($user['password']);
+					// unset($user['recoverphrase']);
+					// unset($user['recoveranswer']);
+					// unset($user['created_at']);
+					// unset($user['updated_at']);
+					return response()->json($user, 200);
+				}
+				else{//fail
+					return response()->json(['message' => 'API user recover - wrong answer'], 420);
+				}
+			}
+			else{ //fail
+				return response()->json(['message' => 'API user recover - wrong user'], 404);
+			}
+		}
+		else //fail
+		{
+			return response()->json(['message' => 'API user recover - lack parameters'], 412);
 		}
 	}
 }
