@@ -245,12 +245,22 @@ class SystemController extends Controller
 		}
 	}
 
+	/**
+	*  rejuvenate (route disabled)
+	*
+	* @return json message
+	*/
 	public function uucpRejuvenateJob($id){
 		$command = 'sudo uustat -r ' . $id; 
 		$output=exec_cli($command) or die;
 		return response($output, 200);
 	}
 
+	/**
+	* kill uucp mail jobs with mailkill returning  a email
+	*
+	* @return json message
+	*/
 	public function uucpKillMail($host, $id){
 		$command = 'sudo mailkill.sh es gui ' . $host . '.' . $id; 
 		ob_start();
@@ -265,26 +275,44 @@ class SystemController extends Controller
 		}
 	}
 
+	/**
+	* kill uucp jobs
+	*
+	* @return json message
+	*/
 	public function uucpKillJob($host, $id){
 		$command = 'sudo uustat -k ' . $host . '.' . $id; 
 		$output=exec_cli($command) or die;
 		return response()->json("uucp job killed: " . $host . '.' .$id, 200);
 	}
 
-
+	/**
+	* kill all uucp jobs
+	*
+	* @return json message
+	*/
 	public function uucpKillJobs(){
 		$command = 'sudo uustat -Ka '; 
 		$output=exec_cli($command) or die;
 		return response($output, 200);
 	}
 
+	/**
+	* kill uucp common jobs
+	*
+	* @return json message
+	*/
 	public function uucpCall(){
 		$command = 'sudo uucico -r1 ' ; 
 		$output=exec_cli($command);
 		return response($output, 200);
 	}
 
-	//port script restart_system.sh
+	/**
+	* system restart
+	*
+	* @return json message
+	*/
 	public function sysRestart() {
 		$command = "sudo systemctl stop uuardopd";
 		$output0 = exec_cli($command);
@@ -303,7 +331,23 @@ class SystemController extends Controller
 
 		return response()->json([$output0,$output1,$output2,$output3,$output4],200);
 	}
+	
+	/**
+	* system reboot 
+	*
+	* @return json message
+	*/
+	public function sysReboot(){
+		$command = "sudo reboot";
+		$output = exec_cli($command);
+		return json_encode("rebooted");
+	}
 
+	/**
+	* system shutdown
+	*
+	* @return json message
+	*/
 	public function sysShutdown(){
 		// set led status OFF on cabinet
 		exec_uc("set_led_status -a OFF");
@@ -315,19 +359,22 @@ class SystemController extends Controller
 		return json_encode("halted");
 	}
 
-	public function sysReboot(){
-		$command = "sudo reboot";
-		$output = exec_cli($command);
-		return json_encode("rebooted");
-	}
-
+	/**
+	* TODO system restore
+	*
+	* @return json message
+	*/
 	public function sysRestore(){
 		$command = "echo test running on php restore";
 		$output = exec_cli($command);
 		return json_encode($output);
 	}
 
-	//TODO check if all syslog is ok to frontend
+	/**
+	* system logs email
+	*
+	* @return json maillog
+	*/
 	public function sysLogMail(){
 		$command = "sudo tail /var/log/mail.log -n 1000| sort -n ";
 		$output=exec_cli($command);
@@ -338,6 +385,11 @@ class SystemController extends Controller
 		return response()->json($output,200);
 	}
 
+	/**
+	* system logs uucp
+	*
+	* @return json uucplog
+	*/
 	public function sysLogUucp(){
 		$command = "sudo uulog -n 1000 | sort -n ";
 		$output=exec_cli($command);
@@ -348,6 +400,11 @@ class SystemController extends Controller
 		return response()->json($output,200);
 	}
 
+	/**
+	* system logs uucp Debug 
+	*
+	* @return json uucpDebuglog
+	*/
 	public function sysDebUucp(){
 		$command = "sudo uulog -D -n 1000 | sort -n ";
 		$output=exec_cli($command);
