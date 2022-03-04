@@ -23,11 +23,11 @@ $router->get('help',  ['uses' => 'HelpController@showHelpMain']);
 
 //Users routes
 $router->group(['prefix' => '/user'], function () use ($router) {
+    $router->post('recover', ['uses' => 'UserController@recoverPassword']); 
     $router->get('', ['uses' => 'UserController@showAllUsers']);
     $router->get('{id}', ['uses' => 'UserController@showOneUser']);
     $router->post('', ['uses' => 'UserController@create']);
     $router->post('{id}', ['uses' => 'UserController@update']);
-    $router->post('recover', ['uses' => 'UserController@recoverPassword']); 
     $router->delete('{id}/{mail}', ['uses' => 'UserController@delete']);
 });
 
