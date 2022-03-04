@@ -27,7 +27,6 @@ class HelpController extends Controller
 			'sys/sensors GET' => 'sensors',
 			'sys/shutdown GET' => 'cli: shutdown',
 			'--------SYS-UUCP-----------' => '----------------------------------------',
-			'sys/uur/id POST' => 'UUCP rejuvenate ID',
 			'sys/uuk/id POST' => 'UUCP kill ID',
 			'sys/uuka POST' => 'UUCP killall jobs',
 			'sys/uuls GET' => 'UUCP list jobs',

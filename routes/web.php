@@ -87,7 +87,6 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->delete('uuka',  ['uses' => 'SystemController@uucpKillJobs']);
     $router->delete('mail/{host}/{id}',  ['uses' => 'SystemController@uucpKillMail']);
     $router->delete('uuk/{host}/{id}',  ['uses' => 'SystemController@uucpKillJob']);
-    $router->post('uur/{host}/{id}',  ['uses' => 'SystemController@uucpRejuvenateJob']);
     $router->get('uucall',  ['uses' => 'SystemController@uucpCall']);
     $router->get('uulog',  ['uses' => 'SystemController@sysLogUucp']);
     $router->get('uudebug',  ['uses' => 'SystemController@sysDebUucp']);
