@@ -27,7 +27,7 @@ class RadioController extends Controller
 			$radio_ref_thresholdv = 0;
 		}
 		$radio_serial = explode("\n", exec_uc("get_serial"))[0];
-
+		$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
 
 		$radio_txrx= explode("\n", exec_uc("get_txrx_status"))[0];
 
@@ -38,11 +38,9 @@ class RadioController extends Controller
 		$radio_fwd=0;
 		$radio_fwd_watts=0;
 
-
 		if($radio_txrx== "INTX" || !$radio_txrx){
 			$radio_tx =true;
 			$radio_rx =false;
-			$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
 			$radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
 
 			if(isset($radio_fwd)){
