@@ -76,16 +76,29 @@ class UserController extends Controller
 
 				//* Call the SOAP method
 				if (! $mailuser_id = $client->mail_user_add($session_id, $client_id, $params)) {
+					$client->logout($session_id);
 					return response()->json(['message' => 'API create user error: cant create email'], 500);
 				}
 				$request['password'] = hash('sha256', $request['password']);
 				$request['emailid'] = $mailuser_id;
 
 				if (! $user = User::create($request->all())) {
+					$client->logout($session_id);
 					return response()->json(['message' => 'API create user error: cant create user'], 500);
 				}
-				$command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -a -m "  . $request['email'] . "@" . env('HERMES_DOMAIN') . " -n " . $request['name'] . "'" ;
 
+				// forward
+				if ($forwarding_id = env('HERMES_EMAILAPI_FORWARDING_ID')){
+					$mail_forward = $client->mail_forward_get($session_id, $forwarding_id);
+					$find =  strpos($mail_forward['destination'], $request['email']);
+					if ($find === false)  {
+						$mail_forward['destination'] .= ', ' .  $request['email'] . '@' . env('HERMES_DOMAIN');
+						$client->mail_forward_update($session_id, $client_id, $forwarding_id, $mail_forward);
+					}
+				}
+
+				// call the uuadm
+				$command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -a -m "  . $request['email'] . "@" . env('HERMES_DOMAIN') . " -n " . $request['name'] . "'" ;
 				if (! $output = exec_cli($command)) {
 					$client->logout($session_id);
 					return response()->json(['message' => 'API create user error: cant advise to central'], 500);
@@ -102,7 +115,7 @@ class UserController extends Controller
 			echo $client->__getLastResponse();
 			die('SOAP Error: '.$e->getMessage());
 		}
-	}
+	} // end of create function
 
 
 	public function update($id, Request $request)
@@ -176,7 +189,7 @@ class UserController extends Controller
 			echo $client->__getLastResponse();
 			die('SOAP Error: '.$e->getMessage());
 		}
-	}
+	} // end of update function
 
 	public function delete($id,$mail)
 	{
@@ -197,7 +210,6 @@ class UserController extends Controller
 				// Parameters
 				$affected_rows = $client->mail_user_delete($session_id, $id);
 
-				$client->logout($session_id);
 				if ($affected_rows <= 0) {
 					return response()->json(['message' => 'API user delete error - cant remove email from server'], 405);
 				}
@@ -208,11 +220,42 @@ class UserController extends Controller
 					return response()->json(['message' => 'API user delete error '], 500);
 				}
 				$command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -d -m "  . $mail . '@' . env('HERMES_DOMAIN') .  "'" ;
-				if ($output = exec_cli($command)) {
-					return response()->json(['message' => 'API user delete error on uux'], 300);
-				}
+				//TOOD check that
+				$output = exec_cli($command);
+				// if ($output = exec_cli($command)) {
+				// 	return response()->json(['message' => 'API user delete error on uux'], 300);
+				// }
 				//returns uucp job id
 				$uucp_job_id= explode("\n", $output)[0];
+
+				if ($forwarding_id = env('HERMES_EMAILAPI_FORWARDING_ID')){
+					$client_id = 1;
+					$mail_forward = $client->mail_forward_get($session_id, $forwarding_id);
+					$find =  strpos($mail_forward['destination'], $mail);
+					if ($find !== false)  {
+						$destination = explode(', ', $mail_forward['destination']);
+						$new_destination = [];
+						//remove
+						foreach ( $destination as $key => $value) {
+							if ($value != $mail . "@" . env('HERMES_DOMAIN') ) {
+								array_push($new_destination, $value) ;
+							}
+						}
+						$mail_forward['destination'] = '';
+						for($i = 0; $i < count($new_destination); $i++) {
+
+							if (count($new_destination)-1 == $i) {
+								$mail_forward['destination'] .= $new_destination[$i];
+							}
+							else{
+								$mail_forward['destination'] .= $new_destination[$i] . ', ';
+							}
+						}
+						$client->mail_forward_update($session_id, $client_id, $forwarding_id, $mail_forward);
+					}
+				}
+
+				$client->logout($session_id);
 
 				$command = "uux -j -r . env('HERMES_ROUTE') . '!uuadm -d -m "  . $id . '@' . env('HERMES_DOMAIN') .  "'" ;
 				if (!$output = exec_cli($command) ){
@@ -286,75 +329,5 @@ class UserController extends Controller
 			// unset($user['updated_at']);
 			return response()->json($user, 200);
 		}
-	}
-
-	 /**
-	 * recover password 
-	 * parameter: $request with email and recoveranswer 
-	 * @return Json
-	 */
-	public function updateFwd(Request $request)
-	{
-		//var_dump($request->all);
-		$username = env('HERMES_EMAILAPI_USER');
-		$password = env('HERMES_EMAILAPI_PASS');
-		$soap_location = env('HERMES_EMAILAPI_LOC');
-		$soap_uri = env('HERMES_EMAILAPI_URI');
-
-		$client = new \SoapClient(null, array('location' => $soap_location,
-			'uri'      => $soap_uri,
-			'trace' => 1,
-			'stream_context'=> stream_context_create(array('ssl'=> array('verify_peer'=>false,'verify_peer_name'=>false))),
-			'exceptions' => 1));
-		try {
-			if ( $session_id = $client->login($username, $password)) {
-				//Logged successfull. Session ID:'.$session_id.'<br />';
-				if ( ! isset($request['id'])) {
-					return response()->json(['message' => 'API fwd update - lack parameters'], 412);
-				}
-				$client_id = 1;
-				$forwarding_id = $request['id'];
-				$mail_forward = $client->mail_forward_get($session_id, $forwarding_id);
-
-				if (isset($request['add'])) {
-					$find =  strpos($mail_forward['destination'], $request['email']);
-					if ($find !== false)  {
-						return response()->json(['message' => 'API fwd update - email already exists on forward'], 412);
-					}
-					$mail_forward['destination'] .= ', ' .  $request['email'];
-				}
-				elseif (isset($request['del'])){
-					$find =  strpos($mail_forward['destination'], $request['email']);
-					if ($find === false)  {
-						return response()->json(['message' => 'API fwd update - email not found in forward'], 412);
-					}
-					$destination = explode(', ', $mail_forward['destination']);
-					$new_destination = [];
-					//remove
-					foreach ( $destination as $key => $value) {
-						if ($value != $request['email']) {
-							array_push($new_destination, $value) ;
-						}
-					}
-					$mail_forward['destination'] = '';
-					for($i = 0; $i < count($new_destination); $i++) {
-						if (count($new_destination)-1 == $i) {
-							$mail_forward['destination'] .= $new_destination[$i];
-						}
-						else{
-							$mail_forward['destination'] .= $new_destination[$i] . ', ';
-						}
-					}
-				}
-				$affected_rows = $client->mail_forward_update($session_id, $client_id, $forwarding_id, $mail_forward);
-				$client->logout($session_id);
-				return($mail_forward );
-			}
-		}
-		catch (SoapFault $e) {
-			echo $client->__getLastResponse();
-			die('SOAP Error: '.$e->getMessage());
-		}
-	}
-
+	} // end of delete function
 }
