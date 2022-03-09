@@ -287,4 +287,74 @@ class UserController extends Controller
 			return response()->json($user, 200);
 		}
 	}
+
+	 /**
+	 * recover password 
+	 * parameter: $request with email and recoveranswer 
+	 * @return Json
+	 */
+	public function updateFwd(Request $request)
+	{
+		//var_dump($request->all);
+		$username = env('HERMES_EMAILAPI_USER');
+		$password = env('HERMES_EMAILAPI_PASS');
+		$soap_location = env('HERMES_EMAILAPI_LOC');
+		$soap_uri = env('HERMES_EMAILAPI_URI');
+
+		$client = new \SoapClient(null, array('location' => $soap_location,
+			'uri'      => $soap_uri,
+			'trace' => 1,
+			'stream_context'=> stream_context_create(array('ssl'=> array('verify_peer'=>false,'verify_peer_name'=>false))),
+			'exceptions' => 1));
+		try {
+            if ( $session_id = $client->login($username, $password)) {
+				//Logged successfull. Session ID:'.$session_id.'<br />';
+				if ( ! isset($request['id'])) {
+					return response()->json(['message' => 'API fwd update - lack parameters'], 412);
+				}
+				$client_id = 1;
+			    $forwarding_id = $request['id'];
+				$mail_forward = $client->mail_forward_get($session_id, $forwarding_id);
+
+				if (isset($request['add'])) {
+					$find =  strpos($mail_forward['destination'], $request['email']);
+					if ($find !== false)  {
+						return response()->json(['message' => 'API fwd update - email already exists on forward'], 412);
+					}
+					$mail_forward['destination'] .= ', ' .  $request['email'];
+				}
+				elseif (isset($request['del'])){
+					$find =  strpos($mail_forward['destination'], $request['email']);
+					if ($find === false)  {
+						return response()->json(['message' => 'API fwd update - email not found in forward'], 412);
+					}
+					$destination = explode(', ', $mail_forward['destination']);
+					$new_destination = [];
+					//remove
+					foreach ( $destination as $key => $value) {
+						if ($value != $request['email']) {
+							array_push($new_destination, $value) ;
+						}
+					}
+					$mail_forward['destination'] = '';
+					for($i = 0; $i < count($new_destination); $i++) {
+                        if (count($new_destination)-1 == $i) {
+							$mail_forward['destination'] .= $new_destination[$i];
+                        }
+						else{
+							$mail_forward['destination'] .= $new_destination[$i] . ', ';
+						}
+                    }
+				}
+				$affected_rows = $client->mail_forward_update($session_id, $client_id, $forwarding_id, $mail_forward);
+    			$client->logout($session_id);
+				return($mail_forward );
+            }
+		}
+		catch (SoapFault $e) {
+			echo $client->__getLastResponse();
+			die('SOAP Error: '.$e->getMessage());
+		}
+	}
+
 }
