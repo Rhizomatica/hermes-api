@@ -23,7 +23,6 @@ $router->get('help',  ['uses' => 'HelpController@showHelpMain']);
 
 //Users routes
 $router->group(['prefix' => '/user'], function () use ($router) {
-    $router->get('fwd', ['uses' => 'UserController@updateFwd']);
     $router->post('recover', ['uses' => 'UserController@recoverPassword']); 
     $router->get('', ['uses' => 'UserController@showAllUsers']);
     $router->get('{id}', ['uses' => 'UserController@showOneUser']);
