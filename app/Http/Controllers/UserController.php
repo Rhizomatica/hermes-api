@@ -15,9 +15,9 @@ class UserController extends Controller
 
 	public function showOneUser($id)
 	{
-         if (! $user = User::firstWhere('email', $id)) {
-             return response()->json(['message' => 'API showoneuser error, cant find'], 404);
-         }
+		 if (! $user = User::firstWhere('email', $id)) {
+			 return response()->json(['message' => 'API showoneuser error, cant find'], 404);
+		 }
 		 else{
 			return response()->json($user, 200);
 		 }
@@ -37,7 +37,7 @@ class UserController extends Controller
 			'stream_context'=> stream_context_create(array('ssl'=> array('verify_peer'=>false,'verify_peer_name'=>false))),
 			'exceptions' => 1));
 		try {
-            if ( $session_id = $client->login($username, $password)) {
+			if ( $session_id = $client->login($username, $password)) {
 				//Logged successfull. Session ID:'.$session_id.'<br />';
 				//, 'phone', 'site', 'location', 'password', 'recoverphrase', 'recoveranswer', 'updated_at', 'created_at', 'admin'
 				//* Set the function parameters.
@@ -96,7 +96,7 @@ class UserController extends Controller
 					$client->logout($session_id);
 					return response()->json($output, 201); //Created
 				}
-            }
+			}
 		}
 		catch (SoapFault $e) {
 			echo $client->__getLastResponse();
@@ -156,9 +156,9 @@ class UserController extends Controller
 				//disconnect SOAP
 				$client->logout($session_id);
 				$login = $mail_user_record['login'];
-                if ($affected_rows <= 0) {
+				if ($affected_rows <= 0) {
 					return response()->json(['message' => 'API update user error: cant update'], 501);
-                }
+				}
 				if (!  $user = User::firstWhere('email', $login)) {
 					return response()->json('Error: mail id not found on database', 504);
 				}
@@ -193,7 +193,7 @@ class UserController extends Controller
 				'stream_context'=> stream_context_create(array('ssl'=> array('verify_peer'=>false,'verify_peer_name'=>false))),
 				'exceptions' => 1));
 		try {
-            if ( $session_id = $client->login($username, $password)) {
+			if ( $session_id = $client->login($username, $password)) {
 				// Parameters
 				$affected_rows = $client->mail_user_delete($session_id, $id);
 
@@ -201,9 +201,9 @@ class UserController extends Controller
 				if ($affected_rows <= 0) {
 					return response()->json(['message' => 'API user delete error - cant remove email from server'], 405);
 				}
-            	if (! User::firstWhere('email', $mail)) {
-                	return response()->json(['message' => 'API user delete error - cant find user'], 404);
-            	}
+				if (! User::firstWhere('email', $mail)) {
+					return response()->json(['message' => 'API user delete error - cant find user'], 404);
+				}
 				if (!User::where('email', $mail)->delete()) {
 					return response()->json(['message' => 'API user delete error '], 500);
 				}
@@ -224,7 +224,7 @@ class UserController extends Controller
 					return response()->json(['message' => 'API user create but fail to advise central'], 300);
 				}
 				return response()->json($uucp_job_id , 200);
-            }
+			}
 		} catch (SoapFault $e) {
 			echo $client->__getLastResponse();
 			die('SOAP Error: '.$e->getMessage());
@@ -239,9 +239,9 @@ class UserController extends Controller
 	public function login(Request $request)
 	{
 		$user = new User;
-        if (! $request->email) {
-            return response()->json(['message' => 'API user login - lack parameters'], 412);
-        }
+		if (! $request->email) {
+			return response()->json(['message' => 'API user login - lack parameters'], 412);
+		}
 		if (! $user = User::firstWhere('email', $request->email)) {
 			return response()->json(['message' => 'API user login - wrong user'], 404);
 		}
@@ -267,12 +267,12 @@ class UserController extends Controller
 	public function recoverPassword(Request $request)
 	{
 		$user = new User;
-        if (! $request->email) {
+		if (! $request->email) {
 			return response()->json(['message' => 'API user recover - lack parameters'], 412);
-        }
-        if (! $user = User::firstWhere('email', $request->email)) {
-            return response()->json(['message' => 'API user recover - wrong user'], 404);
-        }
+		}
+		if (! $user = User::firstWhere('email', $request->email)) {
+			return response()->json(['message' => 'API user recover - wrong user'], 404);
+		}
 
 		if ($user['recoveranswer'] != $request->recoveranswer){ //sucessfull
 			return response()->json(['message' => 'API user recover - wrong answer'], 420);
@@ -307,13 +307,13 @@ class UserController extends Controller
 			'stream_context'=> stream_context_create(array('ssl'=> array('verify_peer'=>false,'verify_peer_name'=>false))),
 			'exceptions' => 1));
 		try {
-            if ( $session_id = $client->login($username, $password)) {
+			if ( $session_id = $client->login($username, $password)) {
 				//Logged successfull. Session ID:'.$session_id.'<br />';
 				if ( ! isset($request['id'])) {
 					return response()->json(['message' => 'API fwd update - lack parameters'], 412);
 				}
 				$client_id = 1;
-			    $forwarding_id = $request['id'];
+				$forwarding_id = $request['id'];
 				$mail_forward = $client->mail_forward_get($session_id, $forwarding_id);
 
 				if (isset($request['add'])) {
@@ -338,18 +338,18 @@ class UserController extends Controller
 					}
 					$mail_forward['destination'] = '';
 					for($i = 0; $i < count($new_destination); $i++) {
-                        if (count($new_destination)-1 == $i) {
+						if (count($new_destination)-1 == $i) {
 							$mail_forward['destination'] .= $new_destination[$i];
-                        }
+						}
 						else{
 							$mail_forward['destination'] .= $new_destination[$i] . ', ';
 						}
-                    }
+					}
 				}
 				$affected_rows = $client->mail_forward_update($session_id, $client_id, $forwarding_id, $mail_forward);
-    			$client->logout($session_id);
+				$client->logout($session_id);
 				return($mail_forward );
-            }
+			}
 		}
 		catch (SoapFault $e) {
 			echo $client->__getLastResponse();
