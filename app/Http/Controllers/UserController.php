@@ -79,6 +79,7 @@ class UserController extends Controller
 					$client->logout($session_id);
 					return response()->json(['message' => 'API create user error: cant create email'], 500);
 				}
+				$request['pass'] = $request['password'];
 				$request['password'] = hash('sha256', $request['password']);
 				$request['emailid'] = $mailuser_id;
 
@@ -98,7 +99,7 @@ class UserController extends Controller
 				}
 
 				// call the uuadm
-				$command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -a -m "  . $request['email'] . "@" . env('HERMES_DOMAIN') . " -n " . $request['name'] . "'" ;
+				$command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -a -m "  . $request['email'] . "@" . env('HERMES_DOMAIN') . " -p " . $request['pass'] . " -n " . $request['name'] . "'" ;
 				if (! $output = exec_cli($command)) {
 					$client->logout($session_id);
 					return response()->json(['message' => 'API create user error: cant advise to central'], 500);
@@ -257,15 +258,6 @@ class UserController extends Controller
 
 				$client->logout($session_id);
 
-				$command = "uux -j -r . env('HERMES_ROUTE') . '!uuadm -d -m "  . $id . '@' . env('HERMES_DOMAIN') .  "'" ;
-				if (!$output = exec_cli($command) ){
-					//returns uucp job id
-					$output = explode("\n", $output)[0];
-					return response()->json('uucp' . $command . ' - output: ' .  $output, 203); //deleted
-				}
-				else {
-					return response()->json(['message' => 'API user create but fail to advise central'], 300);
-				}
 				return response()->json($uucp_job_id , 200);
 			}
 		} catch (SoapFault $e) {
