@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use App\Message;
+// use App\Http\Controllers\MailController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class MessageController extends Controller
 {
@@ -178,7 +180,7 @@ class MessageController extends Controller
     {
         if($message = Message::findOrFail($id)){
             $message->update($request->all());
-			Log::info('update message ' . id);
+			Log::info('update message ' . $id);
             return response()->json($user, 200);
         }
         else{
@@ -204,7 +206,6 @@ class MessageController extends Controller
 				Storage::disk('local')->delete('uploads/' . $message->fileid);
 
 			}
-
 		}
 		Log::info('delete message ' . $id);
         return response()->json(['message' => 'Delete sucessfully message: ' . $id], 200);
@@ -273,6 +274,29 @@ class MessageController extends Controller
                 	}
                 	// TODO move audio and other files
             	}
+			}
+
+			if(env('MAIL_FROM_NAME')){
+
+				$data = array('name'=>$message['name'],
+							'text'=>$message['text'],
+							'file'=>$message['file'],
+							'fileid'=>$message['fileid'],
+							'mimetype'=>$message['mimetype'],
+							'sent_at'=>$message['sent_at'],
+							'orig'=>$message['orig'],
+							'dest'=>$message['dest']
+				);
+
+				// $data = array('dest'=>$message['dest']);
+				// $data = array('orig'=>$message['orig']);
+				// $data = array('sent_at'=>$message['sent_at']);
+				
+				Mail::send('mail', $data, function($message) {
+					// $subject = 'Hermes HMP: ' . $message->subject;
+					$message->to(env('HERMES_FWD_EMAIL'))->subject('HERMES Public message ');
+					//  $message->from('selva@snamservices.com','Selvakumar');
+				});
 
 			}
 
