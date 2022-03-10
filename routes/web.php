@@ -94,7 +94,7 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('shutdown',  ['uses' => 'SystemController@sysShutdown']);
     $router->get('restart',  ['uses' => 'SystemController@sysRestart']);
     $router->get('reboot',  ['uses' => 'SystemController@sysReboot']);
-    $router->get('restore',  ['uses' => 'SystemController@sysRestore']);
+    // $router->get('restore',  ['uses' => 'SystemController@sysRestore']);
 });
 
 $router->group(['prefix' => '/caller'], function () use ($router) {
