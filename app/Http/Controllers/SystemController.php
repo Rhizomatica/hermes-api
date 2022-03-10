@@ -221,6 +221,20 @@ class SystemController extends Controller
 			if(!empty($output[$i])) {
 				$fields = explode(" ", $output[$i]);
 				if ( $fields[6] != "uuadmin"){
+					$count=count($fields);
+					$emails=array();
+					$size= 0;
+					if($count>11){
+						for($j = 7 ; $j < $count-3 ; $j++){
+							$emails[]=$fields[$j];
+						}	
+						$size = $fields[$count-2];
+					}
+					else{
+						$size = $fields[9];
+						$emails[] = $fields[7];
+
+					}
 					$uuid =  explode(".",$fields[0]);
 					$spool[]  =  [
 						'uuidhost' => $uuid[0],
@@ -230,8 +244,9 @@ class SystemController extends Controller
 						'date' => $fields[3],
 						'time' => $fields[4],
 						'type' => $fields[5] == "Executing" ? "Mail" : "HMP", 
-						'size' => $fields[5] == "Executing" ? $fields[9] : explode("(",$fields[7])[1],
-						'destpath' =>  $fields[5] == "Executing" ? null :  $fields[10] ,
+						'size' => $size,
+						'destpath' =>  $fields[5] == "Executing" ? null: $fields[10] ,
+						'emails' =>  $emails,
 					];
 				}
 			}
