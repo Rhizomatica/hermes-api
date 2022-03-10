@@ -113,6 +113,13 @@ $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 //$app->register(Artisaninweb\SoapWrapper\ServiceProvider::class);
 //class_alias('Artisaninweb\SoapWrapper\Facade', 'SoapWrapper');
 
+$app->register(Illuminate\Mail\MailServiceProvider::class);
+
+$app->configure('mail');
+$app->alias('mailer', Illuminate\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
+
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
@@ -123,7 +130,7 @@ $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 | can respond to, as well as the controllers that may handle them.
 |
 */
-
+ 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
