@@ -224,15 +224,23 @@ class SystemController extends Controller
 					$count=count($fields);
 					$emails=array();
 					$size= 0;
-					if($count>11){
+
+					//handle size and emails when is a multiple email
+					if($fields[6] == "crmail" && $count > 11){
 						for($j = 7 ; $j < $count-3 ; $j++){
 							$emails[]=$fields[$j];
 						}	
 						$size = $fields[$count-2];
 					}
-					else{
+					//handle size when is a simple email
+					elseif($fields[6] == "crmail" && $count <= 11){
 						$size = $fields[9];
-						$emails[] = $fields[7];
+						$emails[]=$fields[7];
+					}
+
+					else{
+						$size = explode("(",$fields[7])[1];
+						$emails = null;
 
 					}
 					$uuid =  explode(".",$fields[0]);
@@ -243,9 +251,10 @@ class SystemController extends Controller
 						'user' => $fields[2],
 						'date' => $fields[3],
 						'time' => $fields[4],
-						'type' => $fields[5] == "Executing" ? "Mail" : "HMP", 
-						'size' => $size,
-						'destpath' =>  $fields[5] == "Executing" ? null: $fields[10] ,
+						'type' => $fields[6] == "crmail" ? "Mail" : "HMP", 
+						//'size' => $fields[5] == "Executing" ? $fields[9] : explode("(",$fields[7])[1],
+						'size' => intval($size),
+						'destpath' =>  $fields[6] == "crmail" ? null: $fields[10] ,
 						'emails' =>  $emails,
 					];
 				}
