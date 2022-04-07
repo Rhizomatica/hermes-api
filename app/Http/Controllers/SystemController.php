@@ -9,7 +9,7 @@ use League\Flysystem\Adapter\Local;
 use Illuminate\Http\Request;
 
 use App\System;
-
+use Illuminate\Support\Env;
 
 class SystemController extends Controller
 {
@@ -223,39 +223,57 @@ class SystemController extends Controller
 				if ( $fields[6] != "uuadm"){
 					$count=count($fields);
 					$emails=array();
+					$email_info=array();
 					$size= 0;
+					$type=$fields[6];
+					$uuid_host= explode(".", $fields[0])[0];
+					$uuid=explode(".", $fields[0])[1];
 
-					//handle size and emails when is a multiple email
-					if($fields[6] == "crmail" && $count > 11){
-						for($j = 7 ; $j < $count-3 ; $j++){
-							$emails[]=$fields[$j];
-						}	
-						$size = $fields[$count-2];
-					}
-					//handle size when is a simple email
-					elseif($fields[6] == "crmail" && $count <= 11){
-						$size = $fields[9];
-						$emails[]=$fields[7];
+					// test if spool is a email
+					if($type == "crmail"){
+						// handle when is a multiple email
+						if ($count > 11){
+							for($j = 7 ; $j < $count-3 ; $j++){
+								$emails[]=$fields[$j];
+							}	
+							$size = $fields[$count-2];
+						}
+						// handle when is a simple email
+						else{
+							$size = $fields[9];
+							$emails[]=$fields[7];
+						}
+						$cfile_path=env('HERMES_UUCP') . '/'.  $uuid_host . '/C./C.' . $uuid;
+						$dfile_id= explode(" ", exec_cli('sudo cat ' . $cfile_path))[1];
+						$dfile_path=env('HERMES_UUCP') . '/' . $uuid_host . '/D./' . $dfile_id;
+						$dfile=  exec_cli('sudo zcat ' . $dfile_path . '| head -1');
+						$email_info['from']=explode(" ", explode("\n", $dfile)[0])[1];
+						$email_info['from_date_week']=explode(" ", explode("\n", $dfile)[0])[3];
+						$email_info['from_date_month']=explode(" ", explode("\n", $dfile)[0])[4];
+						$email_info['from_date_day']=explode(" ", explode("\n", $dfile)[0])[5];
+						$email_info['from_date_year']=explode(" ", explode("\n", $dfile)[0])[7];
+						$email_info['from_date_time']=explode(" ", explode("\n", $dfile)[0])[6];
 					}
 
+					//not a email
 					else{
 						$size = explode("(",$fields[7])[1];
 						$emails = null;
 
 					}
-					$uuid =  explode(".",$fields[0]);
 					$spool[]  =  [
-						'uuidhost' => $uuid[0],
-						'uuiduucp' => $uuid[1], 
+						'uuidhost' => $uuid_host,
+						'uuiduucp' => $uuid, 
 						'dest' => $fields[1],
 						'user' => $fields[2],
 						'date' => $fields[3],
 						'time' => $fields[4],
-						'type' => $fields[6] == "crmail" ? "Mail" : "HMP", 
+						'type' => $type == "crmail" ? "Mail" : "HMP", 
 						//'size' => $fields[5] == "Executing" ? $fields[9] : explode("(",$fields[7])[1],
 						'size' => intval($size),
 						'destpath' =>  $fields[6] == "crmail" ? null: $fields[10] ,
 						'emails' =>  $emails,
+						'emailinfo' =>  $email_info,
 					];
 				}
 			}
