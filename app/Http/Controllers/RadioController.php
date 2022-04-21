@@ -250,25 +250,25 @@ class RadioController extends Controller
 	 */
 	public function setRadioTone($par)
 	{
-	system("sudo killall fplay");
+	system("sudo killall ffplay");
 
 	switch ($par) {
 	  case "600":
-		  $command = 'su hermes -c fplay -f lavfi -i "sine=frequency=600" -nodisp > /dev/null 2>&1 &';
+		  $command = 'su hermes -c ffplay -f lavfi -i "sine=frequency=600" -nodisp > /dev/null 2>&1 &';
 		  $output = system("$command");
 		  break;
 	  case "1500":
-		  $command = 'su hermes -c fplay -f lavfi -i "sine=frequency=1500" -nodisp > /dev/null 2>&1 &';
+		  $command = 'su hermes -c ffplay -f lavfi -i "sine=frequency=1500" -nodisp > /dev/null 2>&1 &';
 		  $output = system("$command");
 		  break;
 	  case "3000":
-		  $command = 'su hermes -c fplay -f lavfi -i "sine=frequency=300" -nodisp > /dev/null 2>&1 &';
+		  $command = 'su hermes -c ffplay -f lavfi -i "sine=frequency=300" -nodisp > /dev/null 2>&1 &';
 		  $output = system("$command");
-		  $command = 'su hermes -c fplay -f lavfi -i "sine=frequency=2700" -nodisp > /dev/null 2>&1 &';
+		  $command = 'su hermes -c ffplay -f lavfi -i "sine=frequency=2700" -nodisp > /dev/null 2>&1 &';
 		  $output = system("$command");
 		  break;
 	  default:
-		  $command = "sudo killall fplay";
+		  $command = "sudo killall ffplay";
 		  $output = system("$command");
 		  break;
 	  }
