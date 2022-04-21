@@ -81,6 +81,13 @@ function adc2volts($rawadc){
     return ($output);
 }
 
+//𝑉fwd+𝑉ref / 𝑉fwd−𝑉ref
+function swr($ref, $fwd){
+	$x =  $ref/$fwd;
+	$swr = 1.005099 + 15.72241*$x - 42.24059*$x^2 + 88.25648*$x^3;
+	return ($swr);
+}
+
 /* to watts
 * x = 5397489 + (0.6261549 - 5397489)/(1 + (x/3520.472)^1.950248)
 * k is output in is power in W, x is what we read (raw) from arduino

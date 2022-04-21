@@ -39,9 +39,9 @@ class RadioController extends Controller
 		$radio_fwd_watts=0;
 
 		if($radio_txrx== "INTX" || !$radio_txrx){
-			$radio_tx =true;
-			$radio_rx =false;
-			$radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
+			$radio_tx=true;
+			$radio_rx=false;
+			$radio_fwd=explode("\n", exec_uc("get_fwd"))[0];
 
 			if(isset($radio_fwd)){
 				$radio_fwd_watts = adc2watts($radio_fwd);
@@ -57,6 +57,7 @@ class RadioController extends Controller
 				$radio_ref_volts = 0;
 				$radio_ref = 0;
 			}
+			$radio_swr = swr($radio_ref_volts, $radio_fwd_watts);
 		}
 
 
@@ -101,6 +102,7 @@ class RadioController extends Controller
 			'fwd_watts' => $radio_fwd_watts,
 			'ref_raw' => $radio_ref,
 			'ref_volts' =>  $radio_ref_volts,
+			'swr' => $radio_swr,
 			'txrx' => $radio_txrx,
 			'tx' => $radio_tx,
 			'rx' => $radio_rx,
@@ -135,7 +137,6 @@ class RadioController extends Controller
 		if($radio_txrx== "INTX" || !$radio_txrx){
 			$radio_tx =true;
 			$radio_rx =false;
-			$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
 			$radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
 
 			if(isset($radio_fwd)){
@@ -152,8 +153,8 @@ class RadioController extends Controller
 				$radio_ref_volts = 0;
 				$radio_ref = 0;
 			}
+			$radio_swr = swr($radio_ref_volts, $radio_fwd_watts);
 		}
-
 
 		$radio_led= explode("\n", exec_uc("get_led_status"))[0];
 		if ($radio_led== "LED_ON"){
@@ -186,6 +187,7 @@ class RadioController extends Controller
 			'led' => $radio_led,
 			'fwd_raw' => $radio_fwd,
 			'fwd_watts' => $radio_fwd_watts,
+			'swr' => $radio_swr,
 			'ref_raw' => $radio_ref,
 			'ref_volts' => $radio_ref_volts,
 			'protection' => $radio_protection,
