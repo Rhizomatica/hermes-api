@@ -132,7 +132,7 @@ class RadioController extends Controller
 		$radio_ref_volts=0;
 		$radio_fwd=0;
 		$radio_fwd_watts=0;
-
+		$radio_swr=0;
 
 		if($radio_txrx== "INTX" || !$radio_txrx){
 			$radio_tx =true;
