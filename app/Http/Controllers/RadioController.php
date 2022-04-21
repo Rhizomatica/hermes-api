@@ -63,7 +63,7 @@ class RadioController extends Controller
 
 
 		$radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
-		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep alsatonic -a"))[0]) ;
+		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep ffplay -a"))[0]) ;
 		if (isset($radio_test_tone[3])){
 			$radio_test_tone=$radio_test_tone[3];
 		}
@@ -254,17 +254,17 @@ class RadioController extends Controller
 
 	switch ($par) {
 	  case "600":
-		  $command = 'su hermes -c ffplay -f lavfi -i "sine=frequency=600" -nodisp > /dev/null 2>&1 &';
+		  $command = 'su hermes -c "ffplay -f lavfi -i \"sine=frequency=600\" -nodisp" &';
 		  $output = system("$command");
 		  break;
 	  case "1500":
-		  $command = 'su hermes -c ffplay -f lavfi -i "sine=frequency=1500" -nodisp > /dev/null 2>&1 &';
+		  $command = 'su hermes -c "ffplay -f lavfi -i \"sine=frequency=1500\" -nodisp" &';
 		  $output = system("$command");
 		  break;
 	  case "3000":
-		  $command = 'su hermes -c ffplay -f lavfi -i "sine=frequency=300" -nodisp > /dev/null 2>&1 &';
+		  $command = 'su hermes -c "ffplay -f lavfi -i \"sine=frequency=300\" -nodisp" &';
 		  $output = system("$command");
-		  $command = 'su hermes -c ffplay -f lavfi -i "sine=frequency=2700" -nodisp > /dev/null 2>&1 &';
+		  $command = 'su hermes -c "ffplay -f lavfi -i \"sine=frequency=2700\" -nodisp" &';
 		  $output = system("$command");
 		  break;
 	  default:
