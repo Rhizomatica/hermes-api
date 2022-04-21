@@ -58,7 +58,7 @@ class RadioController extends Controller
 				$radio_ref_volts = 0;
 				$radio_ref = 0;
 			}
-			$radio_swr = swr($radio_ref_volts, $radio_fwd_watts);
+			$radio_swr = swr($radio_ref, $radio_fwd);
 		}
 
 
@@ -154,7 +154,7 @@ class RadioController extends Controller
 				$radio_ref_volts = 0;
 				$radio_ref = 0;
 			}
-			$radio_swr = swr($radio_ref_volts, $radio_fwd_watts);
+			$radio_swr = swr($radio_ref, $radio_fwd);
 		}
 
 		$radio_led= explode("\n", exec_uc("get_led_status"))[0];
