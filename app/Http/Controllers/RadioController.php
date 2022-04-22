@@ -33,34 +33,11 @@ class RadioController extends Controller
 
 		$radio_rx=true;
 		$radio_tx=false;
-		$radio_ref=0;
-		$radio_ref_volts=0;
-		$radio_fwd=0;
-		$radio_fwd_watts=0;
-		$radio_swr=0;
 
 		if($radio_txrx== "INTX" || !$radio_txrx){
 			$radio_tx=true;
 			$radio_rx=false;
-			$radio_fwd=explode("\n", exec_uc("get_fwd"))[0];
-
-			if(isset($radio_fwd)){
-				$radio_fwd_watts = adc2watts($radio_fwd);
-			}
-			else{
-				$radio_fwd_watts = 0;
-			}
-			$radio_ref = explode("\n", exec_uc("get_ref"))[0];
-			if (isset($radio_ref)){
-				$radio_ref_volts = adc2volts($radio_ref);
-			}
-			else{
-				$radio_ref_volts = 0;
-				$radio_ref = 0;
-			}
-			$radio_swr = swr($radio_ref, $radio_fwd);
 		}
-
 
 		$radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
 		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep ffplay -a"))[0]) ;
@@ -99,11 +76,6 @@ class RadioController extends Controller
 			'mode' => $radio_mode,
 			'led' => $radio_led,
 			'bfo' => $radio_bfo,
-			'fwd_raw' => $radio_fwd,
-			'fwd_watts' => $radio_fwd_watts,
-			'ref_raw' => $radio_ref,
-			'ref_volts' =>  $radio_ref_volts,
-			'swr' => $radio_swr,
 			'txrx' => $radio_txrx,
 			'tx' => $radio_tx,
 			'rx' => $radio_rx,
@@ -131,6 +103,7 @@ class RadioController extends Controller
 		$radio_tx=false;
 		$radio_ref=0;
 		$radio_ref_volts=0;
+		$radio_ref_watts=0;
 		$radio_fwd=0;
 		$radio_fwd_watts=0;
 		$radio_swr=0;
@@ -141,7 +114,7 @@ class RadioController extends Controller
 			$radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
 
 			if(isset($radio_fwd)){
-				$radio_fwd_watts = adc2watts($radio_fwd);
+				$radio_fwd_watts = fwd2watts($radio_fwd);
 			}
 			else{
 				$radio_fwd_watts = 0;
@@ -149,6 +122,7 @@ class RadioController extends Controller
 			$radio_ref = explode("\n", exec_uc("get_ref"))[0];
 			if (isset($radio_ref)){
 				$radio_ref_volts = adc2volts($radio_ref);
+				$radio_ref_watts = ref2watts($radio_ref);
 			}
 			else{
 				$radio_ref_volts = 0;
@@ -191,6 +165,7 @@ class RadioController extends Controller
 			'swr' => $radio_swr,
 			'ref_raw' => $radio_ref,
 			'ref_volts' => $radio_ref_volts,
+			'ref_watts' => $radio_ref_volts,
 			'protection' => $radio_protection,
 			'bypass' =>  $radio_bypass,
 		];

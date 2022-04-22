@@ -74,30 +74,55 @@ function exec_nodename(){
     return $output;
 }
 
-function adc2volts($rawadc){
-	$fig = (int) str_pad('1', 3, '0');
-	$tr = $rawadc*5/1023;
-	$output = (floor($tr*$fig)/$fig);
-    return ($output);
-}
-
-//𝑉fwd+𝑉ref / 𝑉fwd−𝑉ref
 function swr($raw_ref, $raw_fwd){
-	$swr = 8.513756 * ( $raw_ref / $raw_fwd ) + 0.5080228;
-	if($swr<1){
-		$swr = 1;
-	}
-	return ($swr);
-}
-
-/* to watts
-* x = 5397489 + (0.6261549 - 5397489)/(1 + (x/3520.472)^1.950248)
-* k is output in is power in W, x is what we read (raw) from arduino
-*/
-function adc2watts($rawadc){
-	if ($rawadc == 0) {
+	if ($raw_ref <= 0 || $raw_fwd <= 0) {
 		return 0;
 	}
-	$watts = 5397489 + ( 0.6261549 - 5397489 ) /  ( 1 + pow( ( ( 0.004882813 * $rawadc ) / 3520.472 ), 1.950248));
-	return (round($watts, 4));
+	else {
+		$swr = 8.513756 * ( $raw_ref / $raw_fwd ) + 0.5080228;
+		if($swr<1){
+			$swr = 1;
+		}
+		return ($swr);
+	}
 }
+
+function fwd2watts($rawadc){
+	if ($rawadc <= 0) {
+		return 0;
+	}
+	else{
+		$x = 0.004882813 * $rawadc;
+		$fwd = -1.616282 + 1.221939 * $x + 0.4510454 * $x^2;
+		if ($fwd < 0) $fwd = 0; 
+		return (round($fwd, 4));
+	}
+}
+
+function ref2watts($rawadc){
+	if ($rawadc <= 0) {
+		return 0;
+	}
+	else{
+		$x = 0.004882813 * $rawadc;
+		$ref = 3.264422 * $x - 0.7132102;
+		return (round($ref, 4));
+	}
+}
+
+function adc2volts($rawadc){
+	if ($rawadc <= 0) {
+		return 0;
+	}
+	else{
+		$volts = 0.004882813 * $rawadc;
+		return (round($volts, 4));
+	}
+}
+
+// function adc2volts($rawadc){
+// 	$fig = (int) str_pad('1', 3, '0');
+// 	$tr = $rawadc*5/1023;
+// 	$output = (floor($tr*$fig)/$fig);
+//     return ($output);
+// }
