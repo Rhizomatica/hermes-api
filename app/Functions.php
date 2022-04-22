@@ -84,6 +84,9 @@ function adc2volts($rawadc){
 //𝑉fwd+𝑉ref / 𝑉fwd−𝑉ref
 function swr($raw_ref, $raw_fwd){
 	$swr = 8.513756 * ( $raw_ref / $raw_fwd ) + 0.5080228;
+	if($swr<1){
+		$swr = 1;
+	}
 	return ($swr);
 }
 
