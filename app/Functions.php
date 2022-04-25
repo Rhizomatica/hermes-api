@@ -83,7 +83,7 @@ function swr($raw_ref, $raw_fwd){
 		if($swr<1){
 			$swr = 1;
 		}
-		return ($swr);
+		return (round($swr, 5));
 	}
 }
 

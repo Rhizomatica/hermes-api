@@ -165,7 +165,7 @@ class RadioController extends Controller
 			'swr' => $radio_swr,
 			'ref_raw' => $radio_ref,
 			'ref_volts' => $radio_ref_volts,
-			'ref_watts' => $radio_ref_volts,
+			'ref_watts' => $radio_ref_watts,
 			'protection' => $radio_protection,
 			'bypass' =>  $radio_bypass,
 		];
