@@ -114,6 +114,7 @@ class RadioController extends Controller
 			$radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
 
 			if(isset($radio_fwd)){
+				$radio_fwd_volts = adc2volts($radio_fwd);
 				$radio_fwd_watts = fwd2watts($radio_fwd);
 			}
 			else{
@@ -161,6 +162,7 @@ class RadioController extends Controller
 			'rx' => $radio_rx,
 			'led' => $radio_led,
 			'fwd_raw' => $radio_fwd,
+			'fwd_volts' => $radio_fwd_volts,
 			'fwd_watts' => $radio_fwd_watts,
 			'swr' => $radio_swr,
 			'ref_raw' => $radio_ref,
