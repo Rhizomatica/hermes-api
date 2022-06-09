@@ -1,5 +1,5 @@
 # Hermes Project
-[Hermes](https://www.rhizomatica.org/hermes/) is a High-frequency Emergency and Rural Multimedia Exchange System.
+[Hermes](https://www.rhizomatica.org/hermes/) - High-frequency Emergency and Rural Multimedia Exchange System.
 
 
 ## Hermes station api
