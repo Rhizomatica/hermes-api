@@ -12,15 +12,27 @@ This is a REST api for use on Hermes stations to exchange messages between then,
 - OpenSSL PHP Extension
 - PDO PHP Extension
 - Mbstring PHP Extension
+- SQLite DataBase
 
 ## to configure
 - Setup your settings creating a .env file from .env.example
+
 - Setup public folders inbox / outbox to uucp public
+
+- set enebled in `php.ini`
+    `extension=pdo_sqlite`
+    `extension=mbstring`
+    `extension=odbc`
+    `extension=openssl`
+
 - Run:
-     compose install
+     composer install
+
+- create `database.sqlite` file in database folder
 
 - To start a fresh database:
     php artisan migrate:refresh --seed
+
 ## Running on port 8000:
 ❯ php -S localhost:8000 -t public
 
