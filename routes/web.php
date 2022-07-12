@@ -136,3 +136,8 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('setdefaults',  ['uses' => 'RadioController@setRadioDefaults']);
     $router->post('restoredefaults',  ['uses' => 'RadioController@restoreRadioDefaults']);
 });
+
+
+$router->group(['prefix' => '/geolocation'], function () use ($router) {
+    $router->get('calibration',  ['uses' => 'GeolocationController@startGPSCalibration']);
+});
