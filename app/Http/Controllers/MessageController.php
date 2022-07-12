@@ -33,13 +33,13 @@ class MessageController extends Controller
     public function showAllMessagesByType($type)
     {
 		if($type=='inbox'){
-			return response()->json(Message::where('inbox', '=', true)->get());
+			return response()->json(Message::where('inbox', '=', true)->orderBy('sent_at', 'DESC')->get());
 		}
 		if($type=='draft'){
-			return response()->json(Message::where('draft', '=', true)->get());
+			return response()->json(Message::where('draft', '=', true)->orderBy('sent_at', 'DESC')->get());
 		}
 		else{
-			return response()->json(Message::where('inbox', '!=', true)->where('draft', '!=', true)->get());
+			return response()->json(Message::where('inbox', '!=', true)->where('draft', '!=', true)->orderBy('sent_at', 'DESC')->get());
 		}
     }
 
