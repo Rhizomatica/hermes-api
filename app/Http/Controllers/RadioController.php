@@ -63,12 +63,12 @@ class RadioController extends Controller
 			$radio_protection = false;
 		}
 
-		$radio_bypass= explode("\n", exec_uc("get_bypass_status"))[0];
-		if ($radio_bypass== "BYPASS_ON"){
-			$radio_bypass=true;
+		$radio_connection= explode("\n", exec_uc("get_connected_status"))[0];
+		if ($radio_connection== "LED_ON"){
+			$radio_connection=true;
 		}
-		else if($radio_bypass == "BYPASS_OFF" || !$radio_bypass){
-			$radio_bypass = false;
+		else if($radio_connection == "LED_OFF" || !$radio_connection){
+			$radio_connection = false;
 		}
 
 		$status = [
@@ -83,7 +83,7 @@ class RadioController extends Controller
 			'protection' => $radio_protection,
 			'refthreshold' => $radio_ref_threshold,
 			'refthresholdv'=> $radio_ref_thresholdv,
-			'bypass' =>  $radio_bypass,
+			'connection' =>  $radio_connection,
 			'serial' =>  $radio_serial,
 			'testtone' => $radio_test_tone
 		];
@@ -149,12 +149,12 @@ class RadioController extends Controller
 			$radio_protection = false;
 		}
 
-		$radio_bypass= explode("\n", exec_uc("get_bypass_status"))[0];
-		if ($radio_bypass== "BYPASS_ON"){
-			$radio_bypass=true;
+		$radio_connection= explode("\n", exec_uc("get_connected_status"))[0];
+		if ($radio_connection== "LED_ON"){
+			$radio_connection=true;
 		}
-		else if($radio_bypass == "BYPASS_OFF" || !$radio_bypass){
-			$radio_bypass = false;
+		else if($radio_connection == "LED_OFF" || !$radio_connection){
+			$radio_connection = false;
 		}
 
 		$status = [
@@ -170,7 +170,7 @@ class RadioController extends Controller
 			'ref_volts' => $radio_ref_volts,
 			'ref_watts' => $radio_ref_watts,
 			'protection' => $radio_protection,
-			'bypass' =>  $radio_bypass,
+			'connection' =>  $radio_connection,
 		];
 		return response()->json($status, 200);
 	}
@@ -496,55 +496,55 @@ class RadioController extends Controller
 	}
 
 	/**
-	 * Get Radio Bypass Status
+	 * Get Radio Connection Status
 	 *
 	 * @return Json
 	 */
-	public function getRadioBypassStatus()
+	public function getRadioConnectionStatus()
 	{
-		$radio_bypass= explode("\n", exec_uc("get_bypass_status"))[0];
-		if($radio_bypass== "BYPASS_ON"){
+		$radio_connection= explode("\n", exec_uc("get_connected_status"))[0];
+		if($radio_connection == "LED_ON"){
 			return response( true, 200);
 		}
-		elseif($radio_bypass== "BYPASS_OFF"){
+		elseif($radio_connection == "LED_OFF"){
 			return response( false, 200);
 		}
 		else{
-			return response()->json(['message' => 'getRadiobyPassStatus fail' . $radio_bypass], 500);
+			return response()->json(['message' => 'getRadioConnectionStatus fail' . $radio_connection], 500);
 		}
 
 	}
 
 	/**
-	 * Set Radio Bypass Status
+	 * Set Radio Connection Status
 	 *
 	 * @return Json
 	 */
-	public function setRadioBypassStatus($status)
+	public function setRadioConnectionStatus($status)
 	{
 		$par = '';
 		if ($status == "ON"){
-			$par = "set_bypass_status -a ON";
+			$par = "set_connected_status -a ON";
 		}
 		elseif ($status == "OFF"){
-			$par = "set_bypass_status -a OFF";
+			$par = "set_connected_status -a OFF";
 		}
 		else{
-			return response()->json(['message' => 'setRadioByPassStatus fail: ' . $status], 500);
+			return response()->json(['message' => 'setRadioConnectionStatus fail: ' . $status], 500);
 		}
 
 		$command = explode("\n", exec_uc($par))[0];
 
 		if ($command == "OK"){
-			$radio_bypass= explode("\n", exec_uc("get_bypass_status"))[0];
-			if($radio_bypass== "BYPASS_ON"){
+			$radio_connection= explode("\n", exec_uc("get_connected_status"))[0];
+			if($radio_connection== "LED_ON"){
 				return response( true, 200);
 			}
-			elseif($radio_bypass== "BYPASS_OFF"){
+			elseif($radio_connection== "LED_OFF"){
 				return response( false, 200);
 			}
 			else{
-				return response()->json(['message' => 'getRadiobyPassStatus fail' . $radio_bypass], 500);
+				return response()->json(['message' => 'getRadioConnectionStatus fail' . $radio_connection], 500);
 			}
 		}
 		else {

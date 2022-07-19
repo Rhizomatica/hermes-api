@@ -68,8 +68,8 @@ class HelpController extends Controller
 			'radio/mastercal GET' => 'get radio MasterCal',
 			'radio/mastercal POST' => 'get radio MasterCal',
 			'radio/protection GET' => 'get radio MasterCal',
-			'radio/bypass GET' => 'get radio BypassStatus',
-			'radio/bypass/{status} POST' => 'get radio BypassStatus'
+			'radio/connection GET' => 'get radio ConnectionStatus',
+			'radio/connection/{status} POST' => 'get radio ConnectionStatus'
 		];
 	return $manual;
 	}
