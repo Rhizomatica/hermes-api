@@ -139,5 +139,5 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
 
 
 $router->group(['prefix' => '/geolocation'], function () use ($router) {
-    $router->get('calibration',  ['uses' => 'GeolocationController@startGPSCalibration']);
+    $router->get('calibration',  ['uses' => 'GeoLocationController@startGPSCalibration']);
 });
