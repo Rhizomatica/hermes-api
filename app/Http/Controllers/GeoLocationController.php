@@ -17,6 +17,9 @@ class GeoLocationController extends Controller
             $command = 'ubitx_client -c gps_calibrate';
             $output = exec_cli($command);
 
+            if($output == 'NO_GPS')
+                return response()->json(['message' => 'No GPS found for calibration: ' . $output], 500);
+
             if(!$output || $output == 'ERROR')
                 return response()->json(['message' => 'Fail on start GPS calibration: ' . $output], 500);
     
