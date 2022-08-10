@@ -17,8 +17,9 @@ class FileController extends Controller
 	public function uploadFile(Request $request)
 	{
 		$validated = $this->validate($request, [
-			'fileup' => 'required|file|max:' . env('HERMES_MAX_FILE') . '| mimes:jpg,png,ogg,mp3,mp4,wav',
-			'pass' => 'min:4|max:20',
+			//'fileup' => 'required|file|max:' . env('HERMES_MAX_FILE') . '| mimes:jpg,png,ogg,mp3,mp4,wav',
+			'fileup' => 'required|file',
+			'pass' => 'min:4|max:20'
 		]);
 
 		if(!$validated){
