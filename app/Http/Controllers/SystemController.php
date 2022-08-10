@@ -212,7 +212,7 @@ class SystemController extends Controller
 	* @return Json
 	*/
 	public function sysGetSpoolList(){
-		$command = 'uustat -a| grep -v uuadm | grep -v sudo | grep -v bash' ;
+		$command = 'uustat -a| grep -v uuadm | grep -v sudo | grep -v bash | grep -v "\-C"';
 		$output=exec_cli($command) ;
 		$output = explode("\n", $output);
 		$spool=[];
