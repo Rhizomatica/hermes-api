@@ -11,7 +11,7 @@
 $router->get('/',  ['uses' => 'HelpController@showHelpMain']);
 $router->get('/help',  ['uses' => 'HelpController@showHelpMain']);
 $router->get('/version', function () use ($router) {
-    return $router->app->version()  ; 
+    return $router->app->version()  ;
 });
 $router->post('login', ['uses' => 'UserController@login']); //TODO remove
 
@@ -23,7 +23,7 @@ $router->get('help',  ['uses' => 'HelpController@showHelpMain']);
 
 //Users routes
 $router->group(['prefix' => '/user'], function () use ($router) {
-    $router->post('recover', ['uses' => 'UserController@recoverPassword']); 
+    $router->post('recover', ['uses' => 'UserController@recoverPassword']);
     $router->get('', ['uses' => 'UserController@showAllUsers']);
     $router->get('{id}', ['uses' => 'UserController@showOneUser']);
     $router->post('', ['uses' => 'UserController@create']);
@@ -62,7 +62,7 @@ $router->group(['prefix' => '/file'], function () use ($router) {
     $router->get('{file}', ['uses' => 'FileController@downloadFile']);
     $router->post('', ['uses' => 'FileController@uploadFile']);
     $router->delete('', ['uses' => 'FileController@deleteLostFiles']);
-	//TODO 
+	//TODO
     // $router->get('', ['uses' => 'FileController@showAllFiles']);
 });
 
@@ -77,7 +77,7 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('queueerase',  ['uses' => 'SystemController@queueErase']);
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
     $router->get('list',  ['uses' => 'SystemController@systemDirList']);
-    $router->post('login', ['uses' => 'UserController@login']); 
+    $router->post('login', ['uses' => 'UserController@login']);
     $router->get('maildu',  ['uses' => 'SystemController@getMailDiskUsage']);
     $router->get('maillog',  ['uses' => 'SystemController@sysLogMail']);
     $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']);
@@ -89,6 +89,7 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->delete('mail/{host}/{id}',  ['uses' => 'SystemController@uucpKillMail']);
     $router->delete('uuk/{host}/{id}',  ['uses' => 'SystemController@uucpKillJob']);
     $router->get('uucall',  ['uses' => 'SystemController@uucpCall']);
+    $router->get('uucall/{uuidhost}',  ['uses' => 'SystemController@uucpCallForHost']);
     $router->get('uulog',  ['uses' => 'SystemController@sysLogUucp']);
     $router->get('uudebug',  ['uses' => 'SystemController@sysDebUucp']);
     $router->get('shutdown',  ['uses' => 'SystemController@sysShutdown']);

@@ -207,8 +207,8 @@ class SystemController extends Controller
 	}
 
 	/**
-	* Get transmission spool 
-	* 
+	* Get transmission spool
+	*
 	* @return Json
 	*/
 	public function sysGetSpoolList(){
@@ -235,7 +235,7 @@ class SystemController extends Controller
 						if ($count > 11){
 							for($j = 7 ; $j < $count-3 ; $j++){
 								$emails[]=$fields[$j];
-							}	
+							}
 							$size = $fields[$count-2];
 						}
 						// handle when is a simple email
@@ -263,12 +263,12 @@ class SystemController extends Controller
 					}
 					$spool[]  =  [
 						'uuidhost' => $uuid_host,
-						'uuiduucp' => $uuid, 
+						'uuiduucp' => $uuid,
 						'dest' => $fields[1],
 						'user' => $fields[2],
 						'date' => $fields[3],
 						'time' => $fields[4],
-						'type' => $type == "crmail" ? "Mail" : "HMP", 
+						'type' => $type == "crmail" ? "Mail" : "HMP",
 						//'size' => $fields[5] == "Executing" ? $fields[9] : explode("(",$fields[7])[1],
 						'size' => intval($size),
 						'destpath' =>  $fields[6] == "crmail" ? null: $fields[10] ,
@@ -293,7 +293,7 @@ class SystemController extends Controller
 	* @return json message
 	*/
 	public function uucpRejuvenateJob($id){
-		$command = 'sudo uustat -r ' . $id; 
+		$command = 'sudo uustat -r ' . $id;
 		$output=exec_cli($command) or die;
 		return response($output, 200);
 	}
@@ -304,7 +304,7 @@ class SystemController extends Controller
 	* @return json message
 	*/
 	public function uucpKillMail($host, $id){
-		$command = 'sudo mailkill.sh es gui ' . $host . '.' . $id; 
+		$command = 'sudo mailkill.sh es gui ' . $host . '.' . $id;
 		ob_start();
 		system($command , $return_var);
 		$output = ob_get_contents();
@@ -323,7 +323,7 @@ class SystemController extends Controller
 	* @return json message
 	*/
 	public function uucpKillJob($host, $id){
-		$command = 'sudo uustat -k ' . $host . '.' . $id; 
+		$command = 'sudo uustat -k ' . $host . '.' . $id;
 		$output=exec_cli($command) or die;
 		return response()->json("uucp job killed: " . $host . '.' .$id, 200);
 	}
@@ -334,21 +334,34 @@ class SystemController extends Controller
 	* @return json message
 	*/
 	public function uucpKillJobs(){
-		$command = 'sudo uustat -Ka '; 
+		$command = 'sudo uustat -Ka ';
 		$output=exec_cli($command) or die;
 		return response($output, 200);
 	}
 
 	/**
-	* kill uucp common jobs
+	* Force uucp common jobs
 	*
 	* @return json message
 	*/
 	public function uucpCall(){
-		$command = 'sudo uucico -r1 ' ; 
+		$command = 'sudo uucico -r1 ' ;
 		$output=exec_cli($command);
 		return response($output, 200);
 	}
+
+	/**
+	* Force uucp common job
+	*
+	* @return json message
+	*/
+	public function uucpCallForHost($uuidhost){
+		$command = 'sudo uucico -r1 ' ;
+		// $command = 'sudo uucico -r1 ' . $uuidhost; //TODO - verificar comando
+		$output=exec_cli($command);
+		return response($output, 200);
+	}
+
 
 	/**
 	* system restart
@@ -373,9 +386,9 @@ class SystemController extends Controller
 
 		return response()->json([$output0,$output1,$output2,$output3,$output4],200);
 	}
-	
+
 	/**
-	* system reboot 
+	* system reboot
 	*
 	* @return json message
 	*/
@@ -443,7 +456,7 @@ class SystemController extends Controller
 	}
 
 	/**
-	* system logs uucp Debug 
+	* system logs uucp Debug
 	*
 	* @return json uucpDebuglog
 	*/
