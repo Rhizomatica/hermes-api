@@ -356,8 +356,8 @@ class SystemController extends Controller
 	* @return json message
 	*/
 	public function uucpCallForHost($uuidhost){
-		$command = 'sudo uucico -r1 ' ;
-		// $command = 'sudo uucico -r1 ' . $uuidhost; //TODO - verificar comando
+		// $command = 'sudo uucico -r1 ' ;
+		$command = 'sudo uucico -S ' . $uuidhost; //TODO - test
 		$output=exec_cli($command);
 		return response($output, 200);
 	}
