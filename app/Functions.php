@@ -106,6 +106,7 @@ function ref2watts($rawadc){
 	else{
 		$x = 0.004882813 * $rawadc;
 		$ref = 3.264422 * $x - 0.7132102;
+		if ($ref < 0) $ref = 0;
 		return (round($ref, 4));
 	}
 }
