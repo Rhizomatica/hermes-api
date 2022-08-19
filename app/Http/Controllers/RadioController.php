@@ -232,7 +232,7 @@ class RadioController extends Controller
 
 	switch ($par) {
 		case "0":
-			$command = 'sudo killall';
+			$command = 'sudo killall alsatonic';
 			$output = system("$command");
 		  break;
 	  case "600":
