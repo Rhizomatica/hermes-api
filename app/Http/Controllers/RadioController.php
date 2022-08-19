@@ -231,6 +231,10 @@ class RadioController extends Controller
 	system("sudo killall ffplay");
 
 	switch ($par) {
+		case "0":
+			$command = 'sudo killall';
+			$output = system("$command");
+		  break;
 	  case "600":
 			$command = 'sudo alsatonic';
 			$output = system("$command");
