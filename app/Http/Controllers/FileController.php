@@ -38,7 +38,9 @@ class FileController extends Controller
 		// set external path
 		$path = '';
 		$imageout = '.vvc';
-		$audioout = '.lpcnet';
+        // $audioout = '.lpcnet';
+        $audioout = '.nesc';
+
 		$gpgout = '.gpg';
 
 		// get contents of the file on request
@@ -214,11 +216,11 @@ class FileController extends Controller
 				->header('Cache-Control', 'max-age=60, must-revalidate');
 		}
 		// verify if file is audio  - LPCNET and decompress
-		elseif (preg_match("/\blpcnet\b/i", $file)) {
+		elseif (preg_match("/\blpcnet\b/i", $file) || preg_match("/\bnesc\b/i", $file)) {
 			$fullpath = $fullpathroot . $origpath;
 			// decompress audio
 			// mount command to decompress audio
-			$command = 'decompress_audio.sh ' . $fullpath . ' ' . $fullpath . $decompressext;;
+			$command = 'decompress_audio.sh ' . $fullpath . ' ' . $fullpath . $decompressext;
 			$fullpath .= $decompressext;
 
 			// decompress audio
