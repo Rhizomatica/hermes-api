@@ -63,9 +63,9 @@ class FileController extends Controller
 					$origpath = $origpath . $imageout;
 					$path = Storage::disk('local')->path($origpath);
 				}
-				// compress audio - script supports  wav mp3 or acc
+				// compress audio - script supports  wav mp3 or aac
 				elseif (preg_match("/\baudio\b/i", $mimetype)) {
-					$command = 'compress_audio.sh ' . $path . ' ' . $path . $audioout;;
+					$command = 'compress_audio.sh ' . $path . ' ' . $path . $audioout;
 					$output = exec_cli($command);
 					$path = Storage::disk('local')->path($origpath);
 
