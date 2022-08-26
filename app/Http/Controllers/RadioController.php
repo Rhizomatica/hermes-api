@@ -176,11 +176,11 @@ class RadioController extends Controller
 	}
 
 	/**
-	 * 
+	 *
 	 * Get TX RX Statustxrx_status
 	 *
 	 * @return Json
-	 * 
+	 *
 	 */
 	public function getRadioTXRXStatus()
 	{
@@ -189,18 +189,18 @@ class RadioController extends Controller
 	}
 
 	/**
-	 * 
-	 * Set PTT 
-	 * 
+	 *
+	 * Set PTT
+	 *
 	 * @return Json
-	 * 
+	 *
 	 */
 	public function setRadioPtt($status)
 	{
 		$command="";
 		if ($status == "ON"){
 			$command = "ptt_on";
-		}	
+		}
 		elseif ($status == "OFF"){
 			$command = "ptt_off";
 		}
@@ -220,20 +220,24 @@ class RadioController extends Controller
 	}
 
 	/**
-	 * 
-	 * Set radio test Tone 
-	 * 
+	 *
+	 * Set radio test Tone
+	 *
 	 * @return Json
-	 * 
+	 *
 	 */
 	public function setRadioTone($par)
 	{
 	system("sudo killall ffplay");
 
 	switch ($par) {
+		case "0":
+			$command = 'sudo killall alsatonic';
+			$output = system("$command");
+		  break;
 	  case "600":
-		  $command = 'su hermes -c "ffplay -f lavfi -i \"sine=frequency=600\" -nodisp" &';
-		  $output = system("$command");
+			$command = 'sudo alsatonic';
+			$output = system("$command");
 		  break;
 	  case "1500":
 		  $command = 'su hermes -c "ffplay -f lavfi -i \"sine=frequency=1500\" -nodisp" &';
@@ -260,7 +264,7 @@ class RadioController extends Controller
 	}
 
 	/**
-	 * 
+	 *
 	 * Get Radio Main Frequency Oscilator
 	 *
 	 * @return Json
@@ -285,7 +289,7 @@ class RadioController extends Controller
 		}
 		else {
 			return response()->json(['message' => 'setRadioFreq error: ' . $command], 500);
-			
+
 		}
 	}
 
@@ -415,7 +419,7 @@ class RadioController extends Controller
 		}
 		else {
 			return response()->json(['message' => 'setRadioMasterCal error: ' . $command], 500);
-			
+
 		}
 	}
 
@@ -602,7 +606,7 @@ class RadioController extends Controller
 			}
 		}
 		else {
-			return response()->json(['message' => 'setRadioRefThreshold out of limit - 0...1023: '. $value] , 500);	
+			return response()->json(['message' => 'setRadioRefThreshold out of limit - 0...1023: '. $value] , 500);
 		}
 	}
 
@@ -626,7 +630,7 @@ class RadioController extends Controller
 			}
 		}
 		else {
-			return response()->json(['message' => 'setRadioRefThresholdV out of limit - 0...5: '. $value] , 500);	
+			return response()->json(['message' => 'setRadioRefThresholdV out of limit - 0...5: '. $value] , 500);
 		}
 	}
 
@@ -648,7 +652,7 @@ class RadioController extends Controller
 
 	/**
 	 * Set radio defaults
-	 * 
+	 *
 	 * @return Json
 	 */
 	public function setRadioDefaults()
@@ -664,7 +668,7 @@ class RadioController extends Controller
 
 	/**
 	 * restore radio  defaults
-	 * 
+	 *
 	 * @return Json
 	 */
 	public function restoreRadioDefaults()
