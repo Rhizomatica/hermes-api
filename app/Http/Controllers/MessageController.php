@@ -15,7 +15,7 @@ class MessageController extends Controller
 {
     /**
      * Get all messages
-     *  parameter: messages 
+     *  parameter: messages
      *
      * @return Json
      */
@@ -26,20 +26,20 @@ class MessageController extends Controller
 
     /**
      *  Get all messages by type
-     *  parameter: 
+     *  parameter:
      *
      * @return Json Messages
      */
     public function showAllMessagesByType($type)
     {
 		if($type=='inbox'){
-			return response()->json(Message::where('inbox', '=', true)->orderBy('sent_at', 'DESC')->get());
+			return response()->json(Message::where('inbox', '=', true)->orderBy('sent_at')->get());
 		}
 		if($type=='draft'){
-			return response()->json(Message::where('draft', '=', true)->orderBy('sent_at', 'DESC')->get());
+			return response()->json(Message::where('draft', '=', true)->orderBy('sent_at')->get());
 		}
 		else{
-			return response()->json(Message::where('inbox', '!=', true)->where('draft', '!=', true)->orderBy('sent_at', 'DESC')->get());
+			return response()->json(Message::where('inbox', '!=', true)->where('draft', '!=', true)->orderBy('sent_at')->get());
 		}
     }
 
@@ -91,7 +91,7 @@ class MessageController extends Controller
         		return response()->json(['message' => 'sendHMP Error: can\'t write message file'], 500);
             }
 
-            // Has file?  
+            // Has file?
             if ($message->fileid && Storage::disk('local')->exists('uploads/'.$message->fileid)) {
 				// TODO Mantain original files?
                 if (! Storage::disk('local')->copy('uploads/' . $message->fileid, 'tmp/' . $message->id . '/' .$message->fileid )){
@@ -106,8 +106,8 @@ class MessageController extends Controller
             }
 			$origpath = 'tmp/' . $message->id . '.hmp';
 
-			
-			// check file size 
+
+			// check file size
 			$hmpsize = Storage::disk('local')->size($origpath);
 			if ( $hmpsize > env('HERMES_MAX_FILE')){
 				$path = Storage::disk('local')->delete($origpath);
@@ -135,7 +135,7 @@ class MessageController extends Controller
             if (Storage::disk('local')->exists($origpath)) {
 				//send message by uucp
         		foreach ($message->dest as $dest){
-					//check spool size 
+					//check spool size
 					$command = "uustat -s " . $dest . " -u www-data  | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
 					$destspoolsize = exec_cli($command);
 					$destspoolsize = $hmpsize + intval($destspoolsize);
@@ -144,7 +144,7 @@ class MessageController extends Controller
 						return response()->json(['message' => 'HMP error: spool larger than ' . env('HERMES_MAX_SPOOL') .' bytes ' ], 500);
 					}
 
-                	$command = 'uucp -r -j -C -d \'' .  $path . '\' \'' . $dest . '!~/' . $message->orig . '_' . $message->id . '.hmp\''; 
+                	$command = 'uucp -r -j -C -d \'' .  $path . '\' \'' . $dest . '!~/' . $message->orig . '_' . $message->id . '.hmp\'';
                 	if(!$output = exec_cli_no($command)){
 							return response()->json(['message' => 'Hermes sendMessage - Error on uucp:  ' . $output . ' - ' .$command], 500);
 					}
@@ -260,7 +260,7 @@ class MessageController extends Controller
 			// test for field file and fileid in message
 			if($message['file'] && $message['fileid'])
 			{
-				// test if file exists 
+				// test if file exists
             	if (Storage::disk('local')->exists('tmp/'.$id.'/' . $message['fileid'])){
                 	// Test and create download folder if it doesn't exists
                 	if (! Storage::disk('local')->exists('downloads')){
@@ -268,7 +268,7 @@ class MessageController extends Controller
         					return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find or create downloads dir'], 500);
                     	}
                 	}
-                	// movefile 
+                	// movefile
                 	if (! Storage::disk('local')->move('tmp/' . $id .'/' .  $message['fileid'] , 'downloads/' . $message['fileid'] )){
         				return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t move imagefile'], 500);
                 	}
@@ -291,7 +291,7 @@ class MessageController extends Controller
 				// $data = array('dest'=>$message['dest']);
 				// $data = array('orig'=>$message['orig']);
 				// $data = array('sent_at'=>$message['sent_at']);
-				
+
 				Mail::send('mail', $data, function($message) {
 					// $subject = 'Hermes HMP: ' . $message->subject;
 					$message->to(env('HERMES_FWD_EMAIL'))->subject('HERMES Public message ');
@@ -388,7 +388,7 @@ class MessageController extends Controller
     }
 
     /**
-     * unCrypt text message 
+     * unCrypt text message
      * parameter: message id, $request->pass
      * @return Json
      */
