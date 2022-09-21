@@ -67,7 +67,7 @@ class DatabaseSeeder extends Seeder
 			'title' => 'default',
 			'stations' => '["local"]',
 			'starttime' => '00:00:00',
-			'stoptime' => '24:00:00',
+			'stoptime' => '23:59:59',
 			'enable' => false
 		]);
 
