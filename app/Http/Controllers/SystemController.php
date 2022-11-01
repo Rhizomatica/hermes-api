@@ -257,12 +257,8 @@ class SystemController extends Controller
 
 					//not a email
 					else{
-						var_dump($fields[7]);
-						die();
-						$size = explode("(",$fields[7])[1];
+						$size = isset($fields[7]) ? explode("(",$fields[7])[1] : 0;
 						$emails = null;
-						
-
 					}
 					$spool[]  =  [
 						'uuidhost' => $uuid_host,
