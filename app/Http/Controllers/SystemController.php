@@ -222,7 +222,8 @@ class SystemController extends Controller
 				$fields = explode(" ", $output[$i]);
 				$type=$fields[6];
                 // should we also treat rmail?
-                if($type == "crmail"){
+
+                if($type == "crmail" || strpos($type,".hmp") !== false){
                     $count=count($fields);
 					$emails=array();
 					$email_info=array();
@@ -230,39 +231,40 @@ class SystemController extends Controller
 					$uuid_host= explode(".", $fields[0])[0];
 					$uuid=explode(".", $fields[0])[1];
 
+
+                   if($type == "crmail"){
+
 					// test if spool is a email
 
-					// handle when is a multiple email
-					if ($count > 11){
-					   for($j = 7 ; $j < $count-3 ; $j++){
-							$emails[]=$fields[$j];
-						}
-							$size = $fields[$count-2];
-					}
-                	// handle when is a simple email
-					else{
-						$size = $fields[9];
-						$emails[]=$fields[7];
-					}
-					$cfile_path=env('HERMES_UUCP') . '/'.  $uuid_host . '/C./C.' . $uuid;
-					$dfile_id= explode(" ", exec_cli('sudo cat ' . $cfile_path))[1];
-					$dfile_path=env('HERMES_UUCP') . '/' . $uuid_host . '/D./' . $dfile_id;
-					$dfile=  exec_cli('sudo xzcat ' . $dfile_path . '| head -1');
-					$email_info['from']=explode(" ", explode("\n", $dfile)[0])[1];
-					$email_info['from_date_week']=explode(" ", explode("\n", $dfile)[0])[3];
-					$email_info['from_date_month']=explode(" ", explode("\n", $dfile)[0])[4];
-					$email_info['from_date_day']=explode(" ", explode("\n", $dfile)[0])[5];
-					$email_info['from_date_year']=explode(" ", explode("\n", $dfile)[0])[7];
-					$email_info['from_date_time']=explode(" ", explode("\n", $dfile)[0])[6];
-				}
+		           	// handle when is a multiple email
+				        if ($count > 11){
+				     	   for($j = 7 ; $j < $count-3 ; $j++){
+					    		$emails[]=$fields[$j];
+						   }
+                           $size = $fields[$count-2];
+					       }
+                	       // handle when is a simple email
+					       else{
+						        $size = $fields[9];
+						        $emails[]=$fields[7];
+					       }
+					       $cfile_path=env('HERMES_UUCP') . '/'.  $uuid_host . '/C./C.' . $uuid;
+					       $dfile_id= explode(" ", exec_cli('sudo cat ' . $cfile_path))[1];
+					       $dfile_path=env('HERMES_UUCP') . '/' . $uuid_host . '/D./' . $dfile_id;
+					       $dfile=  exec_cli('sudo xzcat ' . $dfile_path . '| head -1');
+					       $email_info['from']=explode(" ", explode("\n", $dfile)[0])[1];
+					       $email_info['from_date_week']=explode(" ", explode("\n", $dfile)[0])[3];
+					       $email_info['from_date_month']=explode(" ", explode("\n", $dfile)[0])[4];
+					       $email_info['from_date_day']=explode(" ", explode("\n", $dfile)[0])[5];
+					       $email_info['from_date_year']=explode(" ", explode("\n", $dfile)[0])[7];
+					       $email_info['from_date_time']=explode(" ", explode("\n", $dfile)[0])[6];
+				     }
 
-				// HMP
-				if(strpos($type,".hmp") !== false){
-                    $size = explode("(",$fields[7])[1];
-					$emails = null;
-				}
-
-                if($type == "crmail" || strpos($type,".hmp") !== false){
+				     // HMP
+				     if(strpos($type,".hmp") !== false){
+                        $size = explode("(",$fields[7])[1];
+					    $emails = null;
+                     }
 
                     $spool[]  =  [
 				       	'uuidhost' => $uuid_host,
