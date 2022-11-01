@@ -257,8 +257,11 @@ class SystemController extends Controller
 
 					//not a email
 					else{
+						var_dump($fields[7]);
+						die();
 						$size = explode("(",$fields[7])[1];
 						$emails = null;
+						
 
 					}
 					$spool[]  =  [
