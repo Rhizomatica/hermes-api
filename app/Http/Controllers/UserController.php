@@ -98,18 +98,23 @@ class UserController extends Controller
 					}
 				}
 
-				// call the uuadm
-				$command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -a -m "  . $request['email'] . "@" . env('HERMES_DOMAIN') . " -p " . $request['pass'] . " -n " . $request['name'] . "'" ;
+				// call the uuadm - NOT ANYMORE
+                /*
+                $command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -a -m "  . $request['email'] . "@" . env('HERMES_DOMAIN') . " -p " . $request['pass'] . " -n " . $request['name'] . "'" ;
 				if (! $output = exec_cli($command)) {
 					$client->logout($session_id);
 					return response()->json(['message' => 'API create user error: cant advise to central'], 500);
 				}
 				else {
-					//returns uucp job id
-					$output = explode("\n", $output)[0];
-					$client->logout($session_id);
-					return response()->json($output, 201); //Created
-				}
+                    //returns uucp job id
+                    $output = explode("\n", $output)[0];
+                    $client->logout($session_id);
+				    return response()->json($output, 201); //Created
+                }
+                */
+				$client->logout($session_id);
+				return response()->json(null, 201); //Created
+
 			}
 		}
 		catch (SoapFault $e) {
@@ -220,6 +225,8 @@ class UserController extends Controller
 				if (!User::where('email', $mail)->delete()) {
 					return response()->json(['message' => 'API user delete error '], 500);
 				}
+                // NOT RUNNING UUADM ANYMORE!
+                /*
 				$command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -d -m "  . $mail . '@' . env('HERMES_DOMAIN') .  "'" ;
 				//TOOD check that
 				$output = exec_cli($command);
@@ -228,7 +235,7 @@ class UserController extends Controller
 				// }
 				//returns uucp job id
 				$uucp_job_id= explode("\n", $output)[0];
-
+                */
 				if ($forwarding_id = env('HERMES_EMAILAPI_FORWARDING_ID')){
 					$client_id = 1;
 					$mail_forward = $client->mail_forward_get($session_id, $forwarding_id);
@@ -258,7 +265,7 @@ class UserController extends Controller
 
 				$client->logout($session_id);
 
-				return response()->json($uucp_job_id , 200);
+				return response()->json(null, 200);
 			}
 		} catch (SoapFault $e) {
 			echo $client->__getLastResponse();
