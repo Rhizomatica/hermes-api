@@ -113,7 +113,7 @@ class UserController extends Controller
                 }
                 */
 				$client->logout($session_id);
-				return response()->json(null, 201); //Created
+				return response()->json(0, 201); //Created
 
 			}
 		}
@@ -265,7 +265,7 @@ class UserController extends Controller
 
 				$client->logout($session_id);
 
-				return response()->json(null, 200);
+				return response()->json(0, 200);
 			}
 		} catch (SoapFault $e) {
 			echo $client->__getLastResponse();
