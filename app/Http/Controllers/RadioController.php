@@ -489,10 +489,10 @@ class RadioController extends Controller
 	{
 		$radio_led= explode("\n", exec_uc("get_led_status"))[0];
 		if($radio_led == "LED_ON"){
-			return response( true, 200);
+			return response()->json( true, 200);
 		}
 		elseif($radio_led == "LED_OFF"){
-			return response( false, 200);
+			return response()->json( false, 200);
 		}
 		else{
 			return response()->json(['message' => 'getRadioLetSTatus fail' . $radio_led], 500);
@@ -508,10 +508,10 @@ class RadioController extends Controller
 	{
 		$radio_connection= explode("\n", exec_uc("get_connected_status"))[0];
 		if($radio_connection == "LED_ON"){
-			return response( true, 200);
+			return response()->json( true, 200);
 		}
 		elseif($radio_connection == "LED_OFF"){
-			return response( false, 200);
+			return response()->json( false, 200);
 		}
 		else{
 			return response()->json(['message' => 'getRadioConnectionStatus fail' . $radio_connection], 500);
@@ -542,17 +542,17 @@ class RadioController extends Controller
 		if ($command == "OK"){
 			$radio_connection= explode("\n", exec_uc("get_connected_status"))[0];
 			if($radio_connection== "LED_ON"){
-				return response( true, 200);
+				return response()->json( true, 200);
 			}
 			elseif($radio_connection== "LED_OFF"){
-				return response( false, 200);
+				return response()->json( false, 200);
 			}
 			else{
 				return response()->json(['message' => 'getRadioConnectionStatus fail' . $radio_connection], 500);
 			}
 		}
 		else {
-			return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
+			return response()->json(['message' => 'setRadioConnectionStatus fail: ' . $command], 500);
 		}
 	}
 
