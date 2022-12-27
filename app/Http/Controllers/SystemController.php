@@ -308,8 +308,8 @@ class SystemController extends Controller
 	*
 	* @return json message
 	*/
-	public function uucpKillMail($host, $id){
-		$command = 'sudo mailkill.sh pt gui ' . $host . '.' . $id;
+	public function uucpKillMail($host, $id, $language){
+		$command = 'sudo mailkill.sh ' . $language . ' gui ' . $host . '.' . $id;
 		ob_start();
 		system($command , $return_var);
 		$output = ob_get_contents();
@@ -472,5 +472,9 @@ class SystemController extends Controller
 		ob_clean();
 		ob_start();
 		return response()->json($output,200);
+	}
+
+	public function language(){
+		return env('APP_LANGUAGE');
 	}
 }
