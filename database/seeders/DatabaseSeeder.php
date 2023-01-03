@@ -69,7 +69,7 @@ class DatabaseSeeder extends Seeder
 			'starttime' => '00:00:00',
 			'stoptime' => '23:59:59',
 			'enable' => false,
-            'frequency' => 500
+            'frequency' => '500'
 		]);
 
 
