@@ -68,8 +68,7 @@ class DatabaseSeeder extends Seeder
 			'stations' => '["local"]',
 			'starttime' => '00:00:00',
 			'stoptime' => '23:59:59',
-			'enable' => false,
-            'frequency' => '500'
+			'enable' => false
 		]);
 
 
