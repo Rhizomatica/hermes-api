@@ -20,7 +20,6 @@ class CreateCallerTable extends Migration
             $table->time('starttime')->default(true);
             $table->time('stoptime')->default(false);
             $table->boolean('enable')->default(false);
-            $table->boolean('frequency')->default(false);
             $table->timestamps();
         });
     }
