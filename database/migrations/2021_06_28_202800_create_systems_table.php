@@ -16,6 +16,7 @@ class CreateSystemsTable extends Migration
         Schema::create('systems', function (Blueprint $table) {
             $table->string('host');
             $table->string('allowfile')->default('users');
+            $table->string('allowhmp')->default('admin');
             $table->timestamps();
 
         });

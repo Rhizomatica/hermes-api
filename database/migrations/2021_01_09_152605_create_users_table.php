@@ -22,7 +22,8 @@ class CreateUsersTable extends Migration
             $table->string('location')->nullable(true);
             $table->string('recoverphrase')->nullable(true);
             $table->string('recoveranswer')->nullable(true);
-            $table->boolean('admin')->nullable(true);;
+            $table->boolean('admin')->nullable(true);
+            $table->string('emailid')->nullable(true);
             $table->timestamps();
         });
     }

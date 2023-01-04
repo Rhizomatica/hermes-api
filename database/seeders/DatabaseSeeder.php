@@ -21,55 +21,36 @@ class DatabaseSeeder extends Seeder
             'name' => 'admin',
             'password' => hash('sha256', 'caduceu'),
             'location' => 'local',
+            'emailid' => '1',
             'admin' => true
         ]);
 
         DB::table('systems')->insert([
             'host' => 'stationx.hermes.radio',
-            'allowfile' => 'users'
+            'allowfile' => 'admin',
+            'allowhmp' => 'users'
         ]);
 
-        DB::table('messages')->insert([
-            'name' => 'send test message ',
-            'orig' => 'local',
-            'dest' => '["local"]',
-            'text' => 'lorem ipsum',
-            'draft' => false
-        ]);
+        $this->seedFrequencies();
+    }
 
-        db::table('messages')->insert([
-            'name' => 'bienvenido ',
-            'orig' => 'local',
-            'dest' => '["local"]',
-            'text' => 'Bienvenido ao sistema Hermes',
-            'draft' => false,
-            'inbox' => true
-        ]);
+    private function seedFrequencies(){
+        $command = "egrep -v '^\s*#' /etc/uucp/sys | grep alias | cut -f 2 -d \" \"";
+		$output = exec_cli($command);
+		$sysalias = explode("\n", $output);
 
-        DB::table('messages')->insert([
-            'name' => 'stuck test message ' . Str::random(10),
-            'orig' => 'local',
-            'dest' => '["local"]',
-            'text' => 'lorem ipsum',
-            'draft' => true
-        ]);
-
-        for ($a = 1; $a <= 2; $a++) {
-            DB::table('messages')->insert([
-                'name' => 'send message seeded' . Str::random(0),
-                'orig' => 'local',
-                'dest' => '["local"]',
-                'text' => 'lorem ipsum',
-                'draft' => false
-            ]);
+        foreach ($sysalias as $key => $value) {
+           $this->insertNewFrequency($value);
         }
+    }
 
-        DB::table('caller')->insert([
-            'title' => 'default',
-            'stations' => '["local"]',
-            'starttime' => '00:00:00',
-            'stoptime' => '23:59:59',
-            'enable' => false,
+    private function insertNewFrequency($alias){
+        DB::table('frequency')->insert([
+            'alias' => $alias,
+            'nickname' => null,
+            'frequency' => 0,
+            'mode' => 'LSB',
+            'enable' => false
         ]);
     }
 }
