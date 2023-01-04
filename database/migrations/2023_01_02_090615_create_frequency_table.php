@@ -16,7 +16,7 @@ class CreateFrequencyTable extends Migration
         Schema::create('frequency', function (Blueprint $table) {
             $table->increments('id')->unique();
             $table->string('alias')->nullable(false);
-            $table->string('nickname')->nullable(false);
+            $table->string('nickname')->nullable(true);
             $table->integer('frequency')->default(false);
             $table->string('mode')->default(false);
             $table->boolean('enable')->default(false);
