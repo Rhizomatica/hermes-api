@@ -45,6 +45,9 @@ class DatabaseSeeder extends Seeder
     }
 
     private function insertNewFrequency($alias){
+        if(!empty($alias))
+            return;
+
         DB::table('frequency')->insert([
             'alias' => $alias,
             'nickname' => null,
