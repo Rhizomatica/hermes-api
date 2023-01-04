@@ -34,43 +34,42 @@ class DatabaseSeeder extends Seeder
             'orig' => 'local',
             'dest' => '["local"]',
             'text' => 'lorem ipsum',
-            'draft' => false 
+            'draft' => false
         ]);
 
-		db::table('messages')->insert([
-			'name' => 'bienvenido ',
+        db::table('messages')->insert([
+            'name' => 'bienvenido ',
             'orig' => 'local',
             'dest' => '["local"]',
-			'text' => 'Bienvenido ao sistema Hermes',
-			'draft' => false,
-			'inbox' => true
-		]);
+            'text' => 'Bienvenido ao sistema Hermes',
+            'draft' => false,
+            'inbox' => true
+        ]);
 
         DB::table('messages')->insert([
-            'name' => 'stuck test message '.Str::random(10),
+            'name' => 'stuck test message ' . Str::random(10),
             'orig' => 'local',
             'dest' => '["local"]',
             'text' => 'lorem ipsum',
             'draft' => true
         ]);
-        for($a=1; $a<=2; $a++){
+
+        for ($a = 1; $a <= 2; $a++) {
             DB::table('messages')->insert([
-                'name' => 'send message seeded'.Str::random(0),
-            	'orig' => 'local',
-            	'dest' => '["local"]',
+                'name' => 'send message seeded' . Str::random(0),
+                'orig' => 'local',
+                'dest' => '["local"]',
                 'text' => 'lorem ipsum',
                 'draft' => false
             ]);
         }
 
-		DB::table('caller')->insert([
-			'title' => 'default',
-			'stations' => '["local"]',
-			'starttime' => '00:00:00',
-			'stoptime' => '23:59:59',
-			'enable' => false,
-		]);
-
-
+        DB::table('caller')->insert([
+            'title' => 'default',
+            'stations' => '["local"]',
+            'starttime' => '00:00:00',
+            'stoptime' => '23:59:59',
+            'enable' => false,
+        ]);
     }
 }
