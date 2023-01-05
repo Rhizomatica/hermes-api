@@ -12,7 +12,7 @@ use function PHPUnit\Framework\isEmpty;
 class FrequencyController extends Controller
 {
 
-	public function getFrequencies()
+	public function getAllFrequency()
 	{
 		return response()->json(Frequency::all());
 	}
@@ -20,7 +20,7 @@ class FrequencyController extends Controller
 	public function getFrequency($id)
 	{
 		if (!$frequency = Frequency::firstWhere('id', $id)) {
-			return response()->json(['message' => 'API showoneuser error, cant find'], 404);
+			return response()->json(['message' => 'API show frequency error, cant find'], 404);
 		} else {
 			return response()->json($frequency, 200);
 		}
