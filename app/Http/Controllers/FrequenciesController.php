@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Frequency;
+use App\Frequencies;
 use Log;
 use Illuminate\Http\Request;
 
 
 use function PHPUnit\Framework\isEmpty;
 
-class FrequencyController extends Controller
+class FrequenciesController extends Controller
 {
 
-	public function getAllFrequency()
+	public function getAllFrequencies()
 	{
-		return response()->json(Frequency::all());
+		return response()->json(Frequencies::all());
 	}
 
 	public function getFrequency($id)
 	{
-		if (!$frequency = Frequency::firstWhere('id', $id)) {
+		if (!$frequency = Frequencies::firstWhere('id', $id)) {
 			return response()->json(['message' => 'API show frequency error, cant find'], 404);
 		} else {
 			return response()->json($frequency, 200);
@@ -39,7 +39,7 @@ class FrequencyController extends Controller
 			'enable' => 'required|boolean'
 		]);
 
-		if ($frequency = Frequency::findOrFail($id)) {
+		if ($frequency = Frequencies::findOrFail($id)) {
 			$frequency->update($request->all());
 			Log::info('update frequency' . $id);
 			return response()->json($request, 200);

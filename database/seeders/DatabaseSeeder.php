@@ -48,7 +48,7 @@ class DatabaseSeeder extends Seeder
         if(empty($alias) || $alias == 'gw' || $alias == 'local')
             return;
 
-        DB::table('frequency')->insert([
+        DB::table('frequencies')->insert([
             'alias' => $alias,
             'nickname' => null,
             'frequency' => 0,
