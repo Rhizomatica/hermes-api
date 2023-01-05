@@ -143,3 +143,10 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
 $router->group(['prefix' => '/geolocation'], function () use ($router) {
     $router->get('calibration',  ['uses' => 'GeoLocationController@startGPSCalibration']);
 });
+
+
+$router->group(['prefix' => '/frequency'], function () use ($router) {
+    $router->get('calibration',  ['uses' => 'FrequencyController@getFrequencys']);
+    $router->put('{id}', ['uses' => 'FrequencyController@updateFrequency']);
+
+});
