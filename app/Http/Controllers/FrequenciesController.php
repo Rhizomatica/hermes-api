@@ -37,14 +37,13 @@ class FrequenciesController extends Controller
 
 	public function updateFrequency($id, Request $request)
 	{
-		if (isEmpty($id)) {
-			return response()->json(['message' => 'API update user error: cant update frequency'], 500);
+		if (empty($id)) {
+			return response()->json(['message' => 'API update frequency error: cant update frequency'], 500);
 		}
 
 		$this->validate($request, [
 			'frequency' => 'required|integer',
 			'mode' => 'required|string',
-			'nickname' => 'required|string',
 			'enable' => 'required|boolean'
 		]);
 
