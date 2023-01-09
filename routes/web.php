@@ -146,8 +146,8 @@ $router->group(['prefix' => '/geolocation'], function () use ($router) {
 
 
 $router->group(['prefix' => '/frequency'], function () use ($router) {
-    $router->get('',  ['uses' => 'FrequencyController@getAllFrequency']);
-    $router->get('{id}',  ['uses' => 'FrequencyController@getFrequency']);
-    $router->get('alias/{alias}',  ['uses' => 'FrequencyController@getFrequencyByAlias']);
-    $router->put('{id}', ['uses' => 'FrequencyController@updateFrequency']);
+    $router->get('',  ['uses' => 'FrequenciesController@getAllFrequency']);
+    $router->get('{id}',  ['uses' => 'FrequenciesController@getFrequency']);
+    $router->get('/alias/{alias}',  ['uses' => 'FrequenciesController@getFrequencyByAlias']);
+    $router->put('{id}', ['uses' => 'FrequenciesController@updateFrequency']);
 });
