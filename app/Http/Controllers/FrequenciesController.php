@@ -12,7 +12,7 @@ use function PHPUnit\Framework\isEmpty;
 class FrequenciesController extends Controller
 {
 
-	public function getAllFrequencies()
+	public function getFrequencies()
 	{
 		return response()->json(Frequencies::all());
 	}
