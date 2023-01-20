@@ -1,7 +1,6 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
-
+/** @var \Laravel\Lumen\Routing\Router * $router */
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -11,15 +10,12 @@
 $router->get('/',  ['uses' => 'HelpController@showHelpMain']);
 $router->get('/help',  ['uses' => 'HelpController@showHelpMain']);
 $router->get('/version', function () use ($router) {
-    return $router->app->version()  ;
+    return $router->app->version();
 });
-$router->post('login', ['uses' => 'UserController@login']); //TODO remove
 
-/*$router->get('admin/profile', ['middleware' => 'auth', function () {
-    //
-}]);*/
+$router->post('login', ['uses' => 'UserController@login']);
 
-$router->get('help',  ['uses' => 'HelpController@showHelpMain']);
+// $router->get('help',  ['uses' => 'HelpController@showHelpMain']); // REPETIDO
 
 //Users routes
 $router->group(['prefix' => '/user'], function () use ($router) {
@@ -32,14 +28,14 @@ $router->group(['prefix' => '/user'], function () use ($router) {
 });
 
 // Messages routes
-$router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']);
-$router->get('/mail',  ['uses' => 'MessageController@mailtoall']);
-$router->get('/messages',  ['uses' => 'MessageController@showAllMessages']);
-$router->get('/messages/{type}',  ['uses' => 'MessageController@showAllMessagesByType']);
+$router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']); // NAO USA NA GUI
+$router->get('/mail',  ['uses' => 'MessageController@mailtoall']); //NAO USA NA GUI
+$router->get('/messages',  ['uses' => 'MessageController@showAllMessages']); //Repetido
+$router->get('/messages/{type}',  ['uses' => 'MessageController@showAllMessagesByType']); //COLOCAR NO GRUPO message
 
 $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('', ['uses' => 'MessageController@showAllMessages']);
-    $router->get('list',  ['uses' => '@showAllMessages']);
+    $router->get('list',  ['uses' => 'MessageController@showAllMessages']);
     $router->get('{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('image/{id}', ['uses' => 'FileController@get']);
     $router->get('send/{id}',  ['uses' => 'MessageController@sendMessage']);
@@ -48,7 +44,7 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     $router->delete('{id}', ['uses' => 'MessageController@deleteMessage']);
 });
 
-$router->group(['prefix' => '/inbox'], function () use ($router) {
+$router->group(['prefix' => '/inbox'], function () use ($router) { //GRUPO PODERIA SER MENSAGEM ou RENOMEAR???
     $router->get('', ['uses' => 'MessageController@showAllInboxMessages']);
     $router->get('{id}', ['uses' => 'MessageController@showOneInboxMessage']);
     $router->get('delete/{id}', ['uses' => 'MessageController@deleteInboxMessage']);
@@ -62,22 +58,19 @@ $router->group(['prefix' => '/file'], function () use ($router) {
     $router->get('{file}', ['uses' => 'FileController@downloadFile']);
     $router->post('', ['uses' => 'FileController@uploadFile']);
     $router->delete('', ['uses' => 'FileController@deleteLostFiles']);
-	//TODO
-    // $router->get('', ['uses' => 'FileController@showAllFiles']);
 });
 
 // system commands
-
 $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('',  ['uses' => 'SystemController@getSysStatus']); //double hit for status
     $router->get('config',  ['uses' => 'SystemController@getSysConfig']);
     $router->post('config',  ['uses' => 'SystemController@setSysConfig']);
-    $router->get('gw',  ['uses' => 'SystemController@getSysGw']);
-    $router->get('nodename',  ['uses' => 'SystemController@getSysNodeName']);
+    $router->get('gw',  ['uses' => 'SystemController@getSysGw']); //NAO USA NA GUI
+    $router->get('nodename',  ['uses' => 'SystemController@getSysNodeName']); //NAO USA NA GUI
     $router->get('queueerase',  ['uses' => 'SystemController@queueErase']);
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
     $router->get('list',  ['uses' => 'SystemController@systemDirList']);
-    $router->post('login', ['uses' => 'UserController@login']);
+    // $router->post('login', ['uses' => 'UserController@login']); //Nao usa
     $router->get('maildu',  ['uses' => 'SystemController@getMailDiskUsage']);
     $router->get('maillog',  ['uses' => 'SystemController@sysLogMail']);
     $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']);
@@ -96,10 +89,12 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('restart',  ['uses' => 'SystemController@sysRestart']);
     $router->get('reboot',  ['uses' => 'SystemController@sysReboot']);
     $router->get('language',  ['uses' => 'SystemController@language']);
-    // $router->get('restore',  ['uses' => 'SystemController@sysRestore']);
+    //TODO - REMOVER (APENAS PARA TESTE .ENV)
+    $router->get('env',  ['uses' => 'SystemController@returnEnvProperties']);
+
 });
 
-$router->group(['prefix' => '/caller'], function () use ($router) {
+$router->group(['prefix' => '/caller'], function () use ($router) { //RENAME
     $router->get('',  ['uses' => 'CallerController@showAll']);
     $router->post('', ['uses' => 'CallerController@createSched']);
     $router->put('{id}', ['uses' => 'CallerController@updateSched']);
@@ -117,13 +112,11 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->get('bfo',  ['uses' => 'RadioController@getRadioBfo']);
     $router->post('bfo/{freq}',  ['uses' => 'RadioController@setRadioBfo']);
     $router->get('fwd',  ['uses' => 'RadioController@getRadioFwd']);
-    //$router->post('fwd/{freq}',  ['uses' => 'RadioController@setRadioFwd']);
     $router->get('led',  ['uses' => 'RadioController@getRadioLedStatus']);
     $router->post('led/{status}',  ['uses' => 'RadioController@setRadioLedStatus']);
     $router->get('ref',  ['uses' => 'RadioController@getRadioRef']);
     $router->post('ptt/{status}', ['uses' => 'RadioController@setRadioPtt']);
     $router->post('tone/{par}', ['uses' => 'RadioController@setRadioTone']);
-    //$router->post('ref/{freq}',  ['uses' => 'RadioController@setRadioRef']);
     $router->get('txrx',  ['uses' => 'RadioController@getRadioTxrx']);
     $router->get('mastercal',  ['uses' => 'RadioController@getRadioMasterCal']);
     $router->post('mastercal/{freq}',  ['uses' => 'RadioController@setRadioMasterCal']);
@@ -139,11 +132,9 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('restoredefaults',  ['uses' => 'RadioController@restoreRadioDefaults']);
 });
 
-
 $router->group(['prefix' => '/geolocation'], function () use ($router) {
     $router->get('calibration',  ['uses' => 'GeoLocationController@startGPSCalibration']);
 });
-
 
 $router->group(['prefix' => '/frequency'], function () use ($router) {
     $router->get('',  ['uses' => 'FrequenciesController@getFrequencies']);
