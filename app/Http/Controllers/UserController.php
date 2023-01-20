@@ -27,7 +27,7 @@ class UserController extends Controller
 	public function showOneUser($id)
 	{
 		if (!$user = User::firstWhere('email', $id)) {
-			LogController::saveLog('Error: API showoneuser error, cant find', 404);
+			LogController::saveLog($this, 404, 'Error: API showoneuser error, cant find');
 			return response()->json(['data' => 'Error'], 404);
 		} else {
 			return response()->json(['data' => $user], 200);
@@ -40,7 +40,7 @@ class UserController extends Controller
 		$session_id = $client->login(env('HERMES_EMAILAPI_USER'), env('HERMES_EMAILAPI_PASS'));
 
 		if (!$session_id) {
-			LogController::saveLog('Error: cant find user session', 504);
+			// LogController::saveLog('Error: cant find user session', 504);
 			return response()->json(['data' => 'Error'], 404);
 		}
 
