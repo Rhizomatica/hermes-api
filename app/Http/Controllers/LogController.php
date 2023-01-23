@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Log;
-use Illuminate\Http\Request;
+// use App\User;
 
 class LogController extends Controller
 {
@@ -23,28 +23,35 @@ class LogController extends Controller
 
     public function saveLog($controller, $error_code, $error_message, $stacktrace = null)
     {
+        $client = (new UserController)->getClientSOAP(); //REVER
 
-        $client = $this->getClientSOAP();
-		$session_id = $client->login(env('HERMES_EMAILAPI_USER'), env('HERMES_EMAILAPI_PASS'));
+		var_dump($stacktrace);
+		var_dump($client);
+		die();
 
-        $log = new Log();
-		$log->controller = $controller;
-		$log->error_code = $error_code;
-		$log->error_message = $error_message;
-		$log->stacktrace = $stacktrace;
-		$log->user_id = $client; //TODO - Verificar usuario id da sessao
-        $log->save();
+        // $log = new Log();
+		// $log->controller = $controller;
+		// $log->error_code = $error_code;
+		// $log->error_message = $error_message;
+		// $log->stacktrace = $stacktrace;
+		// $log->user_id = $client->name; //TODO - Verificar usuario id da sessao
+		// $log->station_id = $client->station; //TODO - Verificar usuario id da sessao
+        // $log->save();
     }
 
+	// public function getUser(){
+	// 	$user = User::firstWhere('email', $id);
+	// }
+
     //REPETIDO (Possivelmente nova classe)
-    public function getClientSOAP()
-	{
-		return new \SoapClient(null, array(
-			'location' => env('HERMES_EMAILAPI_LOC'),
-			'uri'      => env('HERMES_EMAILAPI_URI'),
-			'trace' => 1,
-			'stream_context' => stream_context_create(array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false))),
-			'exceptions' => 1
-		));
-	}
+    // public static function getClientSOAP()
+	// {
+	// 	return new \SoapClient(null, array(
+	// 		'location' => env('HERMES_EMAILAPI_LOC'),
+	// 		'uri'      => env('HERMES_EMAILAPI_URI'),
+	// 		'trace' => 1,
+	// 		'stream_context' => stream_context_create(array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false))),
+	// 		'exceptions' => 1
+	// 	));
+	// }
 }

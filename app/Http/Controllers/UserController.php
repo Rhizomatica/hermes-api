@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LogController;
+use SoapFault;
 
 // Dividindo as responsabilidades
 // Removendo redundancias lógicas
@@ -16,19 +17,18 @@ use App\Http\Controllers\LogController;
 
 class UserController extends Controller
 {
-
-	use LogController;
+	public $controller = 'UserController';
 
 	public function showAllUsers()
 	{
 		return response()->json(User::all());
 	}
 
-	public function showOneUser($id)
+	public function showOneUser($id) //TODO - Conferir parametro
 	{
 		if (!$user = User::firstWhere('email', $id)) {
-			LogController::saveLog($this, 404, 'Error: API showoneuser error, cant find');
-			return response()->json(['data' => 'Error'], 404);
+			(new LogController)->saveLog($this->controller, 404, 'Error: API showoneuser error, cant find');
+			return response()->json(['data' => 'error'], 404);
 		} else {
 			return response()->json(['data' => $user], 200);
 		}
@@ -40,12 +40,13 @@ class UserController extends Controller
 		$session_id = $client->login(env('HERMES_EMAILAPI_USER'), env('HERMES_EMAILAPI_PASS'));
 
 		if (!$session_id) {
-			// LogController::saveLog('Error: cant find user session', 504);
-			return response()->json(['data' => 'Error'], 404);
+			(new LogController)->saveLog($this->controller, 404, 'Error: cant find user session');
+			return response()->json(['data' => 'error'], 404);
 		}
 
 		if (!$this->verifyRequiredData($request)) {
-			return response()->json('Error: cant update without required data form', 504);
+			(new LogController)->saveLog($this->controller, 404, 'Error: cant update without required data form');
+			return response()->json(['data' => 'error'], 404);
 		}
 
 		try {
@@ -88,7 +89,8 @@ class UserController extends Controller
 
 			if (!$mailuser_id) {
 				$client->logout($session_id);
-				return response()->json(['message' => 'API create user error: cant create email'], 500);
+				(new LogController)->saveLog($this->controller, 500, 'API create user error: cant create email');
+				return response()->json(['data' => 'error'], 500);
 			}
 
 			$request['pass'] = $request['password'];
@@ -107,7 +109,8 @@ class UserController extends Controller
 			$ISPConfig->updateForward($session_id, $client, $client_id, $request['email']);
 
 			$client->logout($session_id);
-			return response()->json(0, 201); //Created
+			return response()->json(['data' => 'success'], 201);
+			// return response()->json(0, 201); //Created
 
 		} catch (SoapFault $e) {
 			echo $client->__getLastResponse();
@@ -163,6 +166,7 @@ class UserController extends Controller
 			//TODO - Verificar como vem a senha (pode dar problema se vier criptografada)
 			$request['password'] = hash('sha256', $request['password']);
 			$request->request->remove('email'); //Can't update email (remove)
+			// unset($request['email']); //Se nao funcionar o anterior
 			$user = $user->update($request->all());
 
 			if (!$user) {
@@ -205,14 +209,13 @@ class UserController extends Controller
 
 			$user->delete();
 			return response()->json(0, 200);
-
 		} catch (SoapFault $e) {
 			echo $client->__getLastResponse();
 			die('SOAP Error: ' . $e->getMessage());
 		}
 	}
 
-	
+
 	/**
 	 * login
 	 * parameter: $request with email and password
@@ -223,9 +226,9 @@ class UserController extends Controller
 		if (!$request->email) {
 			return response()->json(['message' => 'API user login - lack parameters'], 412);
 		}
-		
+
 		$user = User::firstWhere('email', $request->email);
-		
+
 		if (!$user) {
 			return response()->json(['message' => 'API user login - wrong user'], 404);
 		}
@@ -235,8 +238,8 @@ class UserController extends Controller
 		}
 
 		unset($user['password']);
-		unset($user['recoverphrase']);
-		unset($user['recoveranswer']);
+		unset($user['recoverphrase']); //TODO - Remove field
+		unset($user['recoveranswer']); //TODO - Remove field
 		unset($user['created_at']);
 		unset($user['updated_at']);
 
