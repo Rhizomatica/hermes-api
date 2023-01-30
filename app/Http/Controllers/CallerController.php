@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Log;
+// use Log;
 use App\Caller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CallerController extends Controller
 {
@@ -15,7 +16,6 @@ class CallerController extends Controller
 	 * @return Json
 	 */
 	public function showAll()
-
 	{
 		return response()->json(Caller::all());
 	}
@@ -28,7 +28,7 @@ class CallerController extends Controller
 	 */
 	public function showSched($id)
 	{
-	return response()->json(Caller::find($id));
+		return response()->json(Caller::find($id));
 	}
 
 	/**
@@ -39,27 +39,25 @@ class CallerController extends Controller
 	 */
 	public function createSched(Request $request)
 	{
-	$this->validate($request, [
-		'title' => 'required|unique:caller',
-		'stations' => 'required|array', 
-		'starttime' => 'required|date_format:H:i:s|before:stoptime',
-		'stoptime' => 'required|date_format:H:i:s|after:starttime',
-		'enable' => 'required|boolean'
+		//https://laravel.com/docs/9.x/validation
+		//Create Form requests to data validade and autorizing	...
+
+		$this->validate($request, [
+			'title' => 'required|unique:caller',
+			'stations' => 'required|array',
+			'starttime' => 'required|date_format:H:i:s|before:stoptime',
+			'stoptime' => 'required|date_format:H:i:s|after:starttime',
+			'enable' => 'required|boolean'
 		]);
 
-	if ( ! $request->title || ! $request->starttime || ! $request->stoptime || $request->enable === null){
-			return response()->json(['message' => 'caller: require all fields ' ], 500);
-	}
+		$schedule = Caller::create($request->all());
 
-	$schedule = Caller::create($request->all());
-		if (! $schedule ){
-			return response()->json(['message' => 'caller: cant\'t create a schedule: ' ], 500);
-	}
-		else {
-		//Log::info('creating schedule ' . $schedule);
-			return response()->json( $request->all() , 200);
-	}
-
+		if (!$schedule) {
+			(new LogController)->saveLog('CallerController', 404, 'caller: cant\'t create a schedule: ');
+			return response()->json(['data' => 'error'], 500);
+		} else {
+			return response()->json($schedule, 200);
+		}
 	}
 
 	/**
@@ -70,20 +68,22 @@ class CallerController extends Controller
 	 */
 	public function updateSched($id, Request $request)
 	{
-	$this->validate($request, [
-		'title' => 'required',
-		'stations' => 'required|array', 
-		'starttime' => 'required|date_format:H:i:s|before:stoptime',
-		'stoptime' => 'required|date_format:H:i:s|after:starttime',
-		'enable' => 'required|boolean'
+		$this->validate($request, [
+			'title' => 'required',
+			'stations' => 'required|array',
+			'starttime' => 'required|date_format:H:i:s|before:stoptime',
+			'stoptime' => 'required|date_format:H:i:s|after:starttime',
+			'enable' => 'required|boolean'
 		]);
-		if($schedule = Caller::findOrFail($id)){
+
+		$schedule = Caller::findOrFail($id);
+
+		if ($schedule) {
 			$schedule->update($request->all());
-		Log::info('update schedule' . $id);
+			Log::info('update schedule' . $id);
 			return response()->json($request, 200);
-		}
-		else{
-		Log::warning('schedule cant find to update' . $id);
+		} else {
+			Log::warning('schedule cant find to update' . $id);
 			return response()->json(['message' => 'cant find  schedule' . $id], 404);
 		}
 	}
@@ -95,20 +95,15 @@ class CallerController extends Controller
 	 */
 	public function deleteSched($id)
 	{
-	$schedule = Caller::findOrFail($id);
-		Caller::findOrFail($id)->delete();
-	Log::info('delete schedule ' . $id);
-		return response()->json(['message' => 'Delete sucessfully schedule: ' . $id], 200);
-	}
+		$schedule = Caller::findOrFail($id);
 
-	/**
-	 * set enable  
-	 * parameter: schedule id
-	 *
-	 * @return Json
-	 */
-	public function setEnable($id)
-   {
-		// return response()->json(['unhide' . $id . 'Sucessfully'], 200);
+		if ($schedule) {
+			$schedule->delete();
+			Log::info('delete schedule ' . $id);
+			return response()->json(['message' => 'Delete sucessfully schedule: ' . $id], 200);
+		}
+
+		Log::warning('schedule cant find to delete' . $id);
+		return response()->json(['message' => 'cant find  schedule' . $id], 404);
 	}
 }
