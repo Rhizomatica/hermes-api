@@ -23,10 +23,10 @@ class LogController extends Controller
 
     public function saveLog($controller, $error_code, $error_message, $stacktrace = null)
     {
-        $client = (new UserController)->getClientSOAP(); //REVER
+        // $client = (new UserController)->getClientSOAP(); //REVER
 
 		var_dump($stacktrace);
-		var_dump($client);
+		// var_dump($client);
 		die();
 
         // $log = new Log();

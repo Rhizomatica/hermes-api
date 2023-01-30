@@ -12,6 +12,6 @@ class Log extends Model {
      * @var array
      */
     protected $fillable = [
-        'controller', 'error_code', 'error_message', 'stacktrace', 'user_id', 'updated_at', 'created_at'
+        'controller', 'error_code', 'error_message', 'stacktrace', 'user_id', 'station_id', 'updated_at', 'created_at'
     ];
 }

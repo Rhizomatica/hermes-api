@@ -19,7 +19,8 @@ class CreateLogsTable extends Migration
             $table->integer('error_code')->nullable(false);
             $table->string('error_message')->nullable(true);
             $table->string('stacktrace')->nullable(true);
-            $table->integer('user_id')->nullable(true);
+            $table->integer('user_id')->nullable(false);
+            $table->integer('station_id')->nullable(false);
             $table->timestamps();
         });
     }

@@ -12,8 +12,10 @@ use SoapFault;
 // Removendo repetiçao de códigos
 // Removendo processamentos desnecessários (priorização de execução)
 // Facilitando validacoes
+// Validacao com laravel validate (há possibilidade de customizar retornos, traducao)
 // Definindo Padrao de retorno para o usuário
-// Planejando armazenamento de logs (tabela de log de erros?)
+// Planejando armazenamento de logs (tabela de log de erros?) / Usar o proprio LOG::Laravel
+// https://laravel.com/docs/9.x/logging
 
 class UserController extends Controller
 {
@@ -40,11 +42,13 @@ class UserController extends Controller
 		$session_id = $client->login(env('HERMES_EMAILAPI_USER'), env('HERMES_EMAILAPI_PASS'));
 
 		if (!$session_id) {
+			$client->logout($session_id);
 			(new LogController)->saveLog($this->controller, 404, 'Error: cant find user session');
 			return response()->json(['data' => 'error'], 404);
 		}
 
 		if (!$this->verifyRequiredData($request)) {
+			$client->logout($session_id);
 			(new LogController)->saveLog($this->controller, 404, 'Error: cant update without required data form');
 			return response()->json(['data' => 'error'], 404);
 		}
@@ -259,10 +263,18 @@ class UserController extends Controller
 
 	public function verifyRequiredData($request)
 	{
-		if ($request['email'] && $request['name'] && $request['password'] && $request['phone']) {
-			return true;
+		$validated = $this->validate($request, [
+			'email' => 'required|unique:user',
+			'name' => 'required|max:255',
+			'password' => 'required|max:255',
+			'phone' => 'nullable|max:12'
+		]);
+
+		if(!$validated){
+			(new LogController)->saveLog($this->controller, 404, $validated);
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 }
