@@ -19,7 +19,7 @@ $router->post('login', ['uses' => 'UserController@login']);
 
 //Users routes
 $router->group(['prefix' => '/user'], function () use ($router) {
-    $router->post('recover', ['uses' => 'UserController@recoverPassword']);
+    // $router->post('recover', ['uses' => 'UserController@recoverPassword']); //remove
     $router->get('', ['uses' => 'UserController@showAllUsers']);
     $router->get('{id}', ['uses' => 'UserController@showOneUser']);
     $router->post('', ['uses' => 'UserController@create']);
@@ -67,13 +67,13 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->post('config',  ['uses' => 'SystemController@setSysConfig']);
     $router->get('gw',  ['uses' => 'SystemController@getSysGw']); //NAO USA NA GUI
     $router->get('nodename',  ['uses' => 'SystemController@getSysNodeName']); //NAO USA NA GUI
-    $router->get('queueerase',  ['uses' => 'SystemController@queueErase']);
+    $router->get('queueerase',  ['uses' => 'SystemController@queueErase']); //rename
     $router->get('ls',  ['uses' => 'SystemController@getFiles']);
     $router->get('list',  ['uses' => 'SystemController@systemDirList']);
     // $router->post('login', ['uses' => 'UserController@login']); //Nao usa
     $router->get('maildu',  ['uses' => 'SystemController@getMailDiskUsage']);
     $router->get('maillog',  ['uses' => 'SystemController@sysLogMail']);
-    $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']);
+    $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']); //rename
     $router->get('stations',  ['uses' => 'SystemController@getSysStations']);
     $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
     $router->get('sensors',  ['uses' => 'SystemController@getSensors']);
@@ -85,13 +85,13 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('uucall/{uuidhost}',  ['uses' => 'SystemController@uucpCallForHost']);
     $router->get('uulog',  ['uses' => 'SystemController@sysLogUucp']);
     $router->get('uudebug',  ['uses' => 'SystemController@sysDebUucp']);
-    $router->get('shutdown',  ['uses' => 'SystemController@sysShutdown']);
-    $router->get('restart',  ['uses' => 'SystemController@sysRestart']);
-    $router->get('reboot',  ['uses' => 'SystemController@sysReboot']);
+    $router->get('shutdown',  ['uses' => 'SystemController@sysShutdown']); //rename
+    $router->get('restart',  ['uses' => 'SystemController@sysRestart']); //rename
+    $router->get('reboot',  ['uses' => 'SystemController@sysReboot']); //rename
     $router->get('language',  ['uses' => 'SystemController@language']);
+
     //TODO - REMOVER (APENAS PARA TESTE .ENV)
     $router->get('env',  ['uses' => 'SystemController@returnEnvProperties']);
-
 });
 
 $router->group(['prefix' => '/caller'], function () use ($router) { //RENAME
@@ -128,8 +128,8 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('refthreshold/{value}',  ['uses' => 'RadioController@setRadioRefThreshold']);
     $router->post('refthresholdv/{value}',  ['uses' => 'RadioController@setRadioRefThresholdV']);
     $router->post('protection',  ['uses' => 'RadioController@resetRadioProtection']);
-    $router->post('setdefaults',  ['uses' => 'RadioController@setRadioDefaults']);
-    $router->post('restoredefaults',  ['uses' => 'RadioController@restoreRadioDefaults']);
+    $router->post('setdefaults',  ['uses' => 'RadioController@setRadioDefaults']); //rename
+    $router->post('restoredefaults',  ['uses' => 'RadioController@restoreRadioDefaults']); //rename
 });
 
 $router->group(['prefix' => '/geolocation'], function () use ($router) {

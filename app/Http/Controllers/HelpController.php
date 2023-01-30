@@ -70,6 +70,8 @@ class HelpController extends Controller
 			'radio/protection GET' => 'get radio MasterCal',
 			'radio/connection GET' => 'get radio ConnectionStatus',
 			'radio/connection/{status} POST' => 'get radio ConnectionStatus'
+
+			//UPDATE
 		];
 	return $manual;
 	}
