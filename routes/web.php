@@ -13,6 +13,7 @@ $router->get('/version', function () use ($router) {
 });
 
 $router->post('login', ['uses' => 'UserController@login']);
+$router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']); //AJUSTAR ROTA (INSTALLER)
 
 //Users routes
 $router->group(['prefix' => '/user'], function () use ($router) {
@@ -27,10 +28,10 @@ $router->group(['prefix' => '/user'], function () use ($router) {
 $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('/type/{type}',  ['uses' => 'MessageController@showAllMessagesByType']);
-    $router->get('image/{id}', ['uses' => 'FileController@get']);
+    $router->get('image/{id}', ['uses' => 'FileController@get']); //MUDAR DE LUGAR ?
     $router->post('', ['uses' => 'MessageController@sendHMP']);
     $router->delete('{id}', ['uses' => 'MessageController@deleteMessage']);
-    $router->post('inbox/uncrypt/{id}', ['uses' => 'MessageController@unCrypt']);
+    $router->post('uncrypt/{id}', ['uses' => 'MessageController@unCrypt']);
 });
 
 // file upload, download, crypt, compress, uncompress
