@@ -29,7 +29,7 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     // $router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']); // NAO USA NA GUI
     // $router->get('', ['uses' => 'MessageController@showAllMessages']); //NAO TENHO CERTEZA MAS TA ESTRANHO
     // $router->get('list',  ['uses' => 'MessageController@showAllMessages']); //Duplicado E NAO USA NA GUI
-    $router->get('/{type}',  ['uses' => 'MessageController@showAllMessagesByType']); //COLOCAR NO GRUPO message (renomear)
+    $router->get('/type/{type}',  ['uses' => 'MessageController@showAllMessagesByType']); //COLOCAR NO GRUPO message (renomear)
     $router->get('{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('image/{id}', ['uses' => 'FileController@get']);
 
