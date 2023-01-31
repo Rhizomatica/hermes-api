@@ -27,7 +27,6 @@ $router->group(['prefix' => '/user'], function () use ($router) {
 $router->group(['prefix' => '/message'], function () use ($router) {
     // $router->get('/mail',  ['uses' => 'MessageController@mailtoall']); //NAO USA NA GUI
     // $router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']); // NAO USA NA GUI
-    $router->get('/messages/{type}',  ['uses' => 'MessageController@showAllMessagesByType']); //COLOCAR NO GRUPO message (renomear)
 
     $router->get('', ['uses' => 'MessageController@showAllMessages']);
     $router->get('list',  ['uses' => 'MessageController@showAllMessages']);
@@ -45,6 +44,8 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     // $router->get('inbox/hide/{id}', ['uses' => 'MessageController@hideInboxMessage']); //NAO USA NA GUI
     // $router->get('inbox/unhide/{id}', ['uses' => 'MessageController@unhideInboxMessage']); //NAO USA NA GUI
     $router->post('inbox/uncrypt/{id}', ['uses' => 'MessageController@unCrypt']);
+    $router->get('messages/{type}',  ['uses' => 'MessageController@showAllMessagesByType']); //COLOCAR NO GRUPO message (renomear)
+
 });
 
 
