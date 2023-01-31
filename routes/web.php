@@ -27,11 +27,12 @@ $router->group(['prefix' => '/user'], function () use ($router) {
 $router->group(['prefix' => '/message'], function () use ($router) {
     // $router->get('/mail',  ['uses' => 'MessageController@mailtoall']); //NAO USA NA GUI
     // $router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']); // NAO USA NA GUI
-
-    $router->get('', ['uses' => 'MessageController@showAllMessages']);
-    $router->get('list',  ['uses' => 'MessageController@showAllMessages']);
+    // $router->get('', ['uses' => 'MessageController@showAllMessages']); //NAO TENHO CERTEZA MAS TA ESTRANHO
+    // $router->get('list',  ['uses' => 'MessageController@showAllMessages']); //Duplicado E NAO USA NA GUI
+    $router->get('/{type}',  ['uses' => 'MessageController@showAllMessagesByType']); //COLOCAR NO GRUPO message (renomear)
     $router->get('{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('image/{id}', ['uses' => 'FileController@get']);
+
     $router->get('send/{id}',  ['uses' => 'MessageController@sendMessage']);
     $router->post('', ['uses' => 'MessageController@sendHMP']);
     $router->post('{id}', ['uses' => 'MessageController@update']);
@@ -44,10 +45,7 @@ $router->group(['prefix' => '/message'], function () use ($router) {
     // $router->get('inbox/hide/{id}', ['uses' => 'MessageController@hideInboxMessage']); //NAO USA NA GUI
     // $router->get('inbox/unhide/{id}', ['uses' => 'MessageController@unhideInboxMessage']); //NAO USA NA GUI
     $router->post('inbox/uncrypt/{id}', ['uses' => 'MessageController@unCrypt']);
-    $router->get('messages/{type}',  ['uses' => 'MessageController@showAllMessagesByType']); //COLOCAR NO GRUPO message (renomear)
-
 });
-
 
 // file upload, download, crypt, compress, uncompress
 $router->group(['prefix' => '/file'], function () use ($router) {
