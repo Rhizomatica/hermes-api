@@ -43,23 +43,13 @@ $router->group(['prefix' => '/file'], function () use ($router) {
 
 // system commands
 $router->group(['prefix' => '/sys'], function () use ($router) {
-    $router->get('',  ['uses' => 'SystemController@getSysStatus']); //double hit for status
+    $router->get('',  ['uses' => 'SystemController@getSysStatus']);
     $router->get('config',  ['uses' => 'SystemController@getSysConfig']);
     $router->post('config',  ['uses' => 'SystemController@setSysConfig']);
-    // $router->get('gw',  ['uses' => 'SystemController@getSysGw']); //NAO USA NA GUI
-    // $router->get('nodename',  ['uses' => 'SystemController@getSysNodeName']); //NAO USA NA GUI
-    // $router->get('queueerase',  ['uses' => 'SystemController@queueErase']); //rename (NAO USA NA GUI)
-    // $router->get('ls',  ['uses' => 'SystemController@getFiles']); //NAO USA NA GUI
-    // $router->get('list',  ['uses' => 'SystemController@systemDirList']); //NAO USA NA GUI
-    // $router->post('login', ['uses' => 'UserController@login']); //NAO USA NA GUI
-    // $router->get('maildu',  ['uses' => 'SystemController@getMailDiskUsage']); //NAO USA NA GUI
     $router->get('maillog',  ['uses' => 'SystemController@sysLogMail']);
-    $router->get('run/{command}',  ['uses' => 'SystemController@exec_cli']); //rename //NAO USA NA GUI
     $router->get('stations',  ['uses' => 'SystemController@getSysStations']);
     $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
-    // $router->get('sensors',  ['uses' => 'SystemController@getSensors']); //NAO USA NA GUI
     $router->get('uuls',  ['uses' => 'SystemController@sysGetSpoolList']);
-    // $router->delete('uuka',  ['uses' => 'SystemController@uucpKillJobs']); //NAO USA NA GUI
     $router->delete('mail/{host}/{id}/{language}',  ['uses' => 'SystemController@uucpKillMail']);
     $router->delete('uuk/{host}/{id}',  ['uses' => 'SystemController@uucpKillJob']);
     $router->get('uucall',  ['uses' => 'SystemController@uucpCall']);
@@ -67,8 +57,7 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('uulog',  ['uses' => 'SystemController@sysLogUucp']);
     $router->get('uudebug',  ['uses' => 'SystemController@sysDebUucp']);
     $router->get('shutdown',  ['uses' => 'SystemController@sysShutdown']); //rename
-    $router->get('restart',  ['uses' => 'SystemController@sysRestart']); //rename
-    // $router->get('reboot',  ['uses' => 'SystemController@sysReboot']); //rename (NAO USA NA GUI)
+    $router->get('reboot',  ['uses' => 'SystemController@sysReboot']); //rename
     $router->get('language',  ['uses' => 'SystemController@language']);
 });
 
