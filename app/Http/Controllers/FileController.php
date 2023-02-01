@@ -141,116 +141,116 @@ class FileController extends Controller
 	 * parameter: message id
 	 * @return Json
 	 */
-	public static function downloadFile($file)
-	{
-		// check for password
-		request()->has('i') ? $pass = request()->i : null;
+	// public static function downloadFile($file)
+	// {
+	// 	// check for password
+	// 	request()->has('i') ? $pass = request()->i : null;
 
-		//get message from file
-		$message = Message::where('fileid', '=', $file)->latest('id')->first();
+	// 	//get message from file
+	// 	$message = Message::where('fileid', '=', $file)->latest('id')->first();
 
-		// get timestamp
-		$timestamp = explode('.', $file)[0];
+	// 	// get timestamp
+	// 	$timestamp = explode('.', $file)[0];
 
-		// handle real file extensions
-		if (!isset(explode('.', $file)[1])) {
-			$fileext = '';
-		} else {
-			$fileext = '.' . explode('.', $file)[1];
-		}
+	// 	// handle real file extensions
+	// 	if (!isset(explode('.', $file)[1])) {
+	// 		$fileext = '';
+	// 	} else {
+	// 		$fileext = '.' . explode('.', $file)[1];
+	// 	}
 
-		// handle file nameextension
-		$countdot = count(explode('.', $message->file));
-		if ($countdot > 1) {
-			if ($countdot > 1) {
-				$decompressext = '.' . explode('.', $message->file)[$countdot - 1];
-			} else {
-				$decompressext = '.' . explode('.', $message->file)[1];
-			}
-		}
+	// 	// handle file nameextension
+	// 	$countdot = count(explode('.', $message->file));
+	// 	if ($countdot > 1) {
+	// 		if ($countdot > 1) {
+	// 			$decompressext = '.' . explode('.', $message->file)[$countdot - 1];
+	// 		} else {
+	// 			$decompressext = '.' . explode('.', $message->file)[1];
+	// 		}
+	// 	}
 
-		// set path
-		if ($message->inbox) {
-			$origpath = 'downloads/' . $file;
-		} else {
-			$origpath = 'uploads/' . $file;
-		}
+	// 	// set path
+	// 	if ($message->inbox) {
+	// 		$origpath = 'downloads/' . $file;
+	// 	} else {
+	// 		$origpath = 'uploads/' . $file;
+	// 	}
 
-		// get file path
-		$path = Storage::disk('local')->path($origpath);
-		$fullpathroot = Storage::disk('local')->path('/');
+	// 	// get file path
+	// 	$path = Storage::disk('local')->path($origpath);
+	// 	$fullpathroot = Storage::disk('local')->path('/');
 
-		// verify if file is GPG cryptedj
-		$crypt = false;
-		// teste if message is secure and pass (i) exists
-		if ($message->secure  && $pass) {
-			$fullpath = $fullpathroot . 'tmp/' . $timestamp . $fileext;
-			$gppath = Storage::disk('local')->path('/');
-			$command = 'gpg -o  ' . $fullpath . ' -d --batch --passphrase "' . $pass . '"  --yes ' . $path;
-			exec_cli_no($command);
-			$crypt = true;
-			$origpath = 'tmp/' . $timestamp . $fileext;
-		}
+	// 	// verify if file is GPG cryptedj
+	// 	$crypt = false;
+	// 	// teste if message is secure and pass (i) exists
+	// 	if ($message->secure  && $pass) {
+	// 		$fullpath = $fullpathroot . 'tmp/' . $timestamp . $fileext;
+	// 		$gppath = Storage::disk('local')->path('/');
+	// 		$command = 'gpg -o  ' . $fullpath . ' -d --batch --passphrase "' . $pass . '"  --yes ' . $path;
+	// 		exec_cli_no($command);
+	// 		$crypt = true;
+	// 		$origpath = 'tmp/' . $timestamp . $fileext;
+	// 	}
 
-		// verify if file is image and decompress
-		if (preg_match("/\bvvc\b/i", $file)) {
-			$fullpath = $fullpathroot . $origpath;
-			// decompress image
-			$command = 'decompress_image.sh ' . $fullpath . ' ' . $fullpath . $decompressext;
-			// print "DEBUG uncompress command: " . $command. "\n";
-			if (exec_cli_no($command)) {
-				$origpath = $origpath . $decompressext;
-				$path = Storage::disk('local')->path($origpath);
-			} else {
-				return response()->json(['message' => 'API: download uncompres image error: '], 500);
-			}
-			// get content of file
-			$content = Storage::disk('local')->get($origpath);
+	// 	// verify if file is image and decompress
+	// 	if (preg_match("/\bvvc\b/i", $file)) {
+	// 		$fullpath = $fullpathroot . $origpath;
+	// 		// decompress image
+	// 		$command = 'decompress_image.sh ' . $fullpath . ' ' . $fullpath . $decompressext;
+	// 		// print "DEBUG uncompress command: " . $command. "\n";
+	// 		if (exec_cli_no($command)) {
+	// 			$origpath = $origpath . $decompressext;
+	// 			$path = Storage::disk('local')->path($origpath);
+	// 		} else {
+	// 			return response()->json(['message' => 'API: download uncompres image error: '], 500);
+	// 		}
+	// 		// get content of file
+	// 		$content = Storage::disk('local')->get($origpath);
 
-			// delete generated file
-			Storage::disk('local')->delete($origpath);
-			return response($content)
-				->header('Content-Type', $message->mimetype)
-				->header('Pragma', 'public')
-				->header('Content-Disposition', 'inline; filename="' . $message->file)
-				->header('Cache-Control', 'max-age=60, must-revalidate');
-		}
-		// verify if file is audio  - LPCNET and decompress
-		elseif (preg_match("/\blpcnet\b/i", $file) || preg_match("/\bnesc\b/i", $file)) {
-			$fullpath = $fullpathroot . $origpath;
-			// decompress audio
-			// mount command to decompress audio
-			$command = 'decompress_audio.sh ' . $fullpath . ' ' . $fullpath . $decompressext;
-			$fullpath .= $decompressext;
+	// 		// delete generated file
+	// 		Storage::disk('local')->delete($origpath);
+	// 		return response($content)
+	// 			->header('Content-Type', $message->mimetype)
+	// 			->header('Pragma', 'public')
+	// 			->header('Content-Disposition', 'inline; filename="' . $message->file)
+	// 			->header('Cache-Control', 'max-age=60, must-revalidate');
+	// 	}
+	// 	// verify if file is audio  - LPCNET and decompress
+	// 	elseif (preg_match("/\blpcnet\b/i", $file) || preg_match("/\bnesc\b/i", $file)) {
+	// 		$fullpath = $fullpathroot . $origpath;
+	// 		// decompress audio
+	// 		// mount command to decompress audio
+	// 		$command = 'decompress_audio.sh ' . $fullpath . ' ' . $fullpath . $decompressext;
+	// 		$fullpath .= $decompressext;
 
-			// decompress audio
-			if (exec_cli_no($command)) {
-				$origpath = $origpath .  $decompressext;
-				$path = Storage::disk('local')->path($origpath);
-			} else {
-				return response()->json(['message' => 'API: download uncompres audio error: '], 500);
-			}
+	// 		// decompress audio
+	// 		if (exec_cli_no($command)) {
+	// 			$origpath = $origpath .  $decompressext;
+	// 			$path = Storage::disk('local')->path($origpath);
+	// 		} else {
+	// 			return response()->json(['message' => 'API: download uncompres audio error: '], 500);
+	// 		}
 
-			// get content of file
-			$content = Storage::disk('local')->get($origpath);
-			// delete generated file
-			Storage::disk('local')->delete($origpath);
-			// return response($content);
-			return response($content)
-				->header('Content-Type', $message->mimetype)
-				->header('Pragma', 'public')
-				->header('Content-Disposition', 'inline; filename="' . $message->file)
-				->header('Cache-Control', 'max-age=60, must-revalidate');
-		} else {
-			// $fullpath = $fullpathroot . $origpath;
-			$content = Storage::disk('local')->get($origpath);
-			return response($content)
-				->header('Content-Type', $message->mimetype)
-				->header('Pragma', 'public')
-				->header('Content-Disposition', 'inline; filename="' . $message->file)
-				->header('Cache-Control', 'max-age=60, must-revalidate');
-		}
-	}
+	// 		// get content of file
+	// 		$content = Storage::disk('local')->get($origpath);
+	// 		// delete generated file
+	// 		Storage::disk('local')->delete($origpath);
+	// 		// return response($content);
+	// 		return response($content)
+	// 			->header('Content-Type', $message->mimetype)
+	// 			->header('Pragma', 'public')
+	// 			->header('Content-Disposition', 'inline; filename="' . $message->file)
+	// 			->header('Cache-Control', 'max-age=60, must-revalidate');
+	// 	} else {
+	// 		// $fullpath = $fullpathroot . $origpath;
+	// 		$content = Storage::disk('local')->get($origpath);
+	// 		return response($content)
+	// 			->header('Content-Type', $message->mimetype)
+	// 			->header('Pragma', 'public')
+	// 			->header('Content-Disposition', 'inline; filename="' . $message->file)
+	// 			->header('Cache-Control', 'max-age=60, must-revalidate');
+	// 	}
+	// }
 
 	/**
 	 * cleanLostFiles

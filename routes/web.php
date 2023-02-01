@@ -28,7 +28,7 @@ $router->group(['prefix' => '/user'], function () use ($router) {
 $router->group(['prefix' => '/message'], function () use ($router) {
     $router->get('{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('/type/{type}',  ['uses' => 'MessageController@showAllMessagesByType']);
-    $router->get('image/{id}', ['uses' => 'FileController@get']); //MUDAR DE LUGAR ?
+    $router->get('image/{id}', ['uses' => 'FileController@get']); //Should change prefix?
     $router->post('', ['uses' => 'MessageController@sendHMP']);
     $router->delete('{id}', ['uses' => 'MessageController@deleteMessage']);
     $router->post('uncrypt/{id}', ['uses' => 'MessageController@unCrypt']);
@@ -36,7 +36,7 @@ $router->group(['prefix' => '/message'], function () use ($router) {
 
 // file upload, download, crypt, compress, uncompress
 $router->group(['prefix' => '/file'], function () use ($router) {
-    $router->get('{file}', ['uses' => 'FileController@downloadFile']);
+    // $router->get('{file}', ['uses' => 'FileController@downloadFile']); //Unused???
     $router->post('', ['uses' => 'FileController@uploadFile']);
     $router->delete('', ['uses' => 'FileController@deleteLostFiles']);
 });

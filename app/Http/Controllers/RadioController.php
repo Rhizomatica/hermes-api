@@ -298,11 +298,11 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioMode()
-	{
-		$radio_mode= explode("\n", exec_uc("get_mode"))[0];
-		return response()->json($radio_mode, 200);
-	}
+	// public function getRadioMode()
+	// {
+	// 	$radio_mode= explode("\n", exec_uc("get_mode"))[0];
+	// 	return response()->json($radio_mode, 200);
+	// }
 
 	/**
 	 * Set Radio Mode
@@ -366,44 +366,44 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioFwd()
-	{
-		$bfo= explode("\n", exec_uc("get_fwd"))[0];
-		return response()->json($bfo, 200);
-	}
+	// public function getRadioFwd()
+	// {
+	// 	$bfo= explode("\n", exec_uc("get_fwd"))[0];
+	// 	return response()->json($bfo, 200);
+	// }
 
 	/**
 	 * Get Radio Ref
 	 *
 	 * @return Json
 	 */
-	public function getRadioRef()
-	{
-		$radio_ref = explode("\n", exec_uc("get_ref"))[0];
-		return response()->json($radio_ref, 200);
-	}
+	// public function getRadioRef()
+	// {
+	// 	$radio_ref = explode("\n", exec_uc("get_ref"))[0];
+	// 	return response()->json($radio_ref, 200);
+	// }
 
 	/**
 	 * Get Radio TXRX
 	 *
 	 * @return Json
 	 */
-	public function getRadioTxrx()
-	{
-		$radio_txrx = explode("\n", exec_uc("get_txrx"))[0];
-		return response()->json( $radio_txrx, 200);
-	}
+	// public function getRadioTxrx()
+	// {
+	// 	$radio_txrx = explode("\n", exec_uc("get_txrx"))[0];
+	// 	return response()->json( $radio_txrx, 200);
+	// }
 
 	/**
 	 * Get Radio mastercal
 	 *
 	 * @return Json
 	 */
-	public function getRadioMasterCal()
-	{
-		$radio_mastercal= explode("\n", exec_uc("get_mastercal"))[0];
-		return response()->json($radio_mastercal, 200);
-	}
+	// public function getRadioMasterCal()
+	// {
+	// 	$radio_mastercal= explode("\n", exec_uc("get_mastercal"))[0];
+	// 	return response()->json($radio_mastercal, 200);
+	// }
 
 	/**
 	 * Set Radio Mastercal
@@ -485,39 +485,39 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioLedStatus()
-	{
-		$radio_led= explode("\n", exec_uc("get_led_status"))[0];
-		if($radio_led == "LED_ON"){
-			return response()->json( true, 200);
-		}
-		elseif($radio_led == "LED_OFF"){
-			return response()->json( false, 200);
-		}
-		else{
-			return response()->json(['message' => 'getRadioLetSTatus fail' . $radio_led], 500);
-		}
-	}
+	// public function getRadioLedStatus()
+	// {
+	// 	$radio_led= explode("\n", exec_uc("get_led_status"))[0];
+	// 	if($radio_led == "LED_ON"){
+	// 		return response()->json( true, 200);
+	// 	}
+	// 	elseif($radio_led == "LED_OFF"){
+	// 		return response()->json( false, 200);
+	// 	}
+	// 	else{
+	// 		return response()->json(['message' => 'getRadioLetSTatus fail' . $radio_led], 500);
+	// 	}
+	// }
 
 	/**
 	 * Get Radio Connection Status
 	 *
 	 * @return Json
 	 */
-	public function getRadioConnectionStatus()
-	{
-		$radio_connection= explode("\n", exec_uc("get_connected_status"))[0];
-		if($radio_connection == "LED_ON"){
-			return response()->json( true, 200);
-		}
-		elseif($radio_connection == "LED_OFF"){
-			return response()->json( false, 200);
-		}
-		else{
-			return response()->json(['message' => 'getRadioConnectionStatus fail' . $radio_connection], 500);
-		}
+	// public function getRadioConnectionStatus()
+	// {
+	// 	$radio_connection= explode("\n", exec_uc("get_connected_status"))[0];
+	// 	if($radio_connection == "LED_ON"){
+	// 		return response()->json( true, 200);
+	// 	}
+	// 	elseif($radio_connection == "LED_OFF"){
+	// 		return response()->json( false, 200);
+	// 	}
+	// 	else{
+	// 		return response()->json(['message' => 'getRadioConnectionStatus fail' . $radio_connection], 500);
+	// 	}
 
-	}
+	// }
 
 	/**
 	 * Set Radio Connection Status
@@ -561,16 +561,16 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioSerial()
-	{
-		$radio_serial = explode("\n", exec_uc("get_serial"))[0];
-		if($radio_serial != "ERROR"){
-			return response()->json(true, 200);
-		}
-		else{
-			return response()->json(['message' => 'getRadioSerial fail: ' . $radio_serial], 500);
-		}
-	}
+	// public function getRadioSerial()
+	// {
+	// 	$radio_serial = explode("\n", exec_uc("get_serial"))[0];
+	// 	if($radio_serial != "ERROR"){
+	// 		return response()->json(true, 200);
+	// 	}
+	// 	else{
+	// 		return response()->json(['message' => 'getRadioSerial fail: ' . $radio_serial], 500);
+	// 	}
+	// }
 
 	/**
 	 * Get Radio reflected threshold
