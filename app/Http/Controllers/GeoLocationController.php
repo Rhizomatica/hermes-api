@@ -26,6 +26,5 @@ class GeoLocationController extends Controller
         } catch (\Throwable $th) {
             return response()->json(['message' => 'Internal Server Error:' . $th], 500);
         }
-      
     }
 }

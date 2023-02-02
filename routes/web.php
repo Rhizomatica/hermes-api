@@ -8,12 +8,14 @@
 */
 
 $router->get('/',  ['uses' => 'HelpController@showHelpMain']);
-$router->get('/help',  ['uses' => 'HelpController@showHelpMain']);
 $router->get('/version', function () use ($router) {
     return $router->app->version();
 });
 
 $router->post('login', ['uses' => 'UserController@login']);
+
+
+
 $router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']); //MESSAGE CONTROLLER?
 
 $router->group(['prefix' => '/user'], function () use ($router) {

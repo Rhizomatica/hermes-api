@@ -31,9 +31,9 @@ class FrequenciesController extends Controller
 
 		if (!$frequency) {
 			return response()->json(['message' => 'API show frequency error, cant find'], 404);
-		} else {
-			return response()->json($frequency, 200);
 		}
+		
+		return response()->json($frequency, 200);
 	}
 
 	public function updateFrequency($id, Request $request)
