@@ -16,16 +16,20 @@ class FrequenciesController extends Controller
 
 	public function getFrequency($id)
 	{
-		if (!$frequency = Frequencies::firstWhere('id', $id)) {
+		$frequency = Frequencies::firstWhere('id', $id);
+
+		if (!$frequency) {
 			return response()->json(['message' => 'API show frequency error, cant find'], 404);
-		} else {
-			return response()->json($frequency, 200);
 		}
+
+		return response()->json($frequency, 200);
 	}
 
 	public function getFrequencyByAlias($alias)
 	{
-		if (!$frequency = Frequencies::firstWhere('alias', $alias)) {
+		$frequency = Frequencies::firstWhere('alias', $alias);
+
+		if (!$frequency) {
 			return response()->json(['message' => 'API show frequency error, cant find'], 404);
 		} else {
 			return response()->json($frequency, 200);
@@ -44,13 +48,15 @@ class FrequenciesController extends Controller
 			'enable' => 'required|boolean'
 		]);
 
-		if ($frequency = Frequencies::findOrFail($id)) {
+		$frequency = Frequencies::findOrFail($id);
+
+		if ($frequency) {
 			$frequency->update($request->all());
 			Log::info('update frequency' . $id);
 			return response()->json($request, 200);
-		} else {
-			Log::warning('frequency cant find to update' . $id);
-			return response()->json(['message' => 'cant find this frequency' . $id], 404);
 		}
+
+		Log::warning('frequency cant find to update' . $id);
+		return response()->json(['message' => 'cant find this frequency' . $id], 404);
 	}
 }
