@@ -29,7 +29,7 @@ class HelpController extends Controller
 		$manual = (object) [
 			'title' => 'Hermes API RESUME',
 			'site' => 'https://hermes.radio',
-			'url' => env('APP_URL')+'/api',
+			'url' => env('APP_URL').'/api',
 			'endpoints' => (object) [
 				'general' => $general,
 				'user' => $user,
