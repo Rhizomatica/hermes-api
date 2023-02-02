@@ -12,92 +12,113 @@ class HelpController extends Controller
 
 	public function showHelpMain()
 	{
-
 		//TODO - Doc. Auto Generator
 		$general = [
 			'/ GET' => 'this help',
-			'/version GET' => 'HERMES API version',
-			'/login POST' => 'User authenticate HERMES'
+			'version GET' => 'HERMES API version',
+			'login POST' => 'User authenticate HERMES'
 		];
 
 		$user = [
-			'/ GET' => 'this help',
-			'/version GET' => 'HERMES API version',
-			'/login POST' => 'User authenticate HERMES'
+			'user GET' => 'Show all users',
+			'user/{id} GET' => 'Show a user',
+			'user POST' => 'Create User',
+			'user/{id} PUT' => 'Update User',
+			'user/{id} DELETE' => 'Delete a user'
 		];
 
-		$manual = (object) [
+		$message = [
+			'message/{id} GET' => 'Show a message',
+			'messages/type/{type} GET' => 'Show all messages by type',
+			'image/{id} GET' => 'Show image from message',
+			'message POST' => 'Create message',
+			'message/{id} DELETE' => 'Delete a message',
+			'message/uncrypt/{id} POST' => 'Uncrypt message file'
+		];
+
+		$file = [
+			'file/{file} GET' => 'download, decompress and decrypt a file',
+			'file POST' => 'upload, compress and crypt a file',
+			'file DELETE' => 'Delete file'
+		];
+
+		$system = [
+			'sys/ GET' => 'Show system status',
+			'sys/config GET' => 'Show system configuration',
+			'sys/config POST' => 'Save system configuration',
+			'sys/maillog GET' => 'Show system mail logs',
+			'sys/stations GET' => 'Show system stations',
+			'sys/status GET' => 'Show system status', //REPETIDO ?
+			'sys/uuls GET' => 'UUCP list jobs',
+			'sys/mail/{host}/{id}/{language} DELETE' => 'Kill mail job', //TODO - Improve desc.
+			'sys/uuk/{host}/{id} DELETE' => 'Kill UUCP job',
+			'uucall GET' => 'UUCP call', //TODO - CALLER?
+			'uucall/{uuidhost} GET' => 'UUCP call for host', //TODO - CALLER?
+			'uucall/{uuidhost} GET' => 'UUCP call for host', //TODO - CALLER?
+			'sys/uulog GET' => 'UUCP log',
+			'sys/uudebug GET' => 'UUCP debug log',
+			'sys/shutdown GET' => 'System shutdown', //TODO - review desc.
+			'sys/reboot GET' => 'System reboot',
+			'sys/reboot GET' => 'Show system language'
+		];
+
+		$caller = [ 
+			'caller/ GET' => 'Show all schedules', //TODO - RENAME TO SCHEDULE?
+			'caller/ POST' => 'Create schedule',
+			'caller/{id} PUT' => 'Update schedule',
+			'caller/{id} GET' => 'Show schedule',
+			'caller/{id} DELETE' => 'Delete schedule'
+		];
+
+		$radio = [
+			'radio/status GET' =>  'get radio status',
+			'radio/power GET' =>  'get radio power status',
+			'radio/mode/{mode} POST' => 'set radio mode',
+			'radio/freq GET' => 'get radio freq',
+			'radio/freq/{freq (in hz)} POST' => 'set radio freq (in hz)',
+			'radio/bfo GET' => 'get Radio Freq',
+			'radio/bfo/{freq in hz} POST' => 'set radio bfo (in hz)',
+			'radio/led/{status} POST' => 'set radio LED status',
+			'radio/ptt/{status} POST' => 'Radio post test tone', //TODO - Check
+			'radio/tone/{par} POST' => 'Radio set tone',
+			'radio/mastercal{freq (in hz)} POST' => 'Save radio MasterCal ',
+			'radio/protection GET' => 'get radio MasterCal',
+			'radio/connection/{status} POST' => 'get radio ConnectionStatus',
+			'radio/refthreshold GET' => 'get radio ref. threshold',
+			'radio/refthreshold POST' => 'Set radio ref. threshold',
+			'radio/refthresholdv POST' => 'Set radio ref. thresholdV',
+			'radio/protection POST' => 'Reset radio protection',
+			'radio/default POST' => 'Set radio default'
+		];
+
+		$geolocation = [
+			'geolocation/calibration/ GET' => 'GPS calibration'
+		];
+
+		$frequency = [
+			'frequency GET' => 'Show frequencies',
+			'frequency/{id} GET' => 'Show frequency',
+			'frequency/alias/{alias} GET' => 'Show frequency by alias',
+			'frequency/{id} PUT' => 'Update frequency'
+		];
+
+		$help = (object) [
 			'title' => 'Hermes API RESUME',
 			'site' => 'https://hermes.radio',
-			'url' => env('APP_URL').'/api',
+			'url' => env('APP_URL') . '/api',
 			'endpoints' => (object) [
 				'general' => $general,
 				'user' => $user,
-				// 'file' => $file,
-				// 'system' => $system,
-				// 'caller' => $caller,
-				// 'radio' => $radio,
-				// 'geolocation' => $geolocation,
-				// 'frequency' => $frequency
+				'message' => $message,
+				'file' => $file,
+				'system' => $system,
+				'caller' => $caller,
+				'radio' => $radio,
+				'geolocation' => $geolocation,
+				'frequency' => $frequency
 			]
 		];
 
-		return json_encode($manual);
+		return json_encode($help);
 	}
 }
-
-
-
-
-		// 'sys/status GET' => 'system status',
-		// 	'sys/getnodename GET' => 'node name ( radio CALLSIGN)',
-		// 	'sys/stations GET' => 'show available stations',
-		// 	'sys/maillog GET' => 'get mail log',
-		// 	'sys/restart GET' => 'restart',
-		// 	'sys/reboot GET' => 'reboot',
-		// 	'sys/sensors GET' => 'sensors',
-		// 	'sys/shutdown GET' => 'cli: shutdown',
-		// 	'--------SYS-UUCP-----------' => '----------------------------------------',
-		// 	'sys/uuk/id POST' => 'UUCP kill ID',
-		// 	'sys/uuka POST' => 'UUCP killall jobs',
-		// 	'sys/uuls GET' => 'UUCP list jobs',
-		// 	'sys/uulog GET' => 'UUCP log',
-		// 	'sys/uudebug GET' => 'UUCP debug log',
-		// 	'--------USERS--------------' => '----------------------------------------',
-		// 	'user POST' => 'Create user and email',
-		// 	'user/{id} GET' => 'Show a user',
-		// 	'user/{id} PUT' => 'Update User',
-		// 	'user/{id} DELETE' => 'Delete a user',
-		// 	'users GET' => 'Show all users',
-		// 	'--------MESSAGES-----------' => '----------------------------------------',
-		// 	'message POST' => 'Create message',
-		// 	'message/{id} GET' => 'Show a message',
-		// 	'message/{id} PUT' => 'Update a message',
-		// 	'message/{id} DELETE' => 'Delete a message',
-		// 	'messages GET' => 'Show all messages',
-		// 	'--------INBOX--------------' => '----------------------------------------',
-		// 	'inbox/{id} GET' => 'Show a message',
-		// 	'inbox GET' => 'Show all messages',
-		// 	'unpack/{id} PUT' => 'unpack message',
-		// 	'--------FILES--------------' => '----------------------------------------',
-		// 	'file POST' => 'upload, compress and crypt a  file',
-		// 	'file/{id} GET' => 'download, decompress and decrypt a file',
-		// 	'--------RADIO--------------' => '----------------------------------------',
-		// 	'radio/status GET' =>  'get radio status',
-		// 	'radio/mode GET' => 'get radio mode',
-		// 	'radio/mode/{mode} POST' => 'set radio mode',
-		// 	'radio/freq GET' => 'get radio freq',
-		// 	'radio/freq/{freq in hz} POST' => 'set radio freq',
-		// 	'radio/bfo GET' => 'get Radio Freq',
-		// 	'radio/bfo/{freq in hz} POST' => 'set radio bfo',
-		// 	'radio/fwd GET' => 'get radio fwd',
-		// 	'radio/fwd/{freq in hz} POST' => 'set radio fwd',
-		// 	'radio/led GET' => 'get radio LED Status',
-		// 	'radio/led/{status} POST' => 'set radio LED status',
-		// 	'radio/ref GET' => 'get radio ref',
-		// 	'radio/txrx GET' => 'get radioTxrx',
-		// 	'radio/mastercal GET' => 'get radio MasterCal',
-		// 	'radio/mastercal POST' => 'get radio MasterCal',
-		// 	'radio/protection GET' => 'get radio MasterCal',
-		// 	'radio/connection GET' => 'get radio ConnectionStatus',
-		// 	'radio/connection/{status} POST' => 'get radio ConnectionStatus'
