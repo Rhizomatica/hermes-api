@@ -35,7 +35,7 @@ $router->group(['prefix' => '/message'], function () use ($router) {
 
 // file upload, download, crypt, compress, uncompress
 $router->group(['prefix' => '/file'], function () use ($router) {
-    // $router->get('{file}', ['uses' => 'FileController@downloadFile']); //Unused???
+    $router->get('{file}', ['uses' => 'FileController@downloadFile']);
     $router->post('', ['uses' => 'FileController@uploadFile']);
     $router->delete('', ['uses' => 'FileController@deleteLostFiles']);
 });
@@ -68,7 +68,7 @@ $router->group(['prefix' => '/caller'], function () use ($router) {
 });
 
 $router->group(['prefix' => '/radio'], function () use ($router) {
-    $router->get('',  ['uses' => 'RadioController@getRadioStatus']);
+    $router->get('',  ['uses' => 'RadioController@getRadioStatus']);    
     $router->get('power',  ['uses' => 'RadioController@getRadioPowerStatus']);
     $router->post('mode/{mode}',  ['uses' => 'RadioController@setRadioMode']);
     $router->get('freq',  ['uses' => 'RadioController@getRadioFreq']);

@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Frequencies;
-use Log;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
-
-
-use function PHPUnit\Framework\isEmpty;
 
 class FrequenciesController extends Controller
 {
