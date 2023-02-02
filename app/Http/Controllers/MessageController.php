@@ -177,7 +177,7 @@ class MessageController extends Controller
    */
   public function unCrypt($id, Request $request)
   {
-    if ($request->pass && $request->pass != '') {
+    if ($request->pass && $request->pass != '') { //TODO - Review this cascade
       if ($message = Message::find($id)) {
         if ($message['secure']) {
           $crypt = hex2bin($message['text']);

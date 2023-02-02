@@ -48,13 +48,13 @@ class HelpController extends Controller
 			'sys/config POST' => 'Save system configuration',
 			'sys/maillog GET' => 'Show system mail logs',
 			'sys/stations GET' => 'Show system stations',
-			'sys/status GET' => 'Show system status', //REPETIDO ?
+			'sys/status GET' => 'Show system status', 
 			'sys/uuls GET' => 'UUCP list jobs',
 			'sys/mail/{host}/{id}/{language} DELETE' => 'Kill mail job', //TODO - Improve desc.
 			'sys/uuk/{host}/{id} DELETE' => 'Kill UUCP job',
 			'uucall GET' => 'UUCP call', //TODO - CALLER?
-			'uucall/{uuidhost} GET' => 'UUCP call for host', //TODO - CALLER?
-			'uucall/{uuidhost} GET' => 'UUCP call for host', //TODO - CALLER?
+			'uucall/{uuidhost} GET' => 'UUCP call for host', 
+			'uucall/{uuidhost} GET' => 'UUCP call for host',
 			'sys/uulog GET' => 'UUCP log',
 			'sys/uudebug GET' => 'UUCP debug log',
 			'sys/shutdown GET' => 'System shutdown', //TODO - review desc.
@@ -63,7 +63,7 @@ class HelpController extends Controller
 		];
 
 		$caller = [ 
-			'caller/ GET' => 'Show all schedules', //TODO - RENAME TO SCHEDULE?
+			'caller/ GET' => 'Show all schedules',
 			'caller/ POST' => 'Create schedule',
 			'caller/{id} PUT' => 'Update schedule',
 			'caller/{id} GET' => 'Show schedule',

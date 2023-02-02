@@ -14,8 +14,6 @@ $router->get('/version', function () use ($router) {
 
 $router->post('login', ['uses' => 'UserController@login']);
 
-
-
 $router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']); //MESSAGE CONTROLLER?
 
 $router->group(['prefix' => '/user'], function () use ($router) {
@@ -48,20 +46,20 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->post('config',  ['uses' => 'SystemController@setSysConfig']);
     $router->get('maillog',  ['uses' => 'SystemController@sysLogMail']);
     $router->get('stations',  ['uses' => 'SystemController@getSysStations']);
-    $router->get('status',  ['uses' => 'SystemController@getSysStatus']);
+    $router->get('status',  ['uses' => 'SystemController@getSysStatus']);//REPEATED ?
     $router->get('uuls',  ['uses' => 'SystemController@sysGetSpoolList']);
     $router->delete('mail/{host}/{id}/{language}',  ['uses' => 'SystemController@uucpKillMail']);
     $router->delete('uuk/{host}/{id}',  ['uses' => 'SystemController@uucpKillJob']);
     $router->get('uucall',  ['uses' => 'SystemController@uucpCall']);
-    $router->get('uucall/{uuidhost}',  ['uses' => 'SystemController@uucpCallForHost']);
-    $router->get('uulog',  ['uses' => 'SystemController@sysLogUucp']);
+    $router->get('uucall/{uuidhost}',  ['uses' => 'SystemController@uucpCallForHost']);//TODO - CALLER?
+    $router->get('uulog',  ['uses' => 'SystemController@sysLogUucp']);//TODO - CALLER?
     $router->get('uudebug',  ['uses' => 'SystemController@sysDebUucp']);
     $router->get('shutdown',  ['uses' => 'SystemController@sysShutdown']);
     $router->get('reboot',  ['uses' => 'SystemController@sysReboot']);
     $router->get('language',  ['uses' => 'SystemController@language']);
 });
 
-$router->group(['prefix' => '/caller'], function () use ($router) {
+$router->group(['prefix' => '/caller'], function () use ($router) { //TODO - RENAME TO SCHEDULE?
     $router->get('',  ['uses' => 'CallerController@showAll']);
     $router->post('', ['uses' => 'CallerController@createSched']);
     $router->put('{id}', ['uses' => 'CallerController@updateSched']);
