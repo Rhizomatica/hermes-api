@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Frequencies;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class FrequenciesController extends Controller
 {
@@ -32,7 +32,7 @@ class FrequenciesController extends Controller
 		if (!$frequency) {
 			return response()->json(['message' => 'API show frequency error, cant find'], 404);
 		}
-		
+
 		return response()->json($frequency, 200);
 	}
 

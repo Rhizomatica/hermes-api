@@ -260,22 +260,24 @@ class FileController extends Controller
 	 */
 	public static function deleteLostFiles()
 	{
-
 		// list files on upload
 		$list = ['uploads', 'downloads'];
 
 		foreach ($list as $path) {
 
 			$files = Storage::disk('local')->files($path);
+
 			foreach ($files as $file) {
-				if (!Message::where('fileid', '=', explode($path . '/', $file)[1])->first()) {
+
+				$message = Message::where('fileid', '=', explode($path . '/', $file)[1])->first();
+
+				if (!$message) {
 					$output[] = $file;
 					Storage::disk('local')->delete($file);
 				}
-
-				print "\n";
 			}
 		}
+
 		Storage::disk('local')->deleteDirectory('outbox');
 		Storage::disk('local')->deleteDirectory('tmp');
 
