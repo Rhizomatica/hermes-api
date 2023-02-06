@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Frequencies;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class FrequenciesController extends Controller
 {
@@ -19,7 +18,8 @@ class FrequenciesController extends Controller
 		$frequency = Frequencies::firstWhere('id', $id);
 
 		if (!$frequency) {
-			return response()->json(['message' => 'API show frequency error, cant find'], 404);
+			(new ErrorController)->saveError(get_class($this), 404, 'API Error: User not find');
+			return response()->json(['message' => 'Not found'], 404);
 		}
 
 		return response()->json($frequency, 200);
@@ -30,7 +30,8 @@ class FrequenciesController extends Controller
 		$frequency = Frequencies::firstWhere('alias', $alias);
 
 		if (!$frequency) {
-			return response()->json(['message' => 'API show frequency error, cant find'], 404);
+			(new ErrorController)->saveError(get_class($this), 404, 'API Error: Frequency not found');
+			return response()->json(['message' => 'Not found'], 404);
 		}
 
 		return response()->json($frequency, 200);
@@ -39,7 +40,8 @@ class FrequenciesController extends Controller
 	public function updateFrequency($id, Request $request)
 	{
 		if (empty($id)) {
-			return response()->json(['message' => 'API update frequency error: cant update frequency'], 500);
+			(new ErrorController)->saveError(get_class($this), 404, 'API Error: missing parameter (id)');
+			return response()->json(['message' => 'Missing parameter'], 404);
 		}
 
 		$this->validate($request, [
@@ -52,11 +54,10 @@ class FrequenciesController extends Controller
 
 		if ($frequency) {
 			$frequency->update($request->all());
-			Log::info('update frequency' . $id);
 			return response()->json($request, 200);
 		}
 
-		Log::warning('frequency cant find to update' . $id);
-		return response()->json(['message' => 'cant find this frequency' . $id], 404);
+		(new ErrorController)->saveError(get_class($this), 404, 'API Error: frequency not found');
+		return response()->json(['message' => 'Not Found' . $id], 404);
 	}
 }

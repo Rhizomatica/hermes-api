@@ -15,12 +15,11 @@ class UserController extends Controller
 
 	public function showOneUser($id)
 	{
-		 if (! $user = User::firstWhere('email', $id)) {
-			 return response()->json(['message' => 'API showoneuser error, cant find'], 404);
-		 }
-		 else{
+		if (!$user = User::firstWhere('email', $id)) {
+			return response()->json(['message' => 'API showoneuser error, cant find'], 404);
+		} else {
 			return response()->json($user, 200);
-		 }
+		}
 	}
 
 	public function create(Request $request)
@@ -31,13 +30,10 @@ class UserController extends Controller
 		$soap_location = env('HERMES_EMAILAPI_LOC');
 		$soap_uri = env('HERMES_EMAILAPI_URI');
 
-		$client = new \SoapClient(null, array('location' => $soap_location,
-			'uri'      => $soap_uri,
-			'trace' => 1,
-			'stream_context'=> stream_context_create(array('ssl'=> array('verify_peer'=>false,'verify_peer_name'=>false))),
-			'exceptions' => 1));
+		$client = $this->getClientSOAP();
+
 		try {
-			if ( $session_id = $client->login($username, $password)) {
+			if ($session_id = $client->login($username, $password)) {
 				//Logged successfull. Session ID:'.$session_id.'<br />';
 				//, 'phone', 'site', 'location', 'password', 'recoverphrase', 'recoveranswer', 'updated_at', 'created_at', 'admin'
 				//* Set the function parameters.
@@ -75,7 +71,7 @@ class UserController extends Controller
 				);
 
 				//* Call the SOAP method
-				if (! $mailuser_id = $client->mail_user_add($session_id, $client_id, $params)) {
+				if (!$mailuser_id = $client->mail_user_add($session_id, $client_id, $params)) {
 					$client->logout($session_id);
 					return response()->json(['message' => 'API create user error: cant create email'], 500);
 				}
@@ -83,23 +79,23 @@ class UserController extends Controller
 				$request['password'] = hash('sha256', $request['password']);
 				$request['emailid'] = $mailuser_id;
 
-				if (! $user = User::create($request->all())) {
+				if (!$user = User::create($request->all())) {
 					$client->logout($session_id);
 					return response()->json(['message' => 'API create user error: cant create user'], 500);
 				}
 
 				// forward
-				if ($forwarding_id = env('HERMES_EMAILAPI_FORWARDING_ID')){
+				if ($forwarding_id = env('HERMES_EMAILAPI_FORWARDING_ID')) {
 					$mail_forward = $client->mail_forward_get($session_id, $forwarding_id);
 					$find =  strpos($mail_forward['destination'], $request['email']);
-					if ($find === false)  {
+					if ($find === false) {
 						$mail_forward['destination'] .= ', ' .  $request['email'] . '@' . env('HERMES_DOMAIN');
 						$client->mail_forward_update($session_id, $client_id, $forwarding_id, $mail_forward);
 					}
 				}
 
 				// call the uuadm - NOT ANYMORE
-                /*
+				/*
                 $command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -a -m "  . $request['email'] . "@" . env('HERMES_DOMAIN') . " -p " . $request['pass'] . " -n " . $request['name'] . "'" ;
 				if (! $output = exec_cli($command)) {
 					$client->logout($session_id);
@@ -116,27 +112,26 @@ class UserController extends Controller
 				return response()->json(0, 201); //Created
 
 			}
-		}
-		catch (SoapFault $e) {
+		} catch (SoapFault $e) {
 			echo $client->__getLastResponse();
-			die('SOAP Error: '.$e->getMessage());
+			die('SOAP Error: ' . $e->getMessage());
 		}
 	} // end of create function
 
 
 	public function update($id, Request $request)
 	{
-		
-		//some tests
-		if($id == 'root'){
-			return response()->json(['message' => 'API update user error: cant update root'], 500);
-		 }
 
-		if( $request['email']){
+		//some tests
+		if ($id == 'root') {
+			return response()->json(['message' => 'API update user error: cant update root'], 500);
+		}
+
+		if ($request['email']) {
 			return response()->json(['message' => 'API update user error: cant change an existing login email'], 500);
 		}
 
-		if (! $request[ 'name'] && ! $request[ 'password'] && ! $request[ 'phone']  && ! $request[ 'site'] && ! $request[ 'location'] && ! $request[ 'recoverphrase'] && ! $request[ 'recoveranswer'] && ! $request[ 'admin'] ){
+		if (!$request['name'] && !$request['password'] && !$request['phone']  && !$request['site'] && !$request['location'] && !$request['recoverphrase'] && !$request['recoveranswer'] && !$request['admin']) {
 			return response()->json('Error: cant update without data form ', 504);
 		}
 		$username = env('HERMES_EMAILAPI_USER');
@@ -144,28 +139,24 @@ class UserController extends Controller
 		$soap_location = env('HERMES_EMAILAPI_LOC');
 		$soap_uri = env('HERMES_EMAILAPI_URI');
 
-		$client = new \SoapClient(null, array('location' => $soap_location,
-				'uri'      => $soap_uri,
-				'trace' => 1,
-				'stream_context'=> stream_context_create(array('ssl'=> array('verify_peer'=>false,'verify_peer_name'=>false))),
-				'exceptions' => 1));
+		$client = $this->getClientSOAP();
 
 		try {
-			if($session_id = $client->login($username, $password)) {
+			if ($session_id = $client->login($username, $password)) {
 
 				// Get the email user record
 				$mail_user_record = $client->mail_user_get($session_id, $id);
 
-				if ($request['name']){
-				  	$mail_user_record['name'] = $request['name'];
+				if ($request['name']) {
+					$mail_user_record['name'] = $request['name'];
 				}
 
-				if ($request['password']){
-				  	$mail_user_record['password'] = $request['password'];
+				if ($request['password']) {
+					$mail_user_record['password'] = $request['password'];
 				}
 
-				if ($request['phone']){
-				  	$mail_user_record['phone'] = $request['phone'];
+				if ($request['phone']) {
+					$mail_user_record['phone'] = $request['phone'];
 				}
 
 				$client_id = 1;
@@ -178,55 +169,51 @@ class UserController extends Controller
 				if ($affected_rows <= 0) {
 					return response()->json(['message' => 'API update user error: cant update'], 501);
 				}
-				if (!  $user = User::firstWhere('email', $login)) {
+				if (!$user = User::firstWhere('email', $login)) {
 					return response()->json('Error: mail id not found on database', 504);
 				}
-				if ($request['password']){
+				if ($request['password']) {
 					$request['password'] = hash('sha256', $request['password']);
 				}
 
-				if (! User::where('email', $login)->update($request->all())) {
+				if (!User::where('email', $login)->update($request->all())) {
 					return response()->json(['message' => 'API update error: ispconfig updated but not local database'], 501);
 				}
 				$user = User::firstWhere('email', $login);
-				return response()->json( $user, 200);
+				return response()->json($user, 200);
 			}
 		} catch (SoapFault $e) {
 			echo $client->__getLastResponse();
-			die('SOAP Error: '.$e->getMessage());
+			die('SOAP Error: ' . $e->getMessage());
 		}
 	} // end of update function
 
-	public function delete($id,$mail)
+	public function delete($id, $mail)
 	{
-		if($id == 'root'){
+		if ($id == 'root') {
 			return response()->json('Error: cant delete system user root', 504);
 		}
 		$username = env('HERMES_EMAILAPI_USER');
 		$password = env('HERMES_EMAILAPI_PASS');
 		$soap_location = env('HERMES_EMAILAPI_LOC');
 		$soap_uri = env('HERMES_EMAILAPI_URI');
-		$client = new \SoapClient(null, array('location' => $soap_location,
-				'uri'      => $soap_uri,
-				'trace' => 1,
-				'stream_context'=> stream_context_create(array('ssl'=> array('verify_peer'=>false,'verify_peer_name'=>false))),
-				'exceptions' => 1));
+		$client = $this->getClientSOAP();
 		try {
-			if ( $session_id = $client->login($username, $password)) {
+			if ($session_id = $client->login($username, $password)) {
 				// Parameters
 				$affected_rows = $client->mail_user_delete($session_id, $id);
 
 				if ($affected_rows <= 0) {
 					return response()->json(['message' => 'API user delete error - cant remove email from server'], 405);
 				}
-				if (! User::firstWhere('email', $mail)) {
+				if (!User::firstWhere('email', $mail)) {
 					return response()->json(['message' => 'API user delete error - cant find user'], 404);
 				}
 				if (!User::where('email', $mail)->delete()) {
 					return response()->json(['message' => 'API user delete error '], 500);
 				}
-                // NOT RUNNING UUADM ANYMORE!
-                /*
+				// NOT RUNNING UUADM ANYMORE!
+				/*
 				$command = "uux -j -r '" . env('HERMES_ROUTE') . "!uuadm -d -m "  . $mail . '@' . env('HERMES_DOMAIN') .  "'" ;
 				//TOOD check that
 				$output = exec_cli($command);
@@ -236,26 +223,25 @@ class UserController extends Controller
 				//returns uucp job id
 				$uucp_job_id= explode("\n", $output)[0];
                 */
-				if ($forwarding_id = env('HERMES_EMAILAPI_FORWARDING_ID')){
+				if ($forwarding_id = env('HERMES_EMAILAPI_FORWARDING_ID')) {
 					$client_id = 1;
 					$mail_forward = $client->mail_forward_get($session_id, $forwarding_id);
 					$find =  strpos($mail_forward['destination'], $mail);
-					if ($find !== false)  {
+					if ($find !== false) {
 						$destination = explode(', ', $mail_forward['destination']);
 						$new_destination = [];
 						//remove
-						foreach ( $destination as $key => $value) {
-							if ($value != $mail . "@" . env('HERMES_DOMAIN') ) {
-								array_push($new_destination, $value) ;
+						foreach ($destination as $key => $value) {
+							if ($value != $mail . "@" . env('HERMES_DOMAIN')) {
+								array_push($new_destination, $value);
 							}
 						}
 						$mail_forward['destination'] = '';
-						for($i = 0; $i < count($new_destination); $i++) {
+						for ($i = 0; $i < count($new_destination); $i++) {
 
-							if (count($new_destination)-1 == $i) {
+							if (count($new_destination) - 1 == $i) {
 								$mail_forward['destination'] .= $new_destination[$i];
-							}
-							else{
+							} else {
 								$mail_forward['destination'] .= $new_destination[$i] . ', ';
 							}
 						}
@@ -269,11 +255,11 @@ class UserController extends Controller
 			}
 		} catch (SoapFault $e) {
 			echo $client->__getLastResponse();
-			die('SOAP Error: '.$e->getMessage());
+			die('SOAP Error: ' . $e->getMessage());
 		}
 	}
 
-	 /**
+	/**
 	 * login
 	 * parameter: $request with email and password
 	 * @return Json
@@ -281,16 +267,15 @@ class UserController extends Controller
 	public function login(Request $request)
 	{
 		$user = new User;
-		if (! $request->email) {
+		if (!$request->email) {
 			return response()->json(['message' => 'API user login - lack parameters'], 412);
 		}
-		if (! $user = User::firstWhere('email', $request->email)) {
+		if (!$user = User::firstWhere('email', $request->email)) {
 			return response()->json(['message' => 'API user login - wrong user'], 404);
 		}
-		if ($user['password'] !== hash('sha256', $request->password)){ //sucessfull login
+		if ($user['password'] !== hash('sha256', $request->password)) { //sucessfull login
 			return response()->json(['message' => 'API user login - wrong password'], 420);
-		}
-		else{
+		} else {
 			unset($user['password']);
 			unset($user['recoverphrase']);
 			unset($user['recoveranswer']);
@@ -300,26 +285,25 @@ class UserController extends Controller
 		}
 	}
 
-	 /**
+	/**
 	 * recover password 
 	 * parameter: $request with email and recoveranswer 
 	 * @return Json
 	 */
-	
+
 	public function recoverPassword(Request $request)
 	{
 		$user = new User;
-		if (! $request->email) {
+		if (!$request->email) {
 			return response()->json(['message' => 'API user recover - lack parameters'], 412);
 		}
-		if (! $user = User::firstWhere('email', $request->email)) {
+		if (!$user = User::firstWhere('email', $request->email)) {
 			return response()->json(['message' => 'API user recover - wrong user'], 404);
 		}
 
-		if ($user['recoveranswer'] != $request->recoveranswer){ //sucessfull
+		if ($user['recoveranswer'] != $request->recoveranswer) { //sucessfull
 			return response()->json(['message' => 'API user recover - wrong answer'], 420);
-		}
-		else{
+		} else {
 
 			// unset($user['password']);
 			// unset($user['recoverphrase']);

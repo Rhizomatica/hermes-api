@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Log extends Model
+class Error extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -13,6 +13,6 @@ class Log extends Model
      * @var array
      */
     protected $fillable = [
-        'controller', 'error_code', 'error_message', 'stacktrace', 'user_id', 'station_id', 'updated_at', 'created_at'
+        'controller', 'error_code', 'error_message', 'stacktrace', 'user_id', 'station', 'updated_at', 'created_at'
     ];
 }
