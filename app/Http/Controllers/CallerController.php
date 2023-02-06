@@ -47,10 +47,6 @@ class CallerController extends Controller
 			'enable' => 'required|boolean'
 		]);
 
-		if (!$request->title || !$request->starttime || !$request->stoptime || $request->enable === null) {
-			return response()->json(['message' => 'caller: require all fields '], 500);
-		}
-
 		$schedule = Caller::create($request->all());
 		if (!$schedule) {
 			return response()->json(['message' => 'caller: cant\'t create a schedule: '], 500);
