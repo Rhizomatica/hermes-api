@@ -15,16 +15,20 @@ class GeoLocationController extends Controller
             $command = 'ubitx_client -c gps_calibrate';
             $output = exec_cli($command);
 
-            if($output == 'NO_GPS')
-                return response()->json(['message' => 'No GPS found for calibration: ' . $output], 500);
+            if ($output == 'NO_GPS') {
+                (new ErrorController)->saveError(get_class($this), 500, 'API Error: No GPS found for calibration: ' . $output);
+                return response()->json(['message' => 'Server error'], 500);
+            }
 
-            if(!$output || $output == 'ERROR')
-                return response()->json(['message' => 'Fail on start GPS calibration: ' . $output], 500);
-    
-            return response()->json(['message' => 'GPS Calibration successful'], 200);
-            
+            if (!$output || $output == 'ERROR') {
+                (new ErrorController)->saveError(get_class($this), 500, 'API Error: Fail on start GPS calibration: ' . $output);
+                return response()->json(['message' => 'Server error'], 500);
+            }
+
+            return response()->json(['message' => 'GPS calibration sucessfully'], 200);
         } catch (\Throwable $th) {
-            return response()->json(['message' => 'Internal Server Error:' . $th], 500);
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: nternal Server Error: ' . $th);
+            return response()->json(['message' => 'Server error'], 500);
         }
     }
 }
