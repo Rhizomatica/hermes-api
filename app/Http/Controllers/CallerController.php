@@ -52,7 +52,7 @@ class CallerController extends Controller
 
 		if (!$schedule) {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: can not create a schedule');
-			return response()->json(['message' => 'API Server error'], 500);
+			return response()->json(['message' => 'Server error'], 500);
 		}
 
 		return response()->json($request->all(), 200);
