@@ -14,52 +14,58 @@ class RadioController extends Controller
 		$radio_frequency = explode("\n", exec_uc("get_frequency"))[0];
 		$radio_mode = explode("\n", exec_uc("get_mode"))[0];
 		$radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold"))[0];
+		$radio_serial = explode("\n", exec_uc("get_serial"))[0];
+		$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
+		$radio_txrx = explode("\n", exec_uc("get_txrx_status"))[0];
+		$radio_rx = true;
+		$radio_tx = false;
+		$radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
+		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep ffplay -a"))[0]);
+		$radio_led = explode("\n", exec_uc("get_led_status"))[0];
+		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
+		$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
+
 		if (isset($radio_ref_threshold)) {
 			$radio_ref_thresholdv = adc2volts($radio_ref_threshold);
 		} else {
 			$radio_ref_thresholdv = 0;
 		}
-		$radio_serial = explode("\n", exec_uc("get_serial"))[0];
-		$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
-
-		$radio_txrx = explode("\n", exec_uc("get_txrx_status"))[0];
-
-		$radio_rx = true;
-		$radio_tx = false;
 
 		if ($radio_txrx == "INTX" || !$radio_txrx) {
 			$radio_tx = true;
 			$radio_rx = false;
 		}
 
-		$radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
-		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep ffplay -a"))[0]);
 		if (isset($radio_test_tone[3])) {
 			$radio_test_tone = $radio_test_tone[3];
 		} else {
 			$radio_test_tone = 0;
 		}
 
-
-		$radio_led = explode("\n", exec_uc("get_led_status"))[0];
 		if ($radio_led == "LED_ON") {
 			$radio_led = true;
-		} else if ($radio_led == "LED_OFF" || !$radio_led) {
+		}
+
+		if ($radio_led == "LED_OFF" || !$radio_led) {
 			$radio_led = false;
 		}
 
-		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
-		if ($radio_protection == "PROTECTION_ON") {
-			$radio_protection = true;
-		} else if ($radio_protection == "PROTECTION_OFF" || !$radio_protection) {
-			$radio_protection = false;
-		}
-
-		$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
+		//Repetido ?
 		if ($radio_connection == "LED_ON") {
 			$radio_connection = true;
-		} else if ($radio_connection == "LED_OFF" || !$radio_connection) {
+		}
+
+		if ($radio_connection == "LED_OFF" || !$radio_connection) {
 			$radio_connection = false;
+		}
+		//
+
+		if ($radio_protection == "PROTECTION_ON") {
+			$radio_protection = true;
+		}
+
+		if ($radio_protection == "PROTECTION_OFF" || !$radio_protection) {
+			$radio_protection = false;
 		}
 
 		$status = [
@@ -78,6 +84,7 @@ class RadioController extends Controller
 			'serial' =>  $radio_serial,
 			'testtone' => $radio_test_tone
 		];
+
 		return response()->json($status, 200);
 	}
 
@@ -88,8 +95,6 @@ class RadioController extends Controller
 	 */
 	public function getRadioPowerStatus()
 	{
-		$radio_txrx = explode("\n", exec_uc("get_txrx_status"))[0];
-
 		$radio_rx = true;
 		$radio_tx = false;
 		$radio_ref = 0;
@@ -100,10 +105,18 @@ class RadioController extends Controller
 		$radio_fwd_volts = 0;
 		$radio_swr = 0;
 
+		$radio_txrx = explode("\n", exec_uc("get_txrx_status"))[0];
+		$radio_led = explode("\n", exec_uc("get_led_status"))[0];
+		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
+		$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
+
+
 		if ($radio_txrx == "INTX" || !$radio_txrx) {
 			$radio_tx = true;
 			$radio_rx = false;
+
 			$radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
+			$radio_ref = explode("\n", exec_uc("get_ref"))[0];
 
 			if (isset($radio_fwd)) {
 				$radio_fwd_volts = adc2volts($radio_fwd);
@@ -111,7 +124,7 @@ class RadioController extends Controller
 			} else {
 				$radio_fwd_watts = 0;
 			}
-			$radio_ref = explode("\n", exec_uc("get_ref"))[0];
+
 			if (isset($radio_ref)) {
 				$radio_ref_volts = adc2volts($radio_ref);
 				$radio_ref_watts = ref2watts($radio_ref);
@@ -119,27 +132,31 @@ class RadioController extends Controller
 				$radio_ref_volts = 0;
 				$radio_ref = 0;
 			}
+
 			$radio_swr = swr($radio_ref, $radio_fwd);
 		}
 
-		$radio_led = explode("\n", exec_uc("get_led_status"))[0];
 		if ($radio_led == "LED_ON") {
 			$radio_led = true;
-		} else if ($radio_led == "LED_OFF" || !$radio_led) {
+		}
+
+		if ($radio_led == "LED_OFF" || !$radio_led) {
 			$radio_led = false;
 		}
 
-		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
 		if ($radio_protection == "PROTECTION_ON") {
 			$radio_protection = true;
-		} else if ($radio_protection == "PROTECTION_OFF" || !$radio_protection) {
+		}
+
+		if ($radio_protection == "PROTECTION_OFF" || !$radio_protection) {
 			$radio_protection = false;
 		}
 
-		$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
 		if ($radio_connection == "LED_ON") {
 			$radio_connection = true;
-		} else if ($radio_connection == "LED_OFF" || !$radio_connection) {
+		}
+
+		if ($radio_connection == "LED_OFF" || !$radio_connection) {
 			$radio_connection = false;
 		}
 
@@ -158,6 +175,7 @@ class RadioController extends Controller
 			'protection' => $radio_protection,
 			'connection' =>  $radio_connection,
 		];
+
 		return response()->json($status, 200);
 	}
 
@@ -184,9 +202,10 @@ class RadioController extends Controller
 	public function setRadioPtt($status)
 	{
 		$command = "";
+
 		if ($status == "ON") {
 			$command = "ptt_on";
-		} elseif ($status == "OFF") {
+		} else if ($status == "OFF") {
 			$command = "ptt_off";
 		} else {
 			$command = "ptt_off";
@@ -195,11 +214,12 @@ class RadioController extends Controller
 
 		$output = exec_uc($command);
 		$output = explode("\n", $output)[0];
+
 		if ($output == "OK") {
 			return response()->json("setRadioPTT: " . $status . " - " . $output, 200);
-		} else {
-			return response()->json(["message" => "setRadioPTT: Error - " . $output], 500);
 		}
+
+		return response()->json(["message" => "setRadioPTT: Error - " . $output], 500);
 	}
 
 	/**
@@ -237,12 +257,14 @@ class RadioController extends Controller
 				$output = system("$command");
 				break;
 		}
+
 		$output = explode("\n", $output)[0];
+
 		if (!$output) {
 			return response()->json($par, 200);
-		} else {
-			return response()->json(["message" => "setRadioTone: Error - " . $output], 500);
 		}
+
+		return response()->json(["message" => "setRadioTone: Error - " . $output], 500);
 	}
 
 	/**
@@ -265,12 +287,13 @@ class RadioController extends Controller
 	public function setRadioFreq(int $freq)
 	{
 		$command = explode("\n", exec_uc("set_frequency -a " . $freq))[0];
+
 		if ($command == "OK") {
 			$radio_frequency = explode("\n", exec_uc("get_frequency"))[0];
 			return response()->json($radio_frequency, 200);
-		} else {
-			return response()->json(['message' => 'setRadioFreq error: ' . $command], 500);
 		}
+
+		return response()->json(['message' => 'setRadioFreq error: ' . $command], 500);
 	}
 
 	/**
@@ -282,9 +305,10 @@ class RadioController extends Controller
 	public function setRadioMode($mode)
 	{
 		$radio_mode = "";
+
 		if ($mode == "USB") {
 			$command = explode("\n", exec_uc("set_mode -a USB"))[0];
-		} elseif ($mode == "LSB") {
+		} else if ($mode == "LSB") {
 			$command = explode("\n", exec_uc("set_mode -a LSB"))[0];
 		} else {
 			return response()->json(['message' => 'setRadioMode invalid error: is not USB or LSB' . $mode], 500);
@@ -293,9 +317,9 @@ class RadioController extends Controller
 		if ($command == "OK") {
 			$radio_mode = explode("\n", exec_uc("get_mode"))[0];
 			return response()->json($radio_mode, 200);
-		} else {
-			return response()->json(['message' => 'setRadioMode error: ' . $radio_mode], 500);
 		}
+
+		return response()->json(['message' => 'setRadioMode error: ' . $radio_mode], 500);
 	}
 
 	/**
@@ -317,12 +341,13 @@ class RadioController extends Controller
 	public function setRadioBfo($freq)
 	{
 		$command = explode("\n", exec_uc("set_bfo -a " . $freq))[0];
+
 		if ($command == "OK") {
 			$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
 			return response($radio_bfo, 200);
-		} else {
-			return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
 		}
+
+		return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
 	}
 
 	/**
@@ -333,12 +358,13 @@ class RadioController extends Controller
 	public function setRadioMasterCal($freq)
 	{
 		$command = explode("\n", exec_uc("set_mastercal -a " . $freq))[0];
+
 		if ($command == "OK") {
 			$radio_fwd = explode("\n", exec_uc("get_mastercal"))[0];
 			return response()->json($radio_fwd, 200);
-		} else {
-			return response()->json(['message' => 'setRadioMasterCal error: ' . $command], 500);
 		}
+
+		return response()->json(['message' => 'setRadioMasterCal error: ' . $command], 500);
 	}
 
 	/**
@@ -349,9 +375,10 @@ class RadioController extends Controller
 	public function getRadioProtection()
 	{
 		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
+
 		if ($radio_protection == "PROTECTION_OFF") {
 			return response()->json(false, 200);
-		} else  if ($radio_protection == "PROTECTION_ON") {
+		} else if ($radio_protection == "PROTECTION_ON") {
 			return response()->json(true, 200);
 		} else {
 			return response()->json(['message' => 'setRadioMasterCal error: '], 500);
@@ -366,28 +393,31 @@ class RadioController extends Controller
 	public function setRadioLedStatus($status)
 	{
 		$par = '';
+
 		if ($status == "ON") {
 			$par = "set_led_status -a ON";
-		} elseif ($status == "OFF") {
+		} else if ($status == "OFF") {
 			$par = "set_led_status -a OFF";
 		} else {
 			return response()->json(['message' => 'setRadioLedStatus fail'], 500);
 		}
 
 		$command = explode("\n", exec_uc($par))[0];
+
 		if ($command == "OK") {
+
 			$radio_led = explode("\n", exec_uc("get_led_status"))[0];
 
 			if ($radio_led == "LED_ON") {
 				return response()->json(true, 200);
-			} elseif ($radio_led == "LED_OFF") {
+			} else if ($radio_led == "LED_OFF") {
 				return response()->json(false, 200);
 			} else {
 				return response()->json(['message' => 'setRadioBfo return error: ' . $command], 500);
 			}
-		} else {
-			return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
 		}
+
+		return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
 	}
 
 	/**
@@ -398,9 +428,10 @@ class RadioController extends Controller
 	public function setRadioConnectionStatus($status)
 	{
 		$par = '';
+
 		if ($status == "ON") {
 			$par = "set_connected_status -a ON";
-		} elseif ($status == "OFF") {
+		} else if ($status == "OFF") {
 			$par = "set_connected_status -a OFF";
 		} else {
 			return response()->json(['message' => 'setRadioConnectionStatus fail: ' . $status], 500);
@@ -412,14 +443,14 @@ class RadioController extends Controller
 			$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
 			if ($radio_connection == "LED_ON") {
 				return response()->json(true, 200);
-			} elseif ($radio_connection == "LED_OFF") {
+			} else if ($radio_connection == "LED_OFF") {
 				return response()->json(false, 200);
 			} else {
 				return response()->json(['message' => 'getRadioConnectionStatus fail' . $radio_connection], 500);
 			}
-		} else {
-			return response()->json(['message' => 'setRadioConnectionStatus fail: ' . $command], 500);
 		}
+
+		return response()->json(['message' => 'setRadioConnectionStatus fail: ' . $command], 500);
 	}
 
 	/**
@@ -430,11 +461,12 @@ class RadioController extends Controller
 	public function getRadioRefThreshold()
 	{
 		$radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold"))[0];
+
 		if ($radio_ref_threshold != "ERROR") {
 			return response()->json($radio_ref_threshold, 200);
-		} else {
-			return response()->json(['message' => 'getRadioRefThreshold fail: ' . $radio_ref_threshold], 500);
 		}
+
+		return response()->json(['message' => 'getRadioRefThreshold fail: ' . $radio_ref_threshold], 500);
 	}
 
 	/**
@@ -445,16 +477,18 @@ class RadioController extends Controller
 	public function setRadioRefThreshold($value)
 	{
 		if ($value >= 0 && $value <= 1023) {
+
 			$par = "set_ref_threshold -a " . $value;
 			$radio_ref_threshold = explode("\n", exec_uc($par))[0];
+
 			if ($radio_ref_threshold == "OK") {
 				return response($value, 200);
-			} else {
-				return response()->json(['message' => 'setRadioRefThreshold fail: ' . $radio_ref_threshold], 500);
 			}
-		} else {
-			return response()->json(['message' => 'setRadioRefThreshold out of limit - 0...1023: ' . $value], 500);
+
+			return response()->json(['message' => 'setRadioRefThreshold fail: ' . $radio_ref_threshold], 500);
 		}
+
+		return response()->json(['message' => 'setRadioRefThreshold out of limit - 0...1023: ' . $value], 500);
 	}
 
 	/**
@@ -465,18 +499,20 @@ class RadioController extends Controller
 	public function setRadioRefThresholdV($value)
 	{
 		if ($value >= 0 && $value <= 5) {
+
 			$ratio = 5 / 1023;
 			$vvalue = ceil($value / $ratio);
 			$par = "set_ref_threshold -a " . $vvalue;
 			$radio_ref_threshold = explode("\n", exec_uc($par))[0];
+
 			if ($radio_ref_threshold == "OK") {
 				return response($value, 200);
-			} else {
-				return response()->json(['message' => 'setRadioRefThresholdV fail: ' . $value], 500);
 			}
-		} else {
-			return response()->json(['message' => 'setRadioRefThresholdV out of limit - 0...5: ' . $value], 500);
+
+			return response()->json(['message' => 'setRadioRefThresholdV fail: ' . $value], 500);
 		}
+
+		return response()->json(['message' => 'setRadioRefThresholdV out of limit - 0...5: ' . $value], 500);
 	}
 
 	/**
@@ -487,11 +523,12 @@ class RadioController extends Controller
 	public function resetRadioProtection()
 	{
 		$radio_prot = explode("\n", exec_uc("reset_protection"))[0];
+
 		if ($radio_prot == "OK") {
 			return response(true, 200);
-		} else {
-			return response()->json(['message' => 'resetRadioProtection fail: ' . $radio_prot], 500);
 		}
+
+		return response()->json(['message' => 'resetRadioProtection fail: ' . $radio_prot], 500);
 	}
 
 	/**
@@ -502,10 +539,11 @@ class RadioController extends Controller
 	public function restoreRadioDefaults()
 	{
 		$output = explode("\n", exec_uc("restore_radio_defaults"))[0];
+		
 		if ($output == "OK") {
 			return response(true, 200);
-		} else {
-			return response()->json(['message' => 'restoreRadioDefaults fail: ' . $output], 500);
 		}
+		
+		return response()->json(['message' => 'restoreRadioDefaults fail: ' . $output], 500);
 	}
 }
