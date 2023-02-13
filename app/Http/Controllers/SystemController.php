@@ -2,14 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Adapter\Local;
 use Illuminate\Http\Request;
-
 use App\System;
-use Illuminate\Support\Env;
 
 class SystemController extends Controller
 {
@@ -24,14 +18,15 @@ class SystemController extends Controller
 	public function setSysConfig(Request $request)
 	{
 		if ($request->all()) {
+
 			if (System::select()->update($request->all())) {
 				return response()->json($request->all(), 200);
-			} else {
-				return response()->json(['message' => 'setSysConfig can not update'], 500);
 			}
-		} else {
-			return response()->json(['message' => 'setSysConfig does not have request data'], 500);
+
+			return response()->json(['message' => 'setSysConfig can not update'], 500);
 		}
+
+		return response()->json(['message' => 'setSysConfig does not have request data'], 500);
 	}
 
 	/**
@@ -43,9 +38,9 @@ class SystemController extends Controller
 	{
 		if ($request->all()) {
 			return response()->json(['message' => 'setSysGw TODO'], 200);
-		} else {
-			return response()->json(['message' => 'setSysConfig does not have request data'], 500);
 		}
+
+		return response()->json(['message' => 'setSysConfig does not have request data'], 500);
 	}
 
 	/**
@@ -64,7 +59,7 @@ class SystemController extends Controller
 		$pidhmp = explode("\n", exec_cli("pgrep -x iwatch"))[0];
 		$piddb = explode("\n", exec_cli("pgrep -x mariadbd"))[0];
 		$pidpf = explode("\n", exec_cli("pgrep -x master"))[0];
-		$pidvnc = explode("\n", exec_cli("pgrep -x Xtigervnc"))[0];
+		// $pidvnc = explode("\n", exec_cli("pgrep -x Xtigervnc"))[0];
 		$wifiessid = explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep ssid | cut -c6-"))[0];
 		$wifich = explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep channel| cut -c9-"))[0];
 		$ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''));
@@ -73,7 +68,8 @@ class SystemController extends Controller
 		$interfaces = explode("\n", exec_cli('ip r'));
 		array_pop($interfaces);
 		$memory = explode(" ", exec_cli("free --mega| grep Mem | awk '{print ($2\" \"$3\" \"$4)}'"));
-		$phpmemory = (!function_exists('memory_get_usage')) ? '0' : round(memory_get_usage() / 1024 / 1024, 2) . 'MB';
+		// $phpmemory = (!function_exists('memory_get_usage')) ? '0' : round(memory_get_usage() / 1024 / 1024, 2) . 'MB';
+
 		$status = [
 			'status' => $piduu &&  $piduuardop && $pidmodem &&  $pidradio && $pidhmp && $piduu && $pidpf,
 			'uname' => $uname,
@@ -97,8 +93,9 @@ class SystemController extends Controller
 			'memtotal' => $memory[0] . "MB",
 			'memused' => $memory[1] . "MB",
 			'memfree' => explode("\n", $memory[2])[0] . "MB",
-			'diskfree' => $disk_free ? $disk_free : false,
+			'diskfree' => $disk_free ? $disk_free : false
 		];
+
 		return response()->json($status, 200);
 	}
 
@@ -161,10 +158,9 @@ class SystemController extends Controller
 
 
 					if ($type == "crmail") {
-
 						// test if spool is a email
-
 						// handle when is a multiple email
+
 						if ($count > 11) {
 							for ($j = 7; $j < $count - 3; $j++) {
 								$emails[] = $fields[$j];
@@ -176,6 +172,7 @@ class SystemController extends Controller
 							$size = $fields[9];
 							$emails[] = $fields[7];
 						}
+
 						$cfile_path = env('HERMES_UUCP') . '/' .  $uuid_host . '/C./C.' . $uuid;
 						$dfile_id = explode(" ", exec_cli('sudo cat ' . $cfile_path))[1];
 						$dfile_path = env('HERMES_UUCP') . '/' . $uuid_host . '/D./' . $dfile_id;
@@ -214,9 +211,9 @@ class SystemController extends Controller
 
 		if (sizeof($spool) >= 1) {
 			return response()->json($spool, 200);
-		} else {
-			return response()->json(null, 200);
 		}
+
+		return response()->json(null, 200);
 	}
 
 	/**
@@ -231,11 +228,12 @@ class SystemController extends Controller
 		system($command, $return_var);
 		$output = ob_get_contents();
 		ob_end_clean();
+
 		if ($return_var == 0) {
 			return response()->json("uucp job killed: " . $host . '.' . $id, 200);
-		} else {
-			return response()->json("No job found", 404);
 		}
+
+		return response()->json("No job found", 404);
 	}
 
 	/**
@@ -330,9 +328,9 @@ class SystemController extends Controller
 		$command = "sudo uulog -n 1000 | sort -n ";
 		$output = exec_cli($command);
 		$output = explode("\n", $output);
-
 		ob_clean();
 		ob_start();
+
 		return response()->json($output, 200);
 	}
 
@@ -348,6 +346,7 @@ class SystemController extends Controller
 		$output = explode("\n", $output);
 		ob_clean();
 		ob_start();
+		
 		return response()->json($output, 200);
 	}
 
