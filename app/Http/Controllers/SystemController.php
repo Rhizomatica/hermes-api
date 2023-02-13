@@ -23,10 +23,12 @@ class SystemController extends Controller
 				return response()->json($request->all(), 200);
 			}
 
-			return response()->json(['message' => 'setSysConfig can not update'], 500);
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setSysConfig can not update');
+			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		return response()->json(['message' => 'setSysConfig does not have request data'], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setSysConfig does not have request data');
+		return response()->json(['message' => 'Server error'], 500);
 	}
 
 	/**
@@ -40,7 +42,8 @@ class SystemController extends Controller
 			return response()->json(['message' => 'setSysGw TODO'], 200);
 		}
 
-		return response()->json(['message' => 'setSysConfig does not have request data'], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setSysConfig does not have request data');
+		return response()->json(['message' => 'Server error'], 500);
 	}
 
 	/**
@@ -233,7 +236,8 @@ class SystemController extends Controller
 			return response()->json("uucp job killed: " . $host . '.' . $id, 200);
 		}
 
-		return response()->json("No job found", 404);
+		(new ErrorController)->saveError(get_class($this), 404, 'API Error: Job not found');
+		return response()->json("Not found", 404);
 	}
 
 	/**
@@ -346,7 +350,7 @@ class SystemController extends Controller
 		$output = explode("\n", $output);
 		ob_clean();
 		ob_start();
-		
+
 		return response()->json($output, 200);
 	}
 
