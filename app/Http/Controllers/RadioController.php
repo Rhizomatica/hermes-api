@@ -209,7 +209,8 @@ class RadioController extends Controller
 			$command = "ptt_off";
 		} else {
 			$command = "ptt_off";
-			return response()->json("setRadioPTTon: invalid parameter: " . $status, 500);
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioPTTon - invalid parameter: ' . $status);
+			return response()->json(["message" => "Server error"], 500);
 		}
 
 		$output = exec_uc($command);
@@ -219,7 +220,8 @@ class RadioController extends Controller
 			return response()->json("setRadioPTT: " . $status . " - " . $output, 200);
 		}
 
-		return response()->json(["message" => "setRadioPTT: Error - " . $output], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioPTT - ' . $output);
+		return response()->json(["message" => "Server error"], 500);
 	}
 
 	/**
@@ -264,7 +266,8 @@ class RadioController extends Controller
 			return response()->json($par, 200);
 		}
 
-		return response()->json(["message" => "setRadioTone: Error - " . $output], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioTone: Error - ' . $output);
+		return response()->json(["message" => "Server error"], 500);
 	}
 
 	/**
@@ -293,7 +296,8 @@ class RadioController extends Controller
 			return response()->json($radio_frequency, 200);
 		}
 
-		return response()->json(['message' => 'setRadioFreq error: ' . $command], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioFreq error: ' . $command);
+		return response()->json(['message' => 'Server error'], 500);
 	}
 
 	/**
@@ -311,7 +315,8 @@ class RadioController extends Controller
 		} else if ($mode == "LSB") {
 			$command = explode("\n", exec_uc("set_mode -a LSB"))[0];
 		} else {
-			return response()->json(['message' => 'setRadioMode invalid error: is not USB or LSB' . $mode], 500);
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioMode invalid error: is not USB or LSB' . $mode);
+			return response()->json(['message' => 'Server error' . $mode], 500);
 		}
 
 		if ($command == "OK") {
@@ -319,7 +324,8 @@ class RadioController extends Controller
 			return response()->json($radio_mode, 200);
 		}
 
-		return response()->json(['message' => 'setRadioMode error: ' . $radio_mode], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioMode error: ' . $radio_mode);
+		return response()->json(['message' => 'Server error'], 500);
 	}
 
 	/**
@@ -347,7 +353,8 @@ class RadioController extends Controller
 			return response($radio_bfo, 200);
 		}
 
-		return response()->json(['message' => 'setRadioBfo error: ' . $command], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioBfo error: ' . $command);
+		return response()->json(['message' => 'Server error'], 500);
 	}
 
 	/**
@@ -364,7 +371,8 @@ class RadioController extends Controller
 			return response()->json($radio_fwd, 200);
 		}
 
-		return response()->json(['message' => 'setRadioMasterCal error: ' . $command], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioMasterCal error: ' . $command);
+		return response()->json(['message' => 'Server error'], 500);
 	}
 
 	/**
@@ -381,7 +389,8 @@ class RadioController extends Controller
 		} else if ($radio_protection == "PROTECTION_ON") {
 			return response()->json(true, 200);
 		} else {
-			return response()->json(['message' => 'setRadioMasterCal error: '], 500);
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioMasterCal error');
+			return response()->json(['message' => 'Server error'], 500);
 		}
 	}
 
@@ -399,7 +408,8 @@ class RadioController extends Controller
 		} else if ($status == "OFF") {
 			$par = "set_led_status -a OFF";
 		} else {
-			return response()->json(['message' => 'setRadioLedStatus fail'], 500);
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioLedStatus fail');
+			return response()->json(['message' => 'Server error'], 500);
 		}
 
 		$command = explode("\n", exec_uc($par))[0];
@@ -413,7 +423,8 @@ class RadioController extends Controller
 			} else if ($radio_led == "LED_OFF") {
 				return response()->json(false, 200);
 			} else {
-				return response()->json(['message' => 'setRadioBfo return error: ' . $command], 500);
+				(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioBfo return error' . $command);
+				return response()->json(['message' => 'Server erro'], 500);
 			}
 		}
 
@@ -434,7 +445,8 @@ class RadioController extends Controller
 		} else if ($status == "OFF") {
 			$par = "set_connected_status -a OFF";
 		} else {
-			return response()->json(['message' => 'setRadioConnectionStatus fail: ' . $status], 500);
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioConnectionStatus fail: ' . $status);
+			return response()->json(['message' => 'Server error'], 500);
 		}
 
 		$command = explode("\n", exec_uc($par))[0];
@@ -446,11 +458,13 @@ class RadioController extends Controller
 			} else if ($radio_connection == "LED_OFF") {
 				return response()->json(false, 200);
 			} else {
-				return response()->json(['message' => 'getRadioConnectionStatus fail' . $radio_connection], 500);
+				(new ErrorController)->saveError(get_class($this), 500, 'API Error: getRadioConnectionStatus fail' . $radio_connection);
+				return response()->json(['message' => 'Server error'], 500);
 			}
 		}
 
-		return response()->json(['message' => 'setRadioConnectionStatus fail: ' . $command], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioConnectionStatus fail: ' . $command);
+		return response()->json(['message' => 'Server error'], 500);
 	}
 
 	/**
@@ -466,7 +480,8 @@ class RadioController extends Controller
 			return response()->json($radio_ref_threshold, 200);
 		}
 
-		return response()->json(['message' => 'getRadioRefThreshold fail: ' . $radio_ref_threshold], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: getRadioRefThreshold fail - ' . $radio_ref_threshold);
+		return response()->json(['message' => 'Server error'], 500);
 	}
 
 	/**
@@ -485,10 +500,12 @@ class RadioController extends Controller
 				return response($value, 200);
 			}
 
-			return response()->json(['message' => 'setRadioRefThreshold fail: ' . $radio_ref_threshold], 500);
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioRefThreshold fail: ' . $radio_ref_threshold);
+			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		return response()->json(['message' => 'setRadioRefThreshold out of limit - 0...1023: ' . $value], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioRefThreshold out of limit - 0...1023: ' . $value);
+		return response()->json(['message' => 'Server error'], 500);
 	}
 
 	/**
@@ -509,10 +526,12 @@ class RadioController extends Controller
 				return response($value, 200);
 			}
 
-			return response()->json(['message' => 'setRadioRefThresholdV fail: ' . $value], 500);
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioRefThresholdV fail - ' . $value);
+			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		return response()->json(['message' => 'setRadioRefThresholdV out of limit - 0...5: ' . $value], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioRefThresholdV out of limit - 0...5: ' . $value);
+		return response()->json(['message' => 'Server error'], 500);
 	}
 
 	/**
@@ -528,7 +547,8 @@ class RadioController extends Controller
 			return response(true, 200);
 		}
 
-		return response()->json(['message' => 'resetRadioProtection fail: ' . $radio_prot], 500);
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: resetRadioProtection fail: ' . $radio_prot);
+		return response()->json(['message' => 'Server error'], 500);
 	}
 
 	/**
@@ -539,11 +559,12 @@ class RadioController extends Controller
 	public function restoreRadioDefaults()
 	{
 		$output = explode("\n", exec_uc("restore_radio_defaults"))[0];
-		
+
 		if ($output == "OK") {
 			return response(true, 200);
 		}
-		
-		return response()->json(['message' => 'restoreRadioDefaults fail: ' . $output], 500);
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: restoreRadioDefaults fail: ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
 	}
 }
