@@ -49,7 +49,7 @@ class MessageController extends Controller
   {
 
     $this->validate($request, [
-      'orig' => 'required|array',
+      'orig' => 'required|string',
       'dest' => 'required|array',
       'name' => 'required|string',
       // 'text' => 'string',
