@@ -92,12 +92,8 @@ class MessageController extends Controller
     // Assures to delete the working path
     Storage::deleteDirectory('tmp/' . $message->id);
 
-    // set new origpath on outbox
-    $origpath = env('HERMES_OUTBOX') . '/' . $message->id . '.hmp';
-    $path = Storage::disk('local')->path($origpath);
-
-    $hmpsize = $this->createFile($message, $path, $origpath);
-    $message = $this->sentUUCPMessage($message, $origpath, $hmpsize, $path);
+    $file = $this->createFile($message);
+    $message = $this->sentUUCPMessage($message, $file['origpath'], $file['hmpsize'], $file['$path']);
 
     if ($message == 500) {
       return response()->json(['message' => 'Server error'], 500);
@@ -167,7 +163,7 @@ class MessageController extends Controller
     return response()->json(['message' => 'Server error'], 500);
   }
 
-  public function createFile($message, $path, $origpath)
+  public function createFile($message)
   {
 
     //$message = @json_decode(json_encode($messagefile), true);
@@ -207,6 +203,10 @@ class MessageController extends Controller
       return response()->json(['message' => 'Server error'], 500);
     }
 
+     // set new origpath on outbox
+     $origpath = env('HERMES_OUTBOX') . '/' . $message->id . '.hmp';
+     $path = Storage::disk('local')->path($origpath);
+
     //work path
     if (!env('HERMES_OUTBOX')) {
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes pack message Error: cant package the file' . $path);
@@ -219,7 +219,13 @@ class MessageController extends Controller
       return response()->json(['message' => 'Server error'], 500);
     }
 
-    return $hmpsize;
+    $file = [
+      'hmpsize' => $hmpsize,
+      'path' => $path,
+      'origpath' => $origpath
+    ];
+
+    return $file;
   }
 
   public function sentUUCPMessage($message, $origpath, $hmpsize, $path)
