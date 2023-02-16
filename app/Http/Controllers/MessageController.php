@@ -139,7 +139,8 @@ class MessageController extends Controller
     return response()->json(['message' => 'Server error'], 500);
   }
 
-  public function setPasswordFile($request, $message){
+  public function setPasswordFile($request, $message)
+  {
     if ($request->pass && $request->pass != '' && $request->pass != 'undefined') {
 
       $command = 'echo "' . $request->text . '"| gpg -o - -c -t --cipher-algo AES256 --utf8-strings --batch --passphrase "' . $request->pass . '"  --yes -';
@@ -158,9 +159,9 @@ class MessageController extends Controller
       $message->secure = true;
       $message->text = bin2hex($cryptout);
       $message->save();
-
-      return $message;
     }
+
+    return $message;
   }
 
   public function createFile($message)
@@ -207,9 +208,9 @@ class MessageController extends Controller
       return response()->json(['message' => 'Server error'], 500);
     }
 
-     // set new origpath on outbox
-     $origpath = env('HERMES_OUTBOX') . '/' . $message->id . '.hmp';
-     $path = Storage::disk('local')->path($origpath);
+    // set new origpath on outbox
+    $origpath = env('HERMES_OUTBOX') . '/' . $message->id . '.hmp';
+    $path = Storage::disk('local')->path($origpath);
 
     //work path
     if (!env('HERMES_OUTBOX')) {
@@ -235,7 +236,7 @@ class MessageController extends Controller
   public function sentUUCPMessage($message, $file)
   {
     // UUCP -C Copy  (default) / -d create dirs
-    if (!Storage::disk('local')->exists($file['origpath'] )) {
+    if (!Storage::disk('local')->exists($file['origpath'])) {
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes send message error - Cant find ' . $file['path']);
       return 500;
     }
