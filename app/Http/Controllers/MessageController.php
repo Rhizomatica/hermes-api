@@ -95,7 +95,7 @@ class MessageController extends Controller
     $file = $this->createFile($message);
     $message = $this->sentUUCPMessage($message, $file);
 
-    if ($message == 500) {
+    if (is_int($message) && $message == 500) {
       return response()->json(['message' => 'Server error'], 500);
     }
 
