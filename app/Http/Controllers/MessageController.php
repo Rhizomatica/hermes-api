@@ -230,16 +230,9 @@ class MessageController extends Controller
 
   public function sentUUCPMessage($message, $file)
   {
-
-    var_dump($file);
-    var_dump($file['origpath']);
-    var_dump($file['path']);
-    var_dump($file['hmpsize']);
-    die();
-
     // UUCP -C Copy  (default) / -d create dirs
     if (!Storage::disk('local')->exists($file['origpath'] )) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes send message error - Cant find ' . $path);
+      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes send message error - Cant find ' . $file['path']);
       return 500;
     }
     //send message by uucp
@@ -247,15 +240,15 @@ class MessageController extends Controller
       //check spool size
       $command = "uustat -s " . $dest . " -u www-data  | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
       $destspoolsize = exec_cli($command);
-      $destspoolsize = $hmpsize + intval($destspoolsize);
+      $destspoolsize = $file['hmpsize'] + intval($destspoolsize);
 
       if ($destspoolsize > env('HERMES_MAX_SPOOL')) {
-        $path = Storage::disk('local')->delete($origpath);
+        $file['path'] = Storage::disk('local')->delete($file['$origpath']);
         (new ErrorController)->saveError(get_class($this), 500, 'API Error: HMP spool larger than ' . env('HERMES_MAX_SPOOL') . ' bytes');
         return 500;
       }
 
-      $command = 'uucp -r -j -C -d \'' .  $path . '\' \'' . $dest . '!~/' . $message->orig . '_' . $message->id . '.hmp\'';
+      $command = 'uucp -r -j -C -d \'' .  $file['path'] . '\' \'' . $dest . '!~/' . $message->orig . '_' . $message->id . '.hmp\'';
 
       if (!$output = exec_cli_no($command)) {
         (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes sendMessage - Error on uucp:  ' . $output . ' - ' . $command);
@@ -270,7 +263,7 @@ class MessageController extends Controller
     }
 
     //delete hmp file
-    Storage::disk('local')->delete($origpath);
+    Storage::disk('local')->delete($file['origpath']);
     return $message;
   }
 }
