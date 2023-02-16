@@ -96,22 +96,7 @@ class MessageController extends Controller
     $origpath = env('HERMES_OUTBOX') . '/' . $message->id . '.hmp';
     $path = Storage::disk('local')->path($origpath);
 
-    //work path
-    if (!env('HERMES_OUTBOX')) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes pack message Error: cant package the file' . $path);
-      return response()->json(['message' => 'Server error'], 500);
-    }
-
-    // Clean outbox destination and move the package
-    if (!Storage::disk('local')->move('tmp/' . $message->id . '.hmp', $origpath)) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes pack message Error: cant package the file' . $path);
-      return response()->json(['message' => 'Server error'], 500);
-    }
-
-    //$message = @json_decode(json_encode($messagefile), true);
-    Storage::disk('local')->deleteDirectory('tmp/' . $message->id);
-
-    $hmpsize = $this->createFile($message);
+    $hmpsize = $this->createFile($message, $path, $origpath);
     $message = $this->sentUUCPMessage($message, $origpath, $hmpsize, $path);
 
     if ($message == 500) {
@@ -182,8 +167,12 @@ class MessageController extends Controller
     return response()->json(['message' => 'Server error'], 500);
   }
 
-  public function createFile($message)
+  public function createFile($message, $path, $origpath)
   {
+
+    //$message = @json_decode(json_encode($messagefile), true);
+    Storage::disk('local')->deleteDirectory('tmp/' . $message->id);
+
     // Write message file
     if (!Storage::disk('local')->put('tmp/' . $message->id . '/hmp.json', $message)) {
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: sendHMP can not write message file');
@@ -215,6 +204,18 @@ class MessageController extends Controller
       $path = Storage::disk('local')->delete($origpath);
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: HMP error - larger than ' . env('HERMES_MAX_FILE'));
 
+      return response()->json(['message' => 'Server error'], 500);
+    }
+
+    //work path
+    if (!env('HERMES_OUTBOX')) {
+      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes pack message Error: cant package the file' . $path);
+      return response()->json(['message' => 'Server error'], 500);
+    }
+
+    // Clean outbox destination and move the package
+    if (!Storage::disk('local')->move('tmp/' . $message->id . '.hmp', $origpath)) {
+      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes pack message Error: cant package the file' . $path);
       return response()->json(['message' => 'Server error'], 500);
     }
 
