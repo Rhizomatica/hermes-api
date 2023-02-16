@@ -16,6 +16,8 @@ class MessageController extends Controller
    */
   public function showAllMessagesByType($type)
   {
+    (new ErrorController)->saveError(get_class($this), 404, 'API Error: Job not found');
+
     if ($type == 'inbox') {
       return response()->json(Message::where('inbox', '=', true)->orderBy('sent_at')->get());
     }
@@ -240,6 +242,7 @@ class MessageController extends Controller
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes send message error - Cant find ' . $file['path']);
       return 500;
     }
+
     //send message by uucp
     foreach ($message->dest as $dest) {
       //check spool size
