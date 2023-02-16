@@ -67,31 +67,7 @@ class MessageController extends Controller
       return response()->json(['message' => 'Server error'], 500);
     }
 
-    //TODO - Create own function ()
-    if ($request->pass && $request->pass != '' && $request->pass != 'undefined') {
-
-      $command = 'echo "' . $request->text . '"| gpg -o - -c -t --cipher-algo AES256 --utf8-strings --batch --passphrase "' . $request->pass . '"  --yes -';
-
-      $cryptout = "";
-
-      $output = exec_cli($command);
-
-      if (!$output) {
-        (new ErrorController)->saveError(get_class($this), 500, 'API Error: sendHMP can not encrypt the message');
-        return response()->json(['message' => 'Server error'], 500);
-      }
-
-      $cryptout = $output; // redundant
-
-      $message->secure = true;
-      $message->text = bin2hex($cryptout);
-      $message->save();
-    }
-
-    //find the message in database
-    // Assures to delete the working path
-    Storage::deleteDirectory('tmp/' . $message->id);
-
+    $message = $this->setPasswordFile($request, $message);
     $file = $this->createFile($message);
     $message = $this->sentUUCPMessage($message, $file);
 
@@ -163,11 +139,39 @@ class MessageController extends Controller
     return response()->json(['message' => 'Server error'], 500);
   }
 
+  public function setPasswordFile($request, $message){
+    if ($request->pass && $request->pass != '' && $request->pass != 'undefined') {
+
+      $command = 'echo "' . $request->text . '"| gpg -o - -c -t --cipher-algo AES256 --utf8-strings --batch --passphrase "' . $request->pass . '"  --yes -';
+
+      $cryptout = "";
+
+      $output = exec_cli($command);
+
+      if (!$output) {
+        (new ErrorController)->saveError(get_class($this), 500, 'API Error: sendHMP can not encrypt the message');
+        return response()->json(['message' => 'Server error'], 500);
+      }
+
+      $cryptout = $output; // redundant
+
+      $message->secure = true;
+      $message->text = bin2hex($cryptout);
+      $message->save();
+
+      return $message;
+    }
+  }
+
   public function createFile($message)
   {
 
+    //find the message in database
+    // Assures to delete the working path
+    Storage::deleteDirectory('tmp/' . $message->id);
+
     //$message = @json_decode(json_encode($messagefile), true);
-    Storage::disk('local')->deleteDirectory('tmp/' . $message->id);
+    Storage::disk('local')->deleteDirectory('tmp/' . $message->id); //TODO - Again???
 
     // Write message file
     if (!Storage::disk('local')->put('tmp/' . $message->id . '/hmp.json', $message)) {
