@@ -93,7 +93,7 @@ class MessageController extends Controller
     Storage::deleteDirectory('tmp/' . $message->id);
 
     $file = $this->createFile($message);
-    $message = $this->sentUUCPMessage($message, $file['origpath'], $file['hmpsize'], $file['$path']);
+    $message = $this->sentUUCPMessage($message, $file);
 
     if ($message == 500) {
       return response()->json(['message' => 'Server error'], 500);
@@ -228,10 +228,17 @@ class MessageController extends Controller
     return $file;
   }
 
-  public function sentUUCPMessage($message, $origpath, $hmpsize, $path)
+  public function sentUUCPMessage($message, $file)
   {
+
+    var_dump($file);
+    var_dump($file['origpath']);
+    var_dump($file['path']);
+    var_dump($file['hmpsize']);
+    die();
+
     // UUCP -C Copy  (default) / -d create dirs
-    if (!Storage::disk('local')->exists($origpath)) {
+    if (!Storage::disk('local')->exists($file['origpath'] )) {
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes send message error - Cant find ' . $path);
       return 500;
     }
