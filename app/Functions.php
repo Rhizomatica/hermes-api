@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\ErrorController;
+
+
 function exec_cli($command)
 {
 	ob_start();
@@ -23,54 +26,63 @@ function exec_cli_no($command)
 	}
 }
 
-function exec_cli2($command)
-{
-	ob_start();
-	$output = system($command, $return_var);
-	if ($return_var != 0) {
-		$output = ob_get_contents();
-		ob_end_clean();
-		return ($output);
-	} else {
-		return false;
-	}
-}
+//TODO - Unused
+// function exec_cli2($command)
+// {
+// 	ob_start();
+// 	$output = system($command, $return_var);
+// 	if ($return_var != 0) {
+// 		$output = ob_get_contents();
+// 		ob_end_clean();
+// 		return ($output);
+// 	} else {
+// 		return false;
+// 	}
+// }
 
 function exec_uc($command)
 {
-	ob_start();
-	$ubitx_client = "/usr/bin/ubitx_client -c ";
-	$command = $ubitx_client . $command;
-	system($command, $return_var);
-	$output = ob_get_contents();
-	ob_end_clean();
-	return ($output);
-}
+	try {
+		ob_start();
+		$ubitx_client = "/usr/bin/ubitx_client -c ";
+		$command = $ubitx_client . $command;
+		system($command, $return_var);
+		$output = ob_get_contents();
+		ob_end_clean();
+		return ($output);
+	} catch (\Throwable $th) {
+		(new ErrorController)->saveError($_SERVER['PHP_SELF'], 500, 'API Error: UBITX Client error - ' . $th);
 
-function exec_ucr($command)
-{
-	ob_start();
-	$ubitx_client = "/usr/bin/ubitx_client -c ";
-	$command = $ubitx_client . $command;
-	system($command, $return_var);
-	$output = ob_get_contents();
-	ob_end_clean();
-	if ($return_var != 0) {
-		return false;
-	} else {
-		return true;
+		return 500;
 	}
 }
 
-function exec_nodename()
-{
+//TODO - Unused
+// function exec_ucr($command)
+// {
+// 	ob_start();
+// 	$ubitx_client = "/usr/bin/ubitx_client -c ";
+// 	$command = $ubitx_client . $command;
+// 	system($command, $return_var);
+// 	$output = ob_get_contents();
+// 	ob_end_clean();
+// 	if ($return_var != 0) {
+// 		return false;
+// 	} else {
+// 		return true;
+// 	}
+// }
 
-	$command = 'cat /etc/uucp/config|grep nodename|cut -f 2 -d " "';
-	$output = exec_uc($command);
-	$output = explode("\n", $output)[0];
+// TODO - Unused
+// function exec_nodename()
+// {
 
-	return $output;
-}
+// 	$command = 'cat /etc/uucp/config|grep nodename|cut -f 2 -d " "';
+// 	$output = exec_uc($command);
+// 	$output = explode("\n", $output)[0];
+
+// 	return $output;
+// }
 
 function swr($raw_ref, $raw_fwd)
 {

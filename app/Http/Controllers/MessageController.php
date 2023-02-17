@@ -69,8 +69,6 @@ class MessageController extends Controller
 
     $message = $this->setPasswordFile($request, $message);
     $file = $this->createFile($message);
-    var_dump($message->dest);
-    die();
     $message = $this->sentUUCPMessage($message, $file);
 
     if (is_int($message) && $message == 500) {
