@@ -98,3 +98,9 @@ $router->group(['prefix' => '/frequency'], function () use ($router) {
     $router->get('/alias/{alias}',  ['uses' => 'FrequenciesController@getFrequencyByAlias']);
     $router->put('{id}', ['uses' => 'FrequenciesController@updateFrequency']);
 });
+
+$router->group(['prefix' => '/customerrors'], function () use ($router) {
+    $router->get('',  ['uses' => 'ErrorsController@getCustomErrors']);
+});
+
+
