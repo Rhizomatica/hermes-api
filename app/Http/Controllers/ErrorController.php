@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Log;
-use App\Error;
-use Illuminate\Support\Facades\App;
+use App\CustomError;
 
 class ErrorController extends Controller
 {
 	public function getErrors()
 	{
-		return response()->json(Error::all());
+		return response()->json(CustomError::all());
 	}
 
 	// public function getErrorByUser($id)
@@ -23,7 +22,7 @@ class ErrorController extends Controller
 
 	public function saveError($controller, $error_code, $error_message, $stacktrace = null)
 	{
-		$error = new Error();
+		$error = new CustomError();
 		// $log->user_id = 0;
 		$error->controller = $controller;
 		$error->error_code = $error_code;
