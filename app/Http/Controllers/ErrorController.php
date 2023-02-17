@@ -23,8 +23,7 @@ class ErrorController extends Controller
 
 	public function saveError($controller, $error_code, $error_message, $stacktrace = null)
 	{
-		// $error = new Error;
-		$error = App::call([new Error, 'generate']);
+		$error = new Error();
 		// $log->user_id = 0;
 		$error->controller = $controller;
 		$error->error_code = $error_code;
