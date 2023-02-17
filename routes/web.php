@@ -100,7 +100,7 @@ $router->group(['prefix' => '/frequency'], function () use ($router) {
 });
 
 $router->group(['prefix' => '/customerrors'], function () use ($router) {
-    $router->get('',  ['uses' => 'ErrorsController@getCustomErrors']);
+    $router->get('',  ['uses' => 'ErrorController@getCustomErrors']);
 });
 
 
