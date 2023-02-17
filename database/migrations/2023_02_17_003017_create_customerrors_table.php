@@ -13,7 +13,7 @@ class CreateCustomerrorsTable extends Migration
      */
     public function up()
     {
-        Schema::create('customerrors', function (Blueprint $table) {
+        Schema::create('custom_errors', function (Blueprint $table) {
             $table->increments('id')->unique();
             // $table->integer('user_id')->nullable(false);
             $table->string('controller')->nullable(false);
