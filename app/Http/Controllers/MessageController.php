@@ -69,6 +69,8 @@ class MessageController extends Controller
 
     $message = $this->setPasswordFile($request, $message);
     $file = $this->createFile($message);
+    var_dump($message->dest);
+    die();
     $message = $this->sentUUCPMessage($message, $file);
 
     if (is_int($message) && $message == 500) {
@@ -243,8 +245,6 @@ class MessageController extends Controller
 
     //send message by uucp
     foreach ($message->dest as $dest) {
-      var_dump($dest);
-      die();
       //check spool size
       $command = "uustat -s " . $dest . " -u www-data  | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
       $destspoolsize = exec_cli($command);
