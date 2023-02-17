@@ -16,8 +16,6 @@ class MessageController extends Controller
    */
   public function showAllMessagesByType($type)
   {
-    (new ErrorController)->saveError(get_class($this), 404, 'API Error: Job not found');
-
     if ($type == 'inbox') {
       return response()->json(Message::where('inbox', '=', true)->orderBy('sent_at')->get());
     }
@@ -245,6 +243,8 @@ class MessageController extends Controller
 
     //send message by uucp
     foreach ($message->dest as $dest) {
+      var_dump($dest);
+      die();
       //check spool size
       $command = "uustat -s " . $dest . " -u www-data  | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
       $destspoolsize = exec_cli($command);
