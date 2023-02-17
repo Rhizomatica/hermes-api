@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateErrorTable extends Migration
+class CreateErrorsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateErrorTable extends Migration
      */
     public function up()
     {
-        Schema::create('error', function (Blueprint $table) {
+        Schema::create('errors', function (Blueprint $table) {
             $table->increments('id')->unique();
             // $table->integer('user_id')->nullable(false);
             $table->string('controller')->nullable(false);
@@ -21,6 +21,7 @@ class CreateErrorTable extends Migration
             $table->string('error_message')->nullable(true);
             $table->string('stacktrace')->nullable(true);
             $table->integer('station')->nullable(false);
+            $table->timestamps();
         });
     }
 
@@ -31,6 +32,6 @@ class CreateErrorTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('error');
+        Schema::dropIfExists('errors');
     }
 }
