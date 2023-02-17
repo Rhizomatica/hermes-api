@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Support\Facades\Log;
 use App\Error;
+use Illuminate\Support\Facades\App;
 
 class ErrorController extends Controller
 {
@@ -23,7 +23,8 @@ class ErrorController extends Controller
 
 	public function saveError($controller, $error_code, $error_message, $stacktrace = null)
 	{
-		$error = new Error;
+		// $error = new Error;
+		$error = App::call([new Error, 'generate']);
 		// $log->user_id = 0;
 		$error->controller = $controller;
 		$error->error_code = $error_code;
