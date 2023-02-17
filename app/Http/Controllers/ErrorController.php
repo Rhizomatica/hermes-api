@@ -22,6 +22,12 @@ class ErrorController extends Controller
 
 	public function saveError($controller, $error_code, $error_message, $stacktrace = null)
 	{
+
+		var_dump($controller);
+		var_dump($error_code);
+		var_dump($error_message);
+		die();
+
 		$error = new CustomError;
 		// $log->user_id = 0;
 		$error->controller = $controller;
