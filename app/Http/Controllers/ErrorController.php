@@ -8,7 +8,6 @@ class ErrorController extends Controller
 {
 	public function getCustomErrors()
 	{
-		$this->saveError(get_class($this), 500, 'API Error: Test');
 		return response()->json(CustomError::all());
 	}
 
