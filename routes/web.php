@@ -103,4 +103,8 @@ $router->group(['prefix' => '/customerrors'], function () use ($router) {
     $router->get('',  ['uses' => 'ErrorController@getCustomErrors']);
 });
 
+$router->group(['prefix' => '/wifi'], function () use ($router) {
+    $router->get('',  ['uses' => 'WifiController@getWiFiConfigurations']);
+    $router->post('',  ['uses' => 'WifiController@saveWiFiConfigurations']);
+});
 

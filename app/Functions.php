@@ -42,19 +42,19 @@ function exec_cli_no($command)
 
 function exec_uc($command)
 {
-	try {
-		ob_start();
-		$ubitx_client = "/usr/bin/ubitx_client -c ";
-		$command = $ubitx_client . $command;
-		system($command, $return_var);
-		$output = ob_get_contents();
-		ob_end_clean();
-		return ($output);
-	} catch (\Throwable $th) {
-		(new ErrorController)->saveError($_SERVER['PHP_SELF'], 500, 'API Error: UBITX Client error - ' . $th);
+	ob_start();
+	$ubitx_client = "/usr/bin/ubitx_client -c ";
+	$command = $ubitx_client . $command;
+	system($command, $return_var);
+	$output = ob_get_contents();
+	ob_end_clean();
 
+	if ($output == "WRONG_COMMAND") {
+		(new ErrorController)->saveError($_SERVER['PHP_SELF'], 500, 'API Error: UBITX Client error - ' . $output);
 		return 500;
 	}
+
+	return ($output);
 }
 
 //TODO - Unused
