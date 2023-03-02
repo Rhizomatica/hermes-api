@@ -19,16 +19,27 @@ class WiFiController extends Controller
 
 	public function saveWiFiConfigurations(Request $request)
 	{
-		$wiFiConfigurations = null;
-		$changeNameCLI = 'nmcli c modify "My Connection" connection.id "My favorite connection" connection.interface-name enp1s0';
+		$this->validate($request, [
+			'name' => 'required|string'
+		]);
 
-		$restartWifiCLI = 'shutdown -r now';
+		//TODO - Set default name to wifi (My Connection) or get from ...
+		$changeNameCLI = 'nmcli c modify "My Connection" connection.id ' . $request->name . ' connection.interface-name enp1s0';
 
-		//To apply changes after a modified connection using nmcli, activate again the connection by entering this command:
+		$newWifiName = explode("\n", exec_cli($changeNameCLI))[0];
 
-		$saveWifiConfigCLI ='nmcli con up con-name';
+		if($newWifiName == 'ERROR'){ //TODO - Check error return
+			return response()->json(['message' => 'Server error'], 500);
+		}
 
+		$saveWifiConfigCLI ='nmcli con up ' . $request->name;
 
-		return response()->json($wiFiConfigurations, 200);
+		$applyChanges = explode("\n", exec_cli($saveWifiConfigCLI))[0];
+
+		if($applyChanges == 'ERROR'){ //TODO - Check error return
+			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		return response()->json($applyChanges, 200);
 	}
 }
