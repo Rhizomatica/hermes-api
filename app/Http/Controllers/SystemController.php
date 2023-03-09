@@ -60,17 +60,17 @@ class SystemController extends Controller
 		$pidradio = explode("\n", exec_cli("pgrep -x ubitx_controlle"))[0];
 		$nodename = explode("\n", exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
 		$pidhmp = explode("\n", exec_cli("pgrep -x iwatch"))[0];
-		$piddb = explode("\n", exec_cli("pgrep -x mariadbd"))[0];
+		// $piddb = explode("\n", exec_cli("pgrep -x mariadbd"))[0];
 		$pidpf = explode("\n", exec_cli("pgrep -x master"))[0];
 		// $pidvnc = explode("\n", exec_cli("pgrep -x Xtigervnc"))[0];
 		$wifiessid = explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep ssid | cut -c6-"))[0];
-		$wifich = explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep channel| cut -c9-"))[0];
+		// $wifich = explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep channel| cut -c9-"))[0];
 		$ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''));
 		array_pop($ip);
-		$disk_free = explode("\n", exec_cli("df  / | grep -v Filesystem | awk '{print $4}'"))[0];
+		// $disk_free = explode("\n", exec_cli("df  / | grep -v Filesystem | awk '{print $4}'"))[0];
 		$interfaces = explode("\n", exec_cli('ip r'));
 		array_pop($interfaces);
-		$memory = explode(" ", exec_cli("free --mega| grep Mem | awk '{print ($2\" \"$3\" \"$4)}'"));
+		// $memory = explode(" ", exec_cli("free --mega| grep Mem | awk '{print ($2\" \"$3\" \"$4)}'"));
 		// $phpmemory = (!function_exists('memory_get_usage')) ? '0' : round(memory_get_usage() / 1024 / 1024, 2) . 'MB';
 
 		$status = [
@@ -84,19 +84,19 @@ class SystemController extends Controller
 			'ip' => $ip,
 			'interfaces' => $interfaces,
 			'wifiessid' => $wifiessid ? $wifiessid : false,
-			'wifich' => $wifich ? $wifich : false,
+			// 'wifich' => $wifich ? $wifich : false,
 			'interfaces' => $interfaces,
-			'piduu' => $piduu ? $piduu : false,
+			// 'piduu' => $piduu ? $piduu : false,
 			'piduuardop' => $piduuardop ? $piduuardop : false,
-			'pidmodem' => $pidmodem ? $pidmodem : false,
-			'pidradio' => $pidradio ? $pidradio : false,
-			'pidhmp' => $pidhmp ? $pidhmp : false,
-			'piddb' => $piddb ? $piddb : false,
-			'pidpf' => $pidpf ? $pidpf : false,
-			'memtotal' => $memory[0] . "MB",
-			'memused' => $memory[1] . "MB",
-			'memfree' => explode("\n", $memory[2])[0] . "MB",
-			'diskfree' => $disk_free ? $disk_free : false
+			// 'pidmodem' => $pidmodem ? $pidmodem : false,
+			// 'pidradio' => $pidradio ? $pidradio : false,
+			// 'pidhmp' => $pidhmp ? $pidhmp : false,
+			// 'piddb' => $piddb ? $piddb : false,
+			// 'pidpf' => $pidpf ? $pidpf : false,
+			// 'memtotal' => $memory[0] . "MB",
+			// 'memused' => $memory[1] . "MB",
+			// 'memfree' => explode("\n", $memory[2])[0] . "MB", //Wrong
+			// 'diskfree' => $disk_free ? $disk_free : false
 		];
 
 		return response()->json($status, 200);
