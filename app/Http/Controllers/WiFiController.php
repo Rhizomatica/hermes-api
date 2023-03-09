@@ -1,14 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Frequencies;
 use Illuminate\Http\Request;
 
 class WiFiController extends Controller
 {
 
-	public function getWifiConfigurations()
+	public function getWiFiConfigurations()
 	{
 		$wifiConfigCLI = "";
 		$wifiConfig = explode("\n", exec_cli($wifiConfigCLI))[0];
