@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 
 class WiFiController extends Controller
@@ -12,13 +13,11 @@ class WiFiController extends Controller
 
 		$parsed_cfg = explode("\n", $hostap_file);
 
-		foreach ($parsed_cfg as $i)
-		{
-			if (strpos($i, "=") !== false)
-			{
-				list($name,$value) = explode("=", $i, 2);
+		foreach ($parsed_cfg as $i) {
+			if (strpos($i, "=") !== false) {
+				list($name, $value) = explode("=", $i, 2);
 
-				if( $name == "channel" || $name == "ssid" || $name == "wpa_passphrase" )
+				if ($name == "channel" || $name == "ssid" || $name == "wpa_passphrase")
 					$wifi_settings[$name] = $value;
 			}
 		}
@@ -26,7 +25,7 @@ class WiFiController extends Controller
 		if (isset($wifi_settings['channel']) && isset($wifi_settings['ssid']) && isset($wifi_settings['wpa_passphrase']))
 			return response()->json($wifi_settings, 200);
 		else
-			return response()->json(['message' => 'Server error'], 500);}
+			return response()->json(['message' => 'Server error'], 500);
 	}
 
 	public function saveWiFiConfigurations(Request $request)
@@ -37,16 +36,16 @@ class WiFiController extends Controller
 			'wpa_passphrase' =>  'required|string'
 		]);
 
-        // copy("/etc/hostapd/hostapd.conf.head", "/etc/hostapd/hostapd.conf.head")
-        // exec()
+		// copy("/etc/hostapd/hostapd.conf.head", "/etc/hostapd/hostapd.conf.head")
+		// exec()
 
-        // exec('sudo systemctl restart hostapd', $output, $return_value);
+		// exec('sudo systemctl restart hostapd', $output, $return_value);
 
 
 		//if ($return_value != '0') {
-			return response()->json(['message' => 'Server error'], 500);
+		return response()->json(['message' => 'Server error'], 500);
 		//}
 
-        //	return response()->json($saveWifiConfigCLI, 200);
+		//	return response()->json($saveWifiConfigCLI, 200);
 	}
 }
