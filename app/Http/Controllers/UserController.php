@@ -255,15 +255,18 @@ class UserController extends Controller
 
 	public function verifyRequiredData($request)
 	{
+
 		$validated = $this->validate($request, [
-			'email' => 'required|unique:user',
+			'admin' => 'required',
+			'email' => 'required|unique:users',
 			'name' => 'required|max:255',
 			'password' => 'required|max:255',
-			'phone' => 'nullable|max:12'
+			'phone' => 'nullable|max:12',
+			'location' => 'nullable|max:32'
 		]);
 
 		if (!$validated) {
-			(new ErrorController)->saveError(get_class($this), 404, $validated);
+			(new ErrorController)->saveError(get_class($this), 500, $validated);
 			return false;
 		}
 
