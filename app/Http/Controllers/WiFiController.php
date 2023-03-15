@@ -37,16 +37,16 @@ class WiFiController extends Controller
 			'wpa_passphrase' =>  'required|string'
 		]);
 
-        // copy("/etc/hostapd/hostapd.conf.head", "/etc/hostapd/hostapd.conf.head")
-        // exec()
-
-        // exec('sudo systemctl restart hostapd', $output, $return_value);
-
-
-		//if ($return_value != '0') {
+		if (exec_cli_no("sudo cp /etc/hostapd/hostapd.conf.head /etc/hostapd/hostapd.conf") == false)
 			return response()->json(['message' => 'Server error'], 500);
-		//}
 
-        //	return response()->json($saveWifiConfigCLI, 200);
+		exec_cli("sudo sh -c \"echo channel={$channel} >> /etc/hostapd/hostapd.conf\"");
+		exec_cli("sudo sh -c \"echo ssid={$ssid} >> /etc/hostapd/hostapd.conf\"");
+		exec_cli("sudo sh -c \"echo wpa_passphrase={$wpa_passphrase} >> /etc/hostapd/hostapd.conf\"");
+
+		if (exec_cli_no('sudo systemctl restart hostapd') == false)
+			return response()->json(['message' => 'Server error'], 500);
+
+		return response(true, 200);
 	}
 }
