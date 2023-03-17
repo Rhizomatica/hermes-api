@@ -125,12 +125,6 @@ class UserController extends Controller
 		}
 		//FIM
 
-		if (!$this->verifyRequiredData($request)) {
-			(new ErrorController)->saveError(get_class($this), 504, 'Error: cant update without required data form');
-			return response()->json(['message' => 'Server error'], 504);
-		}
-
-		// TODO - Enviar email na requisicao
 		$user = User::firstWhere('email', $request['email']);
 
 		if (!$user) {
