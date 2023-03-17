@@ -125,7 +125,7 @@ class UserController extends Controller
 		}
 		//FIM
 
-		$user = User::firstWhere('email', $request['email']);
+		$user = User::firstWhere('email', $id);
 
 		if (!$user) {
 			(new ErrorController)->saveError(get_class($this), 504, 'Error: mail id not found on database');
