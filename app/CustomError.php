@@ -1,18 +1,18 @@
 <?php
 
 namespace App;
-
 use Illuminate\Database\Eloquent\Model;
 
-class System extends Model
+class CustomError extends Model
 {
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'host', 'allowfile'
+        'controller', 'error_code', 'error_message', 'stacktrace',
+        // 'user_id', 
+        'station', 'updated_at', 'created_at'
     ];
 }

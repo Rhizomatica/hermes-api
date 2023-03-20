@@ -3,11 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Frequencies;
-use Log;
 use Illuminate\Http\Request;
-
-
-use function PHPUnit\Framework\isEmpty;
 
 class FrequenciesController extends Controller
 {
@@ -19,26 +15,33 @@ class FrequenciesController extends Controller
 
 	public function getFrequency($id)
 	{
-		if (!$frequency = Frequencies::firstWhere('id', $id)) {
-			return response()->json(['message' => 'API show frequency error, cant find'], 404);
-		} else {
-			return response()->json($frequency, 200);
+		$frequency = Frequencies::firstWhere('id', $id);
+
+		if (!$frequency) {
+			(new ErrorController)->saveError(get_class($this), 404, 'API Error: User not find');
+			return response()->json(['message' => 'Not found'], 404);
 		}
+
+		return response()->json($frequency, 200);
 	}
 
 	public function getFrequencyByAlias($alias)
 	{
-		if (!$frequency = Frequencies::firstWhere('alias', $alias)) {
-			return response()->json(['message' => 'API show frequency error, cant find'], 404);
-		} else {
-			return response()->json($frequency, 200);
+		$frequency = Frequencies::firstWhere('alias', $alias);
+
+		if (!$frequency) {
+			(new ErrorController)->saveError(get_class($this), 404, 'API Error: Frequency not found');
+			return response()->json(['message' => 'Not found'], 404);
 		}
+
+		return response()->json($frequency, 200);
 	}
 
 	public function updateFrequency($id, Request $request)
 	{
 		if (empty($id)) {
-			return response()->json(['message' => 'API update frequency error: cant update frequency'], 500);
+			(new ErrorController)->saveError(get_class($this), 404, 'API Error: missing parameter (id)');
+			return response()->json(['message' => 'Missing parameter'], 404);
 		}
 
 		$this->validate($request, [
@@ -47,13 +50,14 @@ class FrequenciesController extends Controller
 			'enable' => 'required|boolean'
 		]);
 
-		if ($frequency = Frequencies::findOrFail($id)) {
+		$frequency = Frequencies::findOrFail($id);
+
+		if ($frequency) {
 			$frequency->update($request->all());
-			Log::info('update frequency' . $id);
 			return response()->json($request, 200);
-		} else {
-			Log::warning('frequency cant find to update' . $id);
-			return response()->json(['message' => 'cant find this frequency' . $id], 404);
 		}
+
+		(new ErrorController)->saveError(get_class($this), 404, 'API Error: frequency not found');
+		return response()->json(['message' => 'Not Found' . $id], 404);
 	}
 }

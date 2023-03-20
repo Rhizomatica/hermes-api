@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Log;
+use Illuminate\Support\Facades\Log;
 use App\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -16,17 +16,14 @@ class FileController extends Controller
 	 */
 	public function uploadFile(Request $request)
 	{
-		$validated = $this->validate($request, [
-			//'fileup' => 'required|file|max:' . env('HERMES_MAX_FILE') . '| mimes:jpg,png,ogg,mp3,mp4,wav',
+		//TODO - Improve validate
+		$this->validate($request, [
 			'fileup' => 'required|file',
 			'pass' => 'min:4|max:20'
 		]);
 
-		if(!$validated){
-		return response()->json(['message' => "The attached file don't match with the rules: "/* .validated.error */], 500);
-		}
-
 		$timestamp = time();
+
 		// get the file and info
 		$file = $request->file('fileup');
 		$filename = $file->getClientOriginalName();
@@ -38,89 +35,108 @@ class FileController extends Controller
 		// set external path
 		$path = '';
 		$imageout = '.vvc';
-        // $audioout = '.lpcnet';
-        $audioout = '.nesc';
-
+		$audioout = '.nesc';
 		$gpgout = '.gpg';
 
 		// get contents of the file on request
-		if ($contents = file_get_contents($request->fileup)) {
-			// Write a new file in tmp with a timestamp with contents
-			if (Storage::disk('local')->put($origpath, $contents)) {
-				$path = Storage::disk('local')->path($origpath);
+		$contents = file_get_contents($request->fileup);
 
-				// check for file types
-				// compress image
-				if (preg_match("/\bimage\b/i", $mimetype)) {
-					$command = 'compress_image.sh ' . $path . ' ' . $path . $imageout;
-					$output = exec_cli($command);
-					$filesize = explode(":", explode("\n", $output)[5])[1];
+		if (!$contents) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error fileup is a file? FILE:' . $request->fileup);
+			return response()->json(['message' => 'Server error'], 500);
+		}
 
-					// delete original file
-					if (!Storage::disk('local')->delete($origpath)) {
-						return response()->json(['message' => 'API: fileup error on delete original image file ' .  $path], 500);
-					}
-					$origpath = $origpath . $imageout;
-					$path = Storage::disk('local')->path($origpath);
-				}
-				// compress audio - script supports  wav mp3 or aac
-				elseif (preg_match("/\baudio\b/i", $mimetype)) {
-					$command = 'compress_audio.sh ' . $path . ' ' . $path . $audioout;
-					$output = exec_cli($command);
-					$path = Storage::disk('local')->path($origpath);
 
-					$filesize = explode(":", explode("\n", $output)[0])[1];
+		// Write a new file in tmp with a timestamp with contents
+		$newFile = Storage::disk('local')->put($origpath, $contents);
 
-					// delete original file
-					if (Storage::disk('local')->delete($origpath)) {
-						$origpath = $origpath . $audioout;
-						$path = Storage::disk('local')->path($origpath);
-					} else {
-						return response()->json(['message' => 'API: fileup error on delete original audio file ' .  $path], 500);
-					}
-				}
-			} else {
-				return response()->json(['message' => 'API: fileup error on write file' . 'tmp/' . $timestamp], 500);
+		if (!$newFile) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error on write file' . 'tmp/' . $timestamp);
+			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		$path = Storage::disk('local')->path($origpath);
+
+		//TODO - Create own function
+		// compress image
+		if (preg_match("/\bimage\b/i", $mimetype)) {
+			$command = 'compress_image.sh ' . $path . ' ' . $path . $imageout;
+			$output = exec_cli($command);
+			$filesize = explode(":", explode("\n", $output)[5])[1];
+
+			// delete original file
+			//TODO - create own function
+			$deleteOldFile = Storage::disk('local')->delete($origpath);
+
+			if (!$deleteOldFile) {
+				(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error on delete original image file ' .  $path);
+				return response()->json(['message' => 'Server error'], 500);
 			}
-		} else {
-			return response()->json(['message' => 'API: fileup error fileup is a file?'], 500);
+
+			$origpath = $origpath . $imageout;
+			$path = Storage::disk('local')->path($origpath);
+		}
+
+		// compress audio - script supports  wav mp3 or aac
+		if (preg_match("/\baudio\b/i", $mimetype)) {
+			$command = 'compress_audio.sh ' . $path . ' ' . $path . $audioout;
+			$output = exec_cli($command);
+			$filesize = explode(":", explode("\n", $output)[0])[1];
+
+			// delete original file
+			$deleteOldFile = Storage::disk('local')->delete($origpath);
+
+			if (!$deleteOldFile) {
+				(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error on delete original audio file ' .  $path);
+				return response()->json(['message' => 'Server error'], 500);
+			}
+
+			$origpath = $origpath . $audioout;
+			$path = Storage::disk('local')->path($origpath);
 		}
 
 		// secure the file
+		//TODO - Create own function
 		if ($request->pass &&  $request->pass != 'undefined') {
 			$command = 'gpg -o ' . $path . '.gpg -c  --cipher-algo AES256 --symmetric --batch --passphrase "' . $request->pass . '"  --yes ' . $path;
-			if ($output = exec_cli_no($command)) {
-				if (!Storage::disk('local')->delete($origpath)) {
-					return response()->json(['message' => 'API: fileup error on delete original file ' .  $path], 500);
-				}
-				$origpath = $origpath . $gpgout;
-			} else {
-				return response()->json(['message' => 'API: fileup error on encrypt the file: '], 500);
+
+			$output = exec_cli_no($command);
+
+			if (!$output) {
+				(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error on encrypt the file:' . $path);
+				return response()->json(['message' => 'Server error'], 500);
 			}
+
+			$deleteOldFile = Storage::disk('local')->delete($origpath);
+
+			if (!$deleteOldFile) {
+				(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error on delete original file :' . $path);
+				return response()->json(['message' => 'Server error'], 500);
+			}
+
+			$origpath = $origpath . $gpgout;
 			$secure = true;
 		} else {
 			$secure = 'none';
 		}
 
-		// Test and create uploads  folder if it doesn't exists
-		if (!Storage::disk('local')->exists('uploads')) {
-			if (!Storage::disk('local')->makeDirectory('uploads')) {
-				return response()->json(['message' => 'API: Error, can\'t find or create uploads dir'], 500);
-			}
+		// Test and create uploads folder if it doesn't exists
+		if (!Storage::disk('local')->exists('uploads') && !Storage::disk('local')->makeDirectory('uploads')) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: can not find or create uploads dir');
+			return response()->json(['message' => 'Server error'], 500);
 		}
 
 		// move the file
 		$internalfilename = explode('/', $origpath)[1];
 		$uploadpath = 'uploads/' . $internalfilename;
-		if (Storage::disk('local')->move($origpath, $uploadpath)) {
-			$filesize = Storage::disk('local')->size($uploadpath);
-			$path = Storage::disk('local')->path($uploadpath);
-		} else {
-			return response()->json(['message' => 'API: fileup error, couldnt complete and move the file: '], 500);
+
+		if (!Storage::disk('local')->move($origpath, $uploadpath)) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error, could not complete and move the file');
+			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		// Log fileup
-		Log::info('API file upload: ' . $filename . ' - ' . $internalfilename);
+		$filesize = Storage::disk('local')->size($uploadpath);
+		$path = Storage::disk('local')->path($uploadpath);
 
 		//finish and show return status
 		return response()->json([
@@ -134,7 +150,7 @@ class FileController extends Controller
 			'filesize' => $filesize,
 			'secure' => $secure,
 		], 200);
-	} // end uploadFile
+	}
 
 	/**
 	 * downloadFile
@@ -162,11 +178,9 @@ class FileController extends Controller
 		// handle file nameextension
 		$countdot = count(explode('.', $message->file));
 		if ($countdot > 1) {
-			if ($countdot > 1) {
-				$decompressext = '.' . explode('.', $message->file)[$countdot - 1];
-			} else {
-				$decompressext = '.' . explode('.', $message->file)[1];
-			}
+			$decompressext = '.' . explode('.', $message->file)[$countdot - 1];
+		} else {
+			$decompressext = '.' . explode('.', $message->file)[1];
 		}
 
 		// set path
@@ -180,30 +194,33 @@ class FileController extends Controller
 		$path = Storage::disk('local')->path($origpath);
 		$fullpathroot = Storage::disk('local')->path('/');
 
-		// verify if file is GPG cryptedj
-		$crypt = false;
 		// teste if message is secure and pass (i) exists
+		//TODO - Create own function
 		if ($message->secure  && $pass) {
 			$fullpath = $fullpathroot . 'tmp/' . $timestamp . $fileext;
 			$gppath = Storage::disk('local')->path('/');
 			$command = 'gpg -o  ' . $fullpath . ' -d --batch --passphrase "' . $pass . '"  --yes ' . $path;
 			exec_cli_no($command);
-			$crypt = true;
 			$origpath = 'tmp/' . $timestamp . $fileext;
 		}
 
 		// verify if file is image and decompress
+		//TODO - Create own function
 		if (preg_match("/\bvvc\b/i", $file)) {
 			$fullpath = $fullpathroot . $origpath;
+
 			// decompress image
-			$command = 'decompress_image.sh ' . $fullpath . ' ' . $fullpath . $decompressext;
 			// print "DEBUG uncompress command: " . $command. "\n";
-			if (exec_cli_no($command)) {
-				$origpath = $origpath . $decompressext;
-				$path = Storage::disk('local')->path($origpath);
-			} else {
-				return response()->json(['message' => 'API: download uncompres image error: '], 500);
+			$command = 'decompress_image.sh ' . $fullpath . ' ' . $fullpath . $decompressext;
+
+			if (!exec_cli_no($command)) {
+				(new ErrorController)->saveError("FileController", 500, 'API Error: download uncompres image error');
+				return response()->json(['message' => 'Server error'], 500);
 			}
+
+			$origpath = $origpath . $decompressext;
+			$path = Storage::disk('local')->path($origpath);
+
 			// get content of file
 			$content = Storage::disk('local')->get($origpath);
 
@@ -215,34 +232,38 @@ class FileController extends Controller
 				->header('Content-Disposition', 'inline; filename="' . $message->file)
 				->header('Cache-Control', 'max-age=60, must-revalidate');
 		}
+
 		// verify if file is audio  - LPCNET and decompress
 		elseif (preg_match("/\blpcnet\b/i", $file) || preg_match("/\bnesc\b/i", $file)) {
 			$fullpath = $fullpathroot . $origpath;
+
 			// decompress audio
 			// mount command to decompress audio
 			$command = 'decompress_audio.sh ' . $fullpath . ' ' . $fullpath . $decompressext;
 			$fullpath .= $decompressext;
 
 			// decompress audio
-			if (exec_cli_no($command)) {
-				$origpath = $origpath .  $decompressext;
-				$path = Storage::disk('local')->path($origpath);
-			} else {
-				return response()->json(['message' => 'API: download uncompres audio error: '], 500);
+			if (!exec_cli_no($command)) {
+				(new ErrorController)->saveError("FileController", 500, 'API Error:download uncompres audio error');
+				return response()->json(['message' => 'Server error'], 500);
 			}
+
+			$origpath = $origpath .  $decompressext;
+			$path = Storage::disk('local')->path($origpath);
 
 			// get content of file
 			$content = Storage::disk('local')->get($origpath);
+
 			// delete generated file
 			Storage::disk('local')->delete($origpath);
-			// return response($content);
+
 			return response($content)
 				->header('Content-Type', $message->mimetype)
 				->header('Pragma', 'public')
 				->header('Content-Disposition', 'inline; filename="' . $message->file)
 				->header('Cache-Control', 'max-age=60, must-revalidate');
+
 		} else {
-			// $fullpath = $fullpathroot . $origpath;
 			$content = Storage::disk('local')->get($origpath);
 			return response($content)
 				->header('Content-Type', $message->mimetype)
@@ -252,6 +273,7 @@ class FileController extends Controller
 		}
 	}
 
+
 	/**
 	 * cleanLostFiles
 	 * parameter: message id
@@ -259,22 +281,24 @@ class FileController extends Controller
 	 */
 	public static function deleteLostFiles()
 	{
-
 		// list files on upload
 		$list = ['uploads', 'downloads'];
 
 		foreach ($list as $path) {
 
 			$files = Storage::disk('local')->files($path);
+
 			foreach ($files as $file) {
-				if (!Message::where('fileid', '=', explode($path . '/', $file)[1])->first()) {
+
+				$message = Message::where('fileid', '=', explode($path . '/', $file)[1])->first();
+
+				if (!$message) {
 					$output[] = $file;
 					Storage::disk('local')->delete($file);
 				}
-
-				print "\n";
 			}
 		}
+
 		Storage::disk('local')->deleteDirectory('outbox');
 		Storage::disk('local')->deleteDirectory('tmp');
 
