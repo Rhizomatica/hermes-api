@@ -100,6 +100,115 @@ class MessageController extends Controller
   }
 
   /**
+   * unpackInboxMessage - Unpack Hermes Message Pack
+   * parameter: id and http request
+   *
+   * @return Json
+   */
+  public function unpackInboxMessage($arg)
+  {
+    $arga = explode('_', $arg);
+    $orig = $arga[0];
+    $id = $arga[1];
+    $id = explode('.', $id)[0];
+
+    $message = '';
+    // Test for tmp dir, if doesnt exist, creates it
+    if (!Storage::disk('local')->exists('inbox/tmp')) {
+      if (!Storage::disk('local')->makeDirectory('tmp')) {
+        return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find or create tmp dir'], 500);
+      }
+    }
+    // Test for HMP file and unpack it
+    if (Storage::disk('local')->exists('inbox/' . $orig  . '_' . $id . '.hmp')) {
+      // Get path, unpack into tmp and read message data
+      $path = Storage::disk('local')->path('');
+      $command  = 'tar xvfz ' .  $path . 'inbox/' . $orig . '_' . $id  . '.hmp' . ' -C ' . $path . 'tmp/';
+      $output = exec_cli($command);
+      $files[] = explode(' ', $output);
+
+      // Test for HMP: hermes message package, create record on messages database
+      if (Storage::disk('local')->exists('tmp/' . $id . '/hmp.json')) {
+        $messagefile = json_decode(Storage::disk('local')->get('tmp/' . $id . '/hmp.json'));
+        $message = @json_decode(json_encode($messagefile), true);
+        // force reset id to get the next from db
+        $message['id'] = null;
+        // force inbox flag
+        $message['inbox'] = true;
+      } else {
+        return response()->json(['message' => 'Hermes unpack inbox message Error: cant find json file from unpacked message'], 500);
+      }
+
+      //create message on database, delete tar and hmp
+      if (!$message = Message::create($message)) {
+        return response()->json(['message' => 'Hermes unpack inbox message Error: cant create message on db'], 500);
+      }
+
+      // Move attached files
+      // test for field file and fileid in message
+      if ($message['file'] && $message['fileid']) {
+        // test if file exists
+        if (Storage::disk('local')->exists('tmp/' . $id . '/' . $message['fileid'])) {
+          // Test and create download folder if it doesn't exists
+          if (!Storage::disk('local')->exists('downloads')) {
+            if (!Storage::disk('local')->makeDirectory('downloads')) {
+              return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find or create downloads dir'], 500);
+            }
+          }
+          // movefile
+          if (!Storage::disk('local')->move('tmp/' . $id . '/' .  $message['fileid'], 'downloads/' . $message['fileid'])) {
+            return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t move imagefile'], 500);
+          }
+          // TODO move audio and other files
+        }
+      }
+
+      if (env('MAIL_FROM_NAME')) {
+
+        $data = array(
+          'name' => $message['name'],
+          'text' => $message['text'],
+          'file' => $message['file'],
+          'fileid' => $message['fileid'],
+          'mimetype' => $message['mimetype'],
+          'sent_at' => $message['sent_at'],
+          'orig' => $message['orig'],
+          'dest' => $message['dest']
+        );
+
+        // $data = array('dest'=>$message['dest']);
+        // $data = array('orig'=>$message['orig']);
+        // $data = array('sent_at'=>$message['sent_at']);
+
+        Mail::send('mail', $data, function ($message) {
+          // $subject = 'Hermes HMP: ' . $message->subject;
+          $message->to(env('HERMES_FWD_EMAIL'))->subject('HERMES Public message ');
+          //  $message->from('selva@snamservices.com','Selvakumar');
+        });
+      }
+
+      if (Storage::disk('local')->exists('tmp/' . $id)) {
+        if (!Storage::disk('local')->deleteDirectory('tmp/' .  $id)) {
+          return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t delete tmp dir'], 500);
+        }
+        // $fullpath = Storage::disk('local')->path('inbox/'. $orig . '_' . $message['id'] . '.hmp');
+        $fullpath = Storage::disk('local')->path('inbox/' . $arg);
+        $command = 'sudo rm -f ' . $fullpath;
+        if (!exec_cli_no($command)) {
+          return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t delete orig file'], 500);
+        }
+      } else {
+        return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t create message on database'], 500);
+      }
+    } else {
+      return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find HMP'], 500);
+    }
+    Log::info('API unpack  ' . $id  . ' - ' . $message .  ' from ' . $orig);
+
+    return response()->json(['message' => $message], 200);
+  }
+
+  /**
    * unCrypt text message
    * parameter: message id, $request->pass
    * @return Json
