@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Log;
 use App\CustomError;
 
@@ -32,5 +33,24 @@ class ErrorController extends Controller
 		$customError->save();
 
 		Log::error($error_message);
+	}
+
+	public function deleteCustomError($id)
+	{
+		if (!$id) {
+			$this->saveError('ErrorController', 404, 'Missing parameter ID to delete custom error');
+			return response()->json(['data' => 'Not found'], 404);
+		}
+
+		$error = CustomError::findOrFail($id);
+
+		if (!$error->id) {
+			$this->saveError('ErrorController', 404, 'Custom error not found');
+			return response()->json(['data' => 'Not found'], 404);
+		}
+
+		$error->delete();
+
+		return response()->json(['data' => 'Success'], 200);
 	}
 }
