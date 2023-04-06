@@ -116,7 +116,8 @@ class MessageController extends Controller
     // Test for tmp dir, if doesnt exist, creates it
     if (!Storage::disk('local')->exists('inbox/tmp')) {
       if (!Storage::disk('local')->makeDirectory('tmp')) {
-        return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find or create tmp dir'], 500);
+        (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes unpack inbox message Error: can\'t find or create tmp dir');
+        return response()->json(['message' => 'Server error'], 500);
       }
     }
     // Test for HMP file and unpack it
@@ -136,12 +137,14 @@ class MessageController extends Controller
         // force inbox flag
         $message['inbox'] = true;
       } else {
-        return response()->json(['message' => 'Hermes unpack inbox message Error: cant find json file from unpacked message'], 500);
+        (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: cant find json file from unpacked message');
+        return response()->json(['message' => 'Server error'], 500);
       }
 
       //create message on database, delete tar and hmp
       if (!$message = Message::create($message)) {
-        return response()->json(['message' => 'Hermes unpack inbox message Error: cant create message on db'], 500);
+        (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: cant create message on db');
+        return response()->json(['message' => 'Server error'], 500);
       }
 
       // Move attached files
@@ -152,12 +155,14 @@ class MessageController extends Controller
           // Test and create download folder if it doesn't exists
           if (!Storage::disk('local')->exists('downloads')) {
             if (!Storage::disk('local')->makeDirectory('downloads')) {
-              return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find or create downloads dir'], 500);
+              (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t find or create downloads dir');
+              return response()->json(['message' => 'Server error'], 500);
             }
           }
           // movefile
           if (!Storage::disk('local')->move('tmp/' . $id . '/' .  $message['fileid'], 'downloads/' . $message['fileid'])) {
-            return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t move imagefile'], 500);
+            (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t move imagefile');
+            return response()->json(['message' => 'Server error'], 500);
           }
           // TODO move audio and other files
         }
@@ -189,19 +194,23 @@ class MessageController extends Controller
 
       if (Storage::disk('local')->exists('tmp/' . $id)) {
         if (!Storage::disk('local')->deleteDirectory('tmp/' .  $id)) {
-          return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t delete tmp dir'], 500);
+          (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t delete tmp dir');
+          return response()->json(['message' => 'Server error'], 500);
         }
         // $fullpath = Storage::disk('local')->path('inbox/'. $orig . '_' . $message['id'] . '.hmp');
         $fullpath = Storage::disk('local')->path('inbox/' . $arg);
         $command = 'sudo rm -f ' . $fullpath;
         if (!exec_cli_no($command)) {
-          return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t delete orig file'], 500);
+          (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t delete orig file');
+          return response()->json(['message' => 'Server error'], 500);
         }
       } else {
-        return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t create message on database'], 500);
+        (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t create message on database');
+        return response()->json(['message' => 'Server error'], 500);
       }
     } else {
-      return response()->json(['message' => 'Hermes unpack inbox message Error: can\'t find HMP'], 500);
+      (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t find HMP');
+      return response()->json(['message' => 'Server error'], 500);
     }
     Log::info('API unpack  ' . $id  . ' - ' . $message .  ' from ' . $orig);
 
