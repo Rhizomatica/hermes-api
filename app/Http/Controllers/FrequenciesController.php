@@ -27,7 +27,7 @@ class FrequenciesController extends Controller
 
 	public function getFrequencyByAlias($alias)
 	{
-		$frequency = Frequencies::firstWhere('alias', $alias);
+		$frequency = Frequencies::firstWhere('alias', $alias)->orderBy('created_at')->get();
 
 		if (!$frequency) {
 			(new ErrorController)->saveError(get_class($this), 404, 'API Error: Frequency not found');
