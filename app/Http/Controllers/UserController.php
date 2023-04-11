@@ -31,20 +31,20 @@ class UserController extends Controller
 		// do we need this?
 		$request['email'] = strtolower($request['email']);
 
-        // do we need this?
-        $request['pass'] = $request['password'];
+		$pass = $request['password'];
+		$email = $request['email'] . '@' . env('HERMES_DOMAIN');
+
 		$request['password'] = hash('sha256', $request['password']);
-		$request['emailid'] = 0;
+		// $request['emailid'] = 0;
 
 		$user = User::create($request->all());
 
 		if (!$user) {
-			$client->logout($session_id);
 			(new ErrorController)->saveError(get_class($this), 500, 'Error: Create user error: can not create user');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-        // call here email_create_user $request['email'] $request['pass']
+		exec_cli_no("email_create_user {$email} {$pass}");
 
         return response()->json(['data' => 'success'], 201);
 		// return response()->json(0, 201); //Created
@@ -59,6 +59,9 @@ class UserController extends Controller
 			return response()->json(['message' => 'Server error'], 504);
 		}
 
+		$pass = $request['password'];
+		$email = $request['email'] . '@' . env('HERMES_DOMAIN');
+
         $request['password'] = hash('sha256', $request['password']);
 		$request->request->remove('email'); //Can't update email (remove)
 		// unset($request['email']); //Se nao funcionar o anterior
@@ -69,7 +72,7 @@ class UserController extends Controller
 			return response()->json(['message' => 'Server error'], 501);
 		}
 
-        // call here email_create_user $request['email'] $request['pass']
+		exec_cli_no("email_update_user {$email} {$pass}");
 
 		return response()->json($user, 200);
 
@@ -80,19 +83,21 @@ class UserController extends Controller
         // why here is not using the id?
 		$user = User::firstWhere('email', $mail);
 
-        // totally wrong... we should test the email
-		if (!$user || $user->name == 'root') {
+		// separate here, if the user is root, dont error out, just dont delete it, and the UI should show a graceful message
+		if (!$user || $user->email == 'root') {
 			(new ErrorController)->saveError(get_class($this), 500, 'API delete user error: cant delete USER');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-        $user->delete();
+		$user->delete();
 
-        // here we call email_delete_user email
+		$email = $mail . '@' . env('HERMES_DOMAIN');
 
-        return response()->json(0, 200);
+		exec_cli_no("email_delete_user {$email}");
 
-}
+		return response()->json(0, 200);
+
+    }
 
 
 	/**
