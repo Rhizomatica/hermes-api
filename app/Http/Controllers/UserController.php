@@ -44,7 +44,7 @@ class UserController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		exec_cli_no("email_create_user {$email} {$pass}");
+		exec_cli_no("sudo email_create_user {$email} {$pass}");
 
         return response()->json(['data' => 'success'], 201);
 		// return response()->json(0, 201); //Created
@@ -72,7 +72,7 @@ class UserController extends Controller
 			return response()->json(['message' => 'Server error'], 501);
 		}
 
-		exec_cli_no("email_update_user {$email} {$pass}");
+		exec_cli_no("sudo email_update_user {$email} {$pass}");
 
 		return response()->json($user, 200);
 
@@ -93,7 +93,7 @@ class UserController extends Controller
 
 		$email = $mail . '@' . env('HERMES_DOMAIN');
 
-		exec_cli_no("email_delete_user {$email}");
+		exec_cli_no("sudo email_delete_user {$email}");
 
 		return response()->json(0, 200);
 
