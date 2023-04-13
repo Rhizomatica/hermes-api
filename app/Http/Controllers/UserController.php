@@ -28,14 +28,18 @@ class UserController extends Controller
 
 	public function create(Request $request)
 	{
-		// do we need this?
 		$request['email'] = strtolower($request['email']);
+
+		$user = User::firstWhere('email', $request['email']);
+		if ($user) {
+			(new ErrorController)->saveError(get_class($this), 504, 'Error: User already exists');
+			return response()->json(['message' => 'Server error'], 504);
+		}
 
 		$pass = $request['password'];
 		$email = $request['email'] . '@' . env('HERMES_DOMAIN');
 
 		$request['password'] = hash('sha256', $request['password']);
-		// $request['emailid'] = 0;
 
 		$user = User::create($request->all());
 
@@ -46,8 +50,7 @@ class UserController extends Controller
 
 		exec_cli_no("sudo email_create_user {$email} {$pass}");
 
-        return response()->json(['data' => 'success'], 201);
-		// return response()->json(0, 201); //Created
+		return response()->json(['data' => 'success'], 201);
 	}
 
 	public function update($id, Request $request)
@@ -68,7 +71,7 @@ class UserController extends Controller
 		$user = $user->update($request->all());
 
 		if (!$user) {
-			(new ErrorController)->saveError(get_class($this), 501, 'API update error: ispconfig updated but not local database');
+			(new ErrorController)->saveError(get_class($this), 501, 'Error: User could not be updated');
 			return response()->json(['message' => 'Server error'], 501);
 		}
 
