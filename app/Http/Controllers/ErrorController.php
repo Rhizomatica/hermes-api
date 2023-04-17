@@ -35,11 +35,11 @@ class ErrorController extends Controller
 		Log::error($error_message);
 	}
 
-	public function deleteCustomError($id)
+	public function deleteCustomError($id = null)
 	{
 		if (!$id) {
-			$this->saveError('ErrorController', 404, 'Missing parameter ID to delete custom error');
-			return response()->json(['data' => 'Not found'], 404);
+			CustomError::truncate();
+			return response()->json(['data' => 'Success'], 200);
 		}
 
 		$error = CustomError::findOrFail($id);
@@ -53,4 +53,5 @@ class ErrorController extends Controller
 
 		return response()->json(['data' => 'Success'], 200);
 	}
+
 }

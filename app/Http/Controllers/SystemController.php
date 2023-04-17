@@ -67,7 +67,7 @@ class SystemController extends Controller
 		// $wifich = explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep channel| cut -c9-"))[0];
 		$ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''));
 		array_pop($ip);
-		// $disk_free = explode("\n", exec_cli("df  / | grep -v Filesystem | awk '{print $4}'"))[0];
+		$disk_free = explode("\n", exec_cli("df  / | grep -v Filesystem | awk '{print $4}'"))[0];
 		$interfaces = explode("\n", exec_cli('ip r'));
 		array_pop($interfaces);
 		// $memory = explode(" ", exec_cli("free --mega| grep Mem | awk '{print ($2\" \"$3\" \"$4)}'"));
@@ -96,7 +96,7 @@ class SystemController extends Controller
 			// 'memtotal' => $memory[0] . "MB",
 			// 'memused' => $memory[1] . "MB",
 			// 'memfree' => explode("\n", $memory[2])[0] . "MB", //Wrong
-			// 'diskfree' => $disk_free ? $disk_free : false
+			'diskfree' => $disk_free ? $disk_free : false
 		];
 
 		return response()->json($status, 200);
