@@ -102,7 +102,7 @@ $router->group(['prefix' => '/frequency'], function () use ($router) {
 $router->group(['prefix' => '/customerrors'], function () use ($router) {
     $router->get('',  ['uses' => 'ErrorController@getCustomErrors']);
     $router->delete('{id}', ['uses' => 'ErrorController@deleteCustomError']);
-    $router->delete('/all', ['uses' => 'ErrorController@deleteCustomError']);
+    $router->delete('', ['uses' => 'ErrorController@deleteCustomError']);
 });
 
 $router->group(['prefix' => '/wifi'], function () use ($router) {
