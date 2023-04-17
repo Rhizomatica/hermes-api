@@ -35,7 +35,7 @@ class ErrorController extends Controller
 		Log::error($error_message);
 	}
 
-	public function deleteCustomError($id)
+	public function deleteCustomError($id = null)
 	{
 		if (!$id) {
 			CustomError::truncate();
