@@ -19,7 +19,7 @@ class UserController extends Controller
 	public function showOneUser($id)
 	{
 		if (!$user = User::firstWhere('email', $id)) {
-			(new ErrorController)->saveError(get_class($this), 404, 'Error: showOneUser error: can not find user');
+			(new ErrorController)->saveError(get_class($this), 404, 'Could not find user');
 			return response()->json(['message' => 'Not found'], 404);
 		} else {
 			return response()->json(['message' => $user], 200);
@@ -32,8 +32,8 @@ class UserController extends Controller
 
 		$user = User::firstWhere('email', $request['email']);
 		if ($user) {
-			(new ErrorController)->saveError(get_class($this), 504, 'Error: User already exists');
-			return response()->json(['message' => 'Server error'], 504);
+			(new ErrorController)->saveError(get_class($this), 409, 'User already exists');
+			return response()->json(['message' => 'Server error'], 409);
 		}
 
 		$pass = $request['password'];
@@ -44,7 +44,7 @@ class UserController extends Controller
 		$user = User::create($request->all());
 
 		if (!$user) {
-			(new ErrorController)->saveError(get_class($this), 500, 'Error: Create user error: can not create user');
+			(new ErrorController)->saveError(get_class($this), 500, 'Could not create user');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
@@ -58,8 +58,8 @@ class UserController extends Controller
 		$user = User::firstWhere('id', $id);
 
 		if (!$user) {
-			(new ErrorController)->saveError(get_class($this), 504, 'Error: User id not found on database');
-			return response()->json(['message' => 'Server error'], 504);
+			(new ErrorController)->saveError(get_class($this), 404, 'User id not found on database');
+			return response()->json(['message' => 'Server error'], 404);
 		}
 
 		$pass = $request['password'];
@@ -71,8 +71,8 @@ class UserController extends Controller
 		$user = $user->update($request->all());
 
 		if (!$user) {
-			(new ErrorController)->saveError(get_class($this), 501, 'Error: User could not be updated');
-			return response()->json(['message' => 'Server error'], 501);
+			(new ErrorController)->saveError(get_class($this), 500, 'User could not be updated');
+			return response()->json(['message' => 'Server error'], 500);
 		}
 
 		exec_cli_no("sudo email_update_user {$email} {$pass}");
@@ -88,8 +88,8 @@ class UserController extends Controller
 
 		// separate here, if the user is root, dont error out, just dont delete it, and the UI should show a graceful message
 		if (!$user || $user->email == 'root') {
-			(new ErrorController)->saveError(get_class($this), 500, 'API delete user error: cant delete USER');
-			return response()->json(['message' => 'Server error'], 500);
+			(new ErrorController)->saveError(get_class($this), 403, 'API cant delete USER root');
+			return response()->json(['message' => 'Server error'], 403);
 		}
 
 		$user->delete();
@@ -118,18 +118,16 @@ class UserController extends Controller
 		$user = User::firstWhere('email', $request->email);
 
 		if (!$user) {
-			(new ErrorController)->saveError(get_class($this), 404, 'API user login - wrong user');
+			(new ErrorController)->saveError(get_class($this), 404, 'API user login - user not found');
 			return response()->json(['message' => 'Not found'], 404);
 		}
 
 		if ($user['password'] !== hash('sha256', $request->password)) { //sucessfull login
-			(new ErrorController)->saveError(get_class($this), 420, 'API user login - wrong password');
-			return response()->json(['message' => 'Server error'], 420);
+			(new ErrorController)->saveError(get_class($this), 500, 'API user login - wrong password');
+			return response()->json(['message' => 'Server error'], 500);
 		}
 
 		unset($user['password']);
-		// unset($user['recoverphrase']); //TODO - Remove field
-		// unset($user['recoveranswer']); //TODO - Remove field
 		unset($user['created_at']);
 		unset($user['updated_at']);
 
@@ -150,7 +148,7 @@ class UserController extends Controller
 		]);
 
 		if (!$validated) {
-			(new ErrorController)->saveError(get_class($this), 500, $validated);
+			(new ErrorController)->saveError(get_class($this), 412, $validated);
 			return false;
 		}
 
