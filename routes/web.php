@@ -103,6 +103,7 @@ $router->group(['prefix' => '/customerrors'], function () use ($router) {
     $router->get('',  ['uses' => 'ErrorController@getCustomErrors']);
     $router->delete('{id}', ['uses' => 'ErrorController@deleteCustomError']);
     $router->delete('', ['uses' => 'ErrorController@deleteCustomError']);
+    $router->post('', ['uses' => 'ErrorController@saveError']);
 });
 
 $router->group(['prefix' => '/wifi'], function () use ($router) {
