@@ -217,7 +217,7 @@ class RadioController extends Controller
 		$output = explode("\n", $output)[0];
 
 		if ($output == "OK") {
-			return response()->json("setRadioPTT: " . $status . " - " . $output, 200);
+			return response()->json($status, 200);
 		}
 
 		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioPTT - ' . $output);
