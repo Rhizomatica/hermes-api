@@ -592,14 +592,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function updateStep(Request $request)
+	public function updateStep($step)
 	{
 
-		$this->validate($request, [
-			'step' => 'required|number'
-		]);
+		if (!$step) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing step value');
+			return response()->json(['message' => 'Server error'], 500);
+		}
 
-		$output = explode("\n", exec_uc("sbitx_client -c set_freqstep -a " . $request->step))[0];
+		$output = explode("\n", exec_uc("sbitx_client -c set_freqstep -a " . $step))[0];
 
 		if ($output == "OK") {
 			return response(true, 200);
