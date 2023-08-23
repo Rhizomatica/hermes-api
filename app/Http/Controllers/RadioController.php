@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+
 class RadioController extends Controller
 {
 	/**
@@ -565,6 +567,46 @@ class RadioController extends Controller
 		}
 
 		(new ErrorController)->saveError(get_class($this), 500, 'API Error: restoreRadioDefaults fail: ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	/**
+	 * Get change frequency step
+	 *
+	 * @return Json
+	 */
+	public function getStep()
+	{
+		$output = explode("\n", exec_uc("sbitx_client -c get_freqstep"))[0];
+
+		if ($output == "OK") {
+			return response($output, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Get step change frequency error - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	/**
+	 * Update change frequency step
+	 *
+	 * @return Json
+	 */
+	public function updateStep(Request $request)
+	{
+
+		if ($request['step'] == null) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing step value');
+			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		$output = explode("\n", exec_uc("sbitx_client -c set_freqstep -a " . $request['step']))[0];
+
+		if ($output == "OK") {
+			return response(true, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Update step change frequency error - ' . $output);
 		return response()->json(['message' => 'Server error'], 500);
 	}
 }

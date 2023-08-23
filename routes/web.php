@@ -86,6 +86,8 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('refthresholdv/{value}',  ['uses' => 'RadioController@setRadioRefThresholdV']);
     $router->post('protection',  ['uses' => 'RadioController@resetRadioProtection']);
     $router->post('default',  ['uses' => 'RadioController@restoreRadioDefaults']);
+    $router->get('step',  ['uses' => 'RadioController@getStep']);
+    $router->post('step',  ['uses' => 'RadioController@updateStep']);
 });
 
 $router->group(['prefix' => '/geolocation'], function () use ($router) {
