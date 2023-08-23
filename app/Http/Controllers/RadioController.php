@@ -579,7 +579,7 @@ class RadioController extends Controller
 	{
 		$output = explode("\n", exec_uc("sbitx_client -c get_freqstep"))[0];
 
-		if ($output == "OK") {
+		if (is_string($output)) {
 			return response($output, 200);
 		}
 
