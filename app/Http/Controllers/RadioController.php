@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+
 class RadioController extends Controller
 {
 	/**
@@ -217,7 +219,7 @@ class RadioController extends Controller
 		$output = explode("\n", $output)[0];
 
 		if ($output == "OK") {
-			return response()->json("setRadioPTT: " . $status . " - " . $output, 200);
+			return response()->json($status, 200);
 		}
 
 		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioPTT - ' . $output);
@@ -565,6 +567,85 @@ class RadioController extends Controller
 		}
 
 		(new ErrorController)->saveError(get_class($this), 500, 'API Error: restoreRadioDefaults fail: ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	/**
+	 * Get frequency step
+	 *
+	 * @return Json
+	 */
+	public function getStep()
+	{
+		$output = explode("\n", exec_uc("sbitx_client -c get_freqstep"))[0];
+
+		if (is_string($output)) {
+			return response($output, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Get step change frequency error - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	/**
+	 * Update change frequency step
+	 *
+	 * @return Json
+	 */
+	public function updateStep($step)
+	{
+
+		if (!$step) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing step value');
+			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		$output = explode("\n", exec_uc("sbitx_client -c set_freqstep -a " . $step))[0];
+
+		if ($output == "OK") {
+			return response(true, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Update step change frequency error - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	/**
+	 * Get volume
+	 *
+	 * @return Json
+	 */
+	public function getVolume()
+	{
+		$output = explode("\n", exec_uc("sbitx_client get_volume"))[0];
+
+		if (is_string($output)) {
+			return response($output, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Get step change frequency error - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	/**
+	 * Update change radio volume
+	 *
+	 * @return Json
+	 */
+	public function changeVolume($volume) 
+	{
+		if (!$volume) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing volume value');
+			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		$output = explode("\n", exec_uc("sbitx_client set_volume" . $volume))[0];
+
+		if ($output == "OK") {
+			return response(true, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Change volume radio error - ' . $output);
 		return response()->json(['message' => 'Server error'], 500);
 	}
 }

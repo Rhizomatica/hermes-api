@@ -10,7 +10,12 @@ class WiFiController extends Controller
 	public function getWiFiConfigurations()
 	{
 		$hostap_file = file_get_contents("/etc/hostapd/hostapd.conf", false);
-
+		
+		if (!$hostap_file) {
+			(new ErrorController)->saveError(get_class($this), 500, 'Error: WiFi settings are unavailable');
+			return response()->json(['message' => 'Server error'], 500);
+		}
+		
 		$parsed_cfg = explode("\n", $hostap_file);
 
 		foreach ($parsed_cfg as $i) {
@@ -44,7 +49,7 @@ class WiFiController extends Controller
 
 		// $wifiRestart = 
 		exec_cli_no("sudo systemctl restart hostapd");
-		
+
 		// if ($wifiRestart == false) {
 		// 	(new ErrorController)->saveError(get_class($this), 500, 'Error: could not restart WiFi device');
 		// 	return response()->json(['message' => 'Server error'], 500);
