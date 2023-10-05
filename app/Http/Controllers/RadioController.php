@@ -639,7 +639,7 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		$output = explode("\n", exec_uc("sbitx_client set_volume" . $volume))[0];
+		$output = explode("\n", exec_uc("sbitx_client set_volume -a " . $volume))[0];
 
 		if ($output == "OK") {
 			return response(true, 200);
