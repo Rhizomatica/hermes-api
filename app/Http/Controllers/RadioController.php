@@ -272,6 +272,24 @@ class RadioController extends Controller
 		return response()->json(["message" => "Server error"], 500);
 	}
 
+	public function setRadioToneSBitx($par)
+	{
+
+		if ($par == 0) {
+			$command = "set_tone -a 0";
+		} else {
+			$command = "set_tone -a 1";
+		}
+
+		$output = exec_uc($command);
+
+		if ($output == 'OK') {
+			return response()->json($par, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioTone: Error - ' . $output);
+		return response()->json(["message" => "Server error"], 500);
+	}
 	/**
 	 *
 	 * Get Radio Main Frequency Oscilator
@@ -632,7 +650,7 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function changeVolume($volume) 
+	public function changeVolume($volume)
 	{
 		if (!$volume) {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing volume value');

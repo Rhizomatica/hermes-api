@@ -46,13 +46,13 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->post('config',  ['uses' => 'SystemController@setSysConfig']);
     $router->get('maillog',  ['uses' => 'SystemController@sysLogMail']);
     $router->get('stations',  ['uses' => 'SystemController@getSysStations']);
-    $router->get('status',  ['uses' => 'SystemController@getSysStatus']);//REPEATED ?
+    $router->get('status',  ['uses' => 'SystemController@getSysStatus']); //REPEATED ?
     $router->get('uuls',  ['uses' => 'SystemController@sysGetSpoolList']);
     $router->delete('mail/{host}/{id}/{language}',  ['uses' => 'SystemController@uucpKillMail']);
     $router->delete('uuk/{host}/{id}',  ['uses' => 'SystemController@uucpKillJob']);
     $router->get('uucall',  ['uses' => 'SystemController@uucpCall']);
-    $router->get('uucall/{uuidhost}',  ['uses' => 'SystemController@uucpCallForHost']);//TODO - CALLER?
-    $router->get('uulog',  ['uses' => 'SystemController@sysLogUucp']);//TODO - CALLER?
+    $router->get('uucall/{uuidhost}',  ['uses' => 'SystemController@uucpCallForHost']); //TODO - CALLER?
+    $router->get('uulog',  ['uses' => 'SystemController@sysLogUucp']); //TODO - CALLER?
     $router->get('uudebug',  ['uses' => 'SystemController@sysDebUucp']);
     $router->get('shutdown',  ['uses' => 'SystemController@sysShutdown']);
     $router->get('reboot',  ['uses' => 'SystemController@sysReboot']);
@@ -68,7 +68,7 @@ $router->group(['prefix' => '/caller'], function () use ($router) { //TODO - REN
 });
 
 $router->group(['prefix' => '/radio'], function () use ($router) {
-    $router->get('',  ['uses' => 'RadioController@getRadioStatus']);    
+    $router->get('',  ['uses' => 'RadioController@getRadioStatus']);
     $router->get('power',  ['uses' => 'RadioController@getRadioPowerStatus']);
     $router->post('mode/{mode}',  ['uses' => 'RadioController@setRadioMode']);
     $router->get('freq',  ['uses' => 'RadioController@getRadioFreq']);
@@ -78,6 +78,7 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('led/{status}',  ['uses' => 'RadioController@setRadioLedStatus']);
     $router->post('ptt/{status}', ['uses' => 'RadioController@setRadioPtt']);
     $router->post('tone/{par}', ['uses' => 'RadioController@setRadioTone']);
+    $router->post('tone/sbitx/{par}', ['uses' => 'RadioController@setRadioToneSBitx']);
     $router->post('mastercal/{freq}',  ['uses' => 'RadioController@setRadioMasterCal']);
     $router->get('protection',  ['uses' => 'RadioController@getRadioProtection']);
     $router->post('connection/{status}',  ['uses' => 'RadioController@setRadioConnectionStatus']);
@@ -114,4 +115,3 @@ $router->group(['prefix' => '/wifi'], function () use ($router) {
     $router->get('',  ['uses' => 'WiFiController@getWiFiConfigurations']);
     $router->post('',  ['uses' => 'WiFiController@saveWiFiConfigurations']);
 });
-
