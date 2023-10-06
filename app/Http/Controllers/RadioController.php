@@ -274,13 +274,16 @@ class RadioController extends Controller
 
 	public function setRadioToneSBitx($par)
 	{
-		system("sudo killall ffplay");
 
-		$output = system("set tone -a " . $par);
+		if ($par == 0) {
+			$command = "set_tone -a 0";
+		} else {
+			$command = "set_tone -a 1";
+		}
 
-		$output = explode("\n", $output)[0];
+		$output = exec_uc($command);
 
-		if (!$output) {
+		if ($output == 'OK') {
 			return response()->json($par, 200);
 		}
 
