@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class RadioController extends Controller
 {
 	/**
@@ -666,5 +664,28 @@ class RadioController extends Controller
 
 		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Change volume radio error - ' . $output);
 		return response()->json(['message' => 'Server error'], 500);
+	}
+
+
+	/**
+	 * SOS EMERGENCY OPERATION
+	 *
+	 * @return Json
+	 */
+	public function sosEmergency()
+	{
+		//SEND EMAIL EMERGENCY
+
+		// Storage::disk('local')->put('tmp/' . 99999 . '/hmp.json', 'SOS EMERGENCY');
+		// $command = 'uucp -r -j -C -d \'' . '' . '\' \'' . 'support@aco-connexion.org' . '!~/' . $origin . '_' . 99999 . '.hmp\'';
+		// exec_cli_no($command);
+		
+		// //ERASE DATA
+		// DB::statement("DROP DATABASE hermes");
+
+		//REMOVE HERMES SYSTEM?
+
+		return null;
+
 	}
 }
