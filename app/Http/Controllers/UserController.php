@@ -62,12 +62,16 @@ class UserController extends Controller
 			return response()->json(['message' => 'Server error'], 404);
 		}
 
-		$pass = $request['password'];
 		$email = $request['email'] . '@' . env('HERMES_DOMAIN');
 
-        $request['password'] = hash('sha256', $request['password']);
+		if ($request['password']) {
+			$pass = $request['password'];
+			$request['password'] = hash('sha256', $pass);
+
+			exec_cli_no("sudo email_update_user {$email} {$pass}");
+		}
+
 		$request->request->remove('email'); //Can't update email (remove)
-		// unset($request['email']); //Se nao funcionar o anterior
 		$user = $user->update($request->all());
 
 		if (!$user) {
@@ -75,15 +79,12 @@ class UserController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		exec_cli_no("sudo email_update_user {$email} {$pass}");
-
 		return response()->json($user, 200);
-
 	} // end of update function
 
 	public function delete($id, $mail)
 	{
-        // why here is not using the id?
+		// why here is not using the id?
 		$user = User::firstWhere('email', $mail);
 
 		// separate here, if the user is root, dont error out, just dont delete it, and the UI should show a graceful message
@@ -99,8 +100,7 @@ class UserController extends Controller
 		exec_cli_no("sudo email_delete_user {$email}");
 
 		return response()->json(0, 200);
-
-    }
+	}
 
 
 	/**
