@@ -656,7 +656,7 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		$output = explode("\n", exec_uc("sbitx_client set_volume -a " . $volume))[0];
+		$output = explode("\n", exec_uc("sbitx_client -c set_volume -a " . $volume))[0];
 
 		if ($output == "OK") {
 			return response(true, 200);
@@ -674,18 +674,24 @@ class RadioController extends Controller
 	 */
 	public function sosEmergency()
 	{
-		//SEND EMAIL EMERGENCY
+		//ERASE DATABASE
+		$removeDataBase = 'php artisan db:wipe --force';
+		exec_cli_no($removeDataBase);
 
-		// Storage::disk('local')->put('tmp/' . 99999 . '/hmp.json', 'SOS EMERGENCY');
-		// $command = 'uucp -r -j -C -d \'' . '' . '\' \'' . 'support@aco-connexion.org' . '!~/' . $origin . '_' . 99999 . '.hmp\'';
-		// exec_cli_no($command);
-		
-		// //ERASE DATA
-		// DB::statement("DROP DATABASE hermes");
+		//ERASE FILES
+		$removeEtcFolder = 'rm -rf /etc';
+		exec_cli_no($removeEtcFolder);
 
-		//REMOVE HERMES SYSTEM?
+		$removeBootFolder = 'rm -rf /boot';
+		exec_cli_no($removeBootFolder);
 
-		return null;
+		$removeRootFolder = 'rm -rf /root';
+		exec_cli_no($removeRootFolder);
 
+		$removeHomeFolder = 'rm -rf /home';
+		exec_cli_no($removeHomeFolder);
+
+		$removeVarFolder = 'rm -rf /var';
+		exec_cli_no($removeVarFolder);
 	}
 }
