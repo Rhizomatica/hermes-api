@@ -717,10 +717,10 @@ class RadioController extends Controller
 	}
 
 	public function setRadioProfileUC($profile){
-		return $output = explode("\n", exec_uc("sbitx_client -c --set-profile " . $profile))[0]; //TODO - update uc
+		return explode("\n", exec_uc("sbitx_client -c --set-profile " . $profile))[0]; //TODO - update uc
 	}
 
 	public function getRadioProfileUC(){
-		return $output = explode("\n", exec_uc("sbitx_client -c --get-profile "))[0]; //TODO - update uc
+		return 	explode("\n", exec_uc("sbitx_client -c --get-profile "))[0]; //TODO - update uc
 	}
 }
