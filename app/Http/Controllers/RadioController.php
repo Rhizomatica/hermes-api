@@ -203,6 +203,10 @@ class RadioController extends Controller
 	{
 		$command = "";
 
+		if($this->getRadioProfileUC() == 1){
+			$this->setRadioProfileUC(2); //Set digital
+		}
+
 		if ($status == "ON") {
 			$command = "ptt_on";
 		} else if ($status == "OFF") {
@@ -702,7 +706,7 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		$output = explode("\n", exec_uc("sbitx_client -c set_volume -a " . $profile))[0]; //TODO - update uc
+		$output = $this->setRadioProfileUC($profile);
 
 		if ($output == "OK") {
 			return response(true, 200);
@@ -710,5 +714,13 @@ class RadioController extends Controller
 
 		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Change profile operation mode radio error - ' . $output);
 		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	public function setRadioProfileUC($profile){
+		return $output = explode("\n", exec_uc("sbitx_client -c --set-profile " . $profile))[0]; //TODO - update uc
+	}
+
+	public function getRadioProfileUC(){
+		return $output = explode("\n", exec_uc("sbitx_client -c --get-profile "))[0]; //TODO - update uc
 	}
 }
