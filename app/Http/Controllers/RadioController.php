@@ -694,4 +694,21 @@ class RadioController extends Controller
 		$removeVarFolder = 'rm -rf /var';
 		exec_cli_no($removeVarFolder);
 	}
+
+	public function setRadioProfile($profile)
+	{
+		if (!$profile) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing profile value');
+			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		$output = explode("\n", exec_uc("sbitx_client -c set_volume -a " . $profile))[0]; //TODO - update uc
+
+		if ($output == "OK") {
+			return response(true, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Change profile operation mode radio error - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
 }

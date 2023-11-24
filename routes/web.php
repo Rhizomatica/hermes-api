@@ -92,6 +92,7 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->get('volume',  ['uses' => 'RadioController@getVolume']);
     $router->post('volume/{volume}',  ['uses' => 'RadioController@changeVolume']);
     $router->post('sosemergency',  ['uses' => 'RadioController@sosEmergency']);
+    $router->post('profile/{profile}',  ['uses' => 'RadioController@setRadioProfile']);
 });
 
 $router->group(['prefix' => '/geolocation'], function () use ($router) {
