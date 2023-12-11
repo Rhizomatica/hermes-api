@@ -30,7 +30,7 @@ class WiFiController extends Controller
 		//get mac address list
 		$accept_mac_file = file_get_contents("/etc/hostapd/accept", false);
 		$mac_list = explode("\n", $accept_mac_file);
-		$wifi_settings[$mac_list];
+		$wifi_settings['accept_mac_file'] = $mac_list;
 
 		if (isset($wifi_settings['channel']) && isset($wifi_settings['ssid']) && isset($wifi_settings['wpa_passphrase']) && isset($wifi_settings['macaddr_acl']))
 			return response()->json($wifi_settings, 200);
