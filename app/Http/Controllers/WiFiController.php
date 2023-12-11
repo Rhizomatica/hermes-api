@@ -74,4 +74,15 @@ class WiFiController extends Controller
 
 		return response(true, 200);
 	}
+
+	public function macAddressList(Request $request){
+		$this->validate($request, [
+			'macAddressList' => 'required|string'
+		]);
+
+		exec_cli("sudo sh -c \"echo {$request->macAddressList} >> /etc/hostapd/accept\"");
+		exec_cli_no("sudo systemctl restart hostapd");
+
+		return response(true, 200);
+	}
 }

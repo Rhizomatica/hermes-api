@@ -117,4 +117,5 @@ $router->group(['prefix' => '/wifi'], function () use ($router) {
     $router->get('',  ['uses' => 'WiFiController@getWiFiConfigurations']);
     $router->post('',  ['uses' => 'WiFiController@saveWiFiConfigurations']);
     $router->post('/mac/filter',  ['uses' => 'WiFiController@macFilter']);
+    $router->post('/mac/address',  ['uses' => 'WiFiController@macAddressList']);
 });
