@@ -62,4 +62,16 @@ class WiFiController extends Controller
 
 		return response(true, 200);
 	}
+
+	public function macFilter(Request $request){
+		$this->validate($request, [
+			'macFilter' => 'required|string'
+		]);
+
+		exec_cli_no("sudo cp /etc/hostapd/hostapd.conf.head /etc/hostapd/hostapd.conf");
+		exec_cli("sudo sh -c \"echo macaddr_acl={$request->macFilter} >> /etc/hostapd/hostapd.conf\"");
+		exec_cli("sudo sh -c \"echo accept_mac_file=/etc/hostapd/accept >> /etc/hostapd/hostapd.conf\"");
+
+		return response(true, 200);
+	}
 }
