@@ -22,12 +22,17 @@ class WiFiController extends Controller
 			if (strpos($i, "=") !== false) {
 				list($name, $value) = explode("=", $i, 2);
 
-				if ($name == "channel" || $name == "ssid" || $name == "wpa_passphrase")
+				if ($name == "channel" || $name == "ssid" || $name == "wpa_passphrase" || $name == 'macaddr_acl')
 					$wifi_settings[$name] = $value;
 			}
 		}
 
-		if (isset($wifi_settings['channel']) && isset($wifi_settings['ssid']) && isset($wifi_settings['wpa_passphrase']))
+		//get mac address list
+		$accept_mac_file = file_get_contents("/etc/hostapd/accept", false);
+		$mac_list = explode("\n", $accept_mac_file);
+		$wifi_settings[$mac_list];
+
+		if (isset($wifi_settings['channel']) && isset($wifi_settings['ssid']) && isset($wifi_settings['wpa_passphrase']) && isset($wifi_settings['macaddr_acl']))
 			return response()->json($wifi_settings, 200);
 
 		(new ErrorController)->saveError(get_class($this), 500, 'Error: WiFi settings are unavailable');
