@@ -10,12 +10,12 @@ class WiFiController extends Controller
 	public function getWiFiConfigurations()
 	{
 		$hostap_file = file_get_contents("/etc/hostapd/hostapd.conf", false);
-		
+
 		if (!$hostap_file) {
 			(new ErrorController)->saveError(get_class($this), 500, 'Error: WiFi settings are unavailable');
 			return response()->json(['message' => 'Server error'], 500);
 		}
-		
+
 		$parsed_cfg = explode("\n", $hostap_file);
 
 		foreach ($parsed_cfg as $i) {
@@ -28,6 +28,10 @@ class WiFiController extends Controller
 		}
 
 		//get mac address list
+		if (!file_exists("/etc/hostapd/accept")) {
+			exec_cli("sudo touch /etc/hostapd/accept");
+		}
+
 		$accept_mac_file = file_get_contents("/etc/hostapd/accept", false);
 		$mac_list = explode("\n", $accept_mac_file);
 		$wifi_settings['accept_mac_file'] = $mac_list;
@@ -63,7 +67,8 @@ class WiFiController extends Controller
 		return response(true, 200);
 	}
 
-	public function macFilter(Request $request){
+	public function macFilter(Request $request)
+	{
 		$this->validate($request, [
 			'macFilter' => 'required|string'
 		]);
@@ -75,7 +80,8 @@ class WiFiController extends Controller
 		return response(true, 200);
 	}
 
-	public function macAddressList(Request $request){
+	public function macAddressList(Request $request)
+	{
 		$this->validate($request, [
 			'macAddressList' => 'required|string'
 		]);
