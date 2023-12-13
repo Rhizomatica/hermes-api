@@ -86,6 +86,7 @@ class WiFiController extends Controller
 			'macAddressList' => 'required|string'
 		]);
 
+		exec_cli("sudo truncate -s 0 /etc/hostapd/accept");
 		exec_cli("sudo sh -c \"echo {$request->macAddressList} >> /etc/hostapd/accept\"");
 		exec_cli_no("sudo systemctl restart hostapd");
 
