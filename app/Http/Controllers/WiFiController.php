@@ -75,14 +75,13 @@ class WiFiController extends Controller
 
 	public function macAddressList(Request $request)
 	{
-		$this->validate($request, [
-			'macAddressList' => 'required|string'
-		]);
+		if ($request->macAddressList != '') {
+			$macAddress = implode($request->macAddressList);
+			$macAddress = str_replace(";", "<br>", $macAddress);
+		}
 
-		//Tem que validar formato?
-		//Quebra de linha
 		exec_cli("sudo truncate -s 0 /etc/hostapd/accept");
-		exec_cli("sudo sh -c \"echo {$request->macAddressList} >> /etc/hostapd/accept\"");
+		exec_cli("sudo sh -c \"echo {$macAddress} >> /etc/hostapd/accept\"");
 		exec_cli_no("sudo systemctl restart hostapd");
 
 		return response(true, 200);
