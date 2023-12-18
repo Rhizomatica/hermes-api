@@ -56,13 +56,7 @@ class WiFiController extends Controller
 		exec_cli("sudo sh -c \"echo ssid={$request->ssid} >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo wpa_passphrase={$request->wpa_passphrase} >> /etc/hostapd/hostapd.conf\"");
 
-		// $wifiRestart = 
 		exec_cli_no("sudo systemctl restart hostapd");
-
-		// if ($wifiRestart == false) {
-		// 	(new ErrorController)->saveError(get_class($this), 500, 'Error: could not restart WiFi device');
-		// 	return response()->json(['message' => 'Server error'], 500);
-		// }
 
 		return response(true, 200);
 	}
@@ -73,7 +67,6 @@ class WiFiController extends Controller
 			'macFilter' => 'required|string'
 		]);
 
-		exec_cli_no("sudo cp /etc/hostapd/hostapd.conf.head /etc/hostapd/hostapd.conf");
 		exec_cli("sudo sh -c \"echo macaddr_acl={$request->macFilter} >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo accept_mac_file=/etc/hostapd/accept >> /etc/hostapd/hostapd.conf\"");
 
@@ -86,6 +79,8 @@ class WiFiController extends Controller
 			'macAddressList' => 'required|string'
 		]);
 
+		//Tem que validar formato?
+		//Quebra de linha
 		exec_cli("sudo truncate -s 0 /etc/hostapd/accept");
 		exec_cli("sudo sh -c \"echo {$request->macAddressList} >> /etc/hostapd/accept\"");
 		exec_cli_no("sudo systemctl restart hostapd");
