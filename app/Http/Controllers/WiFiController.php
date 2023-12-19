@@ -80,11 +80,11 @@ class WiFiController extends Controller
 		if ($request->macAddressList !== ''  && $request->macAddressList !== null) {
 			$macAddressList = json_decode($request->macAddressList);
 			$macAddressList = implode($macAddressList);
-			$macAddressList = str_replace(";", "<br>", $macAddressList);
+			$macAddressList = str_replace(";", "\n", $macAddressList);
 		}
 
 		exec_cli("sudo truncate -s 0 /etc/hostapd/accept");
-		exec_cli("sudo sh -c \"echo {$macAddressList} >> /etc/hostapd/accept\"");
+		exec_cli("sudo sh -c \"echo -e {$macAddressList} >> /etc/hostapd/accept\"");
 		exec_cli_no("sudo systemctl restart hostapd");
 
 		return response(true, 200);
