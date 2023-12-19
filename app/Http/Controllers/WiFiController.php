@@ -67,7 +67,22 @@ class WiFiController extends Controller
 			'macFilter' => 'required|string'
 		]);
 
-		//TODO -writting multiple times
+		$hostap_file = file_get_contents("/etc/hostapd/hostapd.conf", false);
+		$parsed_cfg = explode("\n", $hostap_file);
+
+		foreach ($parsed_cfg as $i) {
+			if (strpos($i, "=") !== false) {
+				list($name, $value) = explode("=", $i, 2);
+
+				if ($name == "channel" || $name == "ssid" || $name == "wpa_passphrase")
+					$wifi_settings[$name] = $value;
+			}
+		}
+
+		exec_cli_no("sudo cp /etc/hostapd/hostapd.conf.head /etc/hostapd/hostapd.conf");
+		exec_cli("sudo sh -c \"echo channel=$wifi_settings[channel] >> /etc/hostapd/hostapd.conf\"");
+		exec_cli("sudo sh -c \"echo ssid=$wifi_settings[ssid] >> /etc/hostapd/hostapd.conf\"");
+		exec_cli("sudo sh -c \"echo wpa_passphrase=$wifi_settings[wpa_passphrase] >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo macaddr_acl={$request->macFilter} >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo accept_mac_file=/etc/hostapd/accept >> /etc/hostapd/hostapd.conf\"");
 
