@@ -76,9 +76,9 @@ class WiFiController extends Controller
 	public function macAddressList(Request $request)
 	{
 		$macAddressList = '';
-		
+
 		if ($request->macAddressList !== ''  && $request->macAddressList !== null) {
-			$macAddressList = str_split($request->macAddressList);
+			$macAddressList = json_decode($macAddressList);
 			$macAddressList = implode($macAddressList);
 			$macAddressList = str_replace(";", "<br>", $macAddressList);
 		}
