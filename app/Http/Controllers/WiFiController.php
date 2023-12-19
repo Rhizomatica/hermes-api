@@ -51,6 +51,7 @@ class WiFiController extends Controller
 			'wpa_passphrase' =>  'required|string'
 		]);
 
+		exec_cli("sudo truncate -s 0 /etc/hostapd/hostapd.conf");
 		exec_cli_no("sudo cp /etc/hostapd/hostapd.conf.head /etc/hostapd/hostapd.conf");
 		exec_cli("sudo sh -c \"echo channel={$request->channel} >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo ssid={$request->ssid} >> /etc/hostapd/hostapd.conf\"");
@@ -79,6 +80,7 @@ class WiFiController extends Controller
 			}
 		}
 
+		exec_cli("sudo truncate -s 0 /etc/hostapd/hostapd.conf");
 		exec_cli_no("sudo cp /etc/hostapd/hostapd.conf.head /etc/hostapd/hostapd.conf");
 		exec_cli("sudo sh -c \"echo channel=$wifi_settings[channel] >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo ssid=$wifi_settings[ssid] >> /etc/hostapd/hostapd.conf\"");
