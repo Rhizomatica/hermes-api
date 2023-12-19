@@ -67,6 +67,7 @@ class WiFiController extends Controller
 			'macFilter' => 'required|string'
 		]);
 
+		//TODO -writting multiple times
 		exec_cli("sudo sh -c \"echo macaddr_acl={$request->macFilter} >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo accept_mac_file=/etc/hostapd/accept >> /etc/hostapd/hostapd.conf\"");
 
@@ -77,9 +78,8 @@ class WiFiController extends Controller
 	{
 		$macAddressList = '';
 
-		if ($request->macAddressList !== ''  && $request->macAddressList !== null) {
-			$macAddressList = json_decode($request->macAddressList);
-			$macAddressList = implode($macAddressList);
+		if ($request->macAddressList !== ''  && $request->macAddressList !== null && is_array($request->macAddressList)) {
+			$macAddressList = implode($request->macAddressList);
 			$macAddressList = str_replace(";", "\n", $macAddressList);
 		}
 
