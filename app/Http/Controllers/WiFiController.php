@@ -75,13 +75,16 @@ class WiFiController extends Controller
 
 	public function macAddressList(Request $request)
 	{
-		if ($request->macAddressList !== ''  && $request->macAddressList !== null && is_array($request->macAddressList)) {
-			$macAddress = implode($request->macAddressList);
-			$macAddress = str_replace(";", "<br>", $macAddress);
+		$macAddressList = '';
+		
+		if ($request->macAddressList !== ''  && $request->macAddressList !== null) {
+			$macAddressList = str_split($request->macAddressList);
+			$macAddressList = implode($macAddressList);
+			$macAddressList = str_replace(";", "<br>", $macAddressList);
 		}
 
 		exec_cli("sudo truncate -s 0 /etc/hostapd/accept");
-		exec_cli("sudo sh -c \"echo {$macAddress} >> /etc/hostapd/accept\"");
+		exec_cli("sudo sh -c \"echo {$macAddressList} >> /etc/hostapd/accept\"");
 		exec_cli_no("sudo systemctl restart hostapd");
 
 		return response(true, 200);
