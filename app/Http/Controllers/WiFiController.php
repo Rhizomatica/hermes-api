@@ -57,7 +57,7 @@ class WiFiController extends Controller
 		exec_cli("sudo sh -c \"echo channel={$request->channel} >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo ssid={$request->ssid} >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo wpa_passphrase={$request->wpa_passphrase} >> /etc/hostapd/hostapd.conf\"");
-		exec_cli("sudo sh -c \"echo wpa_passphrase={$request->macaddr_acl} >> /etc/hostapd/hostapd.conf\"");
+		exec_cli("sudo sh -c \"echo macaddr_acl={$request->macaddr_acl} >> /etc/hostapd/hostapd.conf\"");
 
 		exec_cli_no("sudo systemctl restart hostapd");
 
