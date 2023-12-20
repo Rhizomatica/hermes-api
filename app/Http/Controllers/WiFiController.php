@@ -48,7 +48,8 @@ class WiFiController extends Controller
 		$this->validate($request, [
 			'channel' => 'required|string',
 			'ssid' => 'required|string',
-			'wpa_passphrase' =>  'required|string'
+			'wpa_passphrase' =>  'required|string',
+			'macaddr_acl' =>  'required|string',
 		]);
 
 		exec_cli("sudo truncate -s 0 /etc/hostapd/hostapd.conf");
@@ -56,6 +57,7 @@ class WiFiController extends Controller
 		exec_cli("sudo sh -c \"echo channel={$request->channel} >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo ssid={$request->ssid} >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo wpa_passphrase={$request->wpa_passphrase} >> /etc/hostapd/hostapd.conf\"");
+		exec_cli("sudo sh -c \"echo wpa_passphrase={$request->macaddr_acl} >> /etc/hostapd/hostapd.conf\"");
 
 		exec_cli_no("sudo systemctl restart hostapd");
 
@@ -86,7 +88,6 @@ class WiFiController extends Controller
 		exec_cli("sudo sh -c \"echo ssid=$wifi_settings[ssid] >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo wpa_passphrase=$wifi_settings[wpa_passphrase] >> /etc/hostapd/hostapd.conf\"");
 		exec_cli("sudo sh -c \"echo macaddr_acl={$request->macFilter} >> /etc/hostapd/hostapd.conf\"");
-		exec_cli("sudo sh -c \"echo accept_mac_file=/etc/hostapd/accept >> /etc/hostapd/hostapd.conf\"");
 
 		return response(true, 200);
 	}
