@@ -94,7 +94,7 @@ class WiFiController extends Controller
 	public function macAddress(Request $request)
 	{
 		$this->validate($request, [
-			'mac address' => 'required|string'
+			'macAddress' => 'required|string'
 		]);
 
 		exec_cli("sudo sh -c \"echo {$request->macAddress} >> /etc/hostapd/accept\"");
