@@ -115,7 +115,7 @@ class WiFiController extends Controller
 		exec_cli("sudo truncate -s 0 /etc/hostapd/accept");
 
 		foreach ($parsed_accept_file as $i) {
-			if ($i !== $address) {
+			if ($i !== $address && $i !== '') {
 				exec_cli("sudo sh -c \"echo {$i} >> /etc/hostapd/accept\"");
 			}
 		}
