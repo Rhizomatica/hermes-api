@@ -91,18 +91,34 @@ class WiFiController extends Controller
 		return response(true, 200);
 	}
 
-	public function macAddressList(Request $request)
+	public function macAddress(Request $request)
 	{
-		$macAddressList = '';
+		$this->validate($request, [
+			'mac address' => 'required|string'
+		]);
 
-		if ($request->macAddressList !== ''  && $request->macAddressList !== null && is_array($request->macAddressList)) {
-			$macAddressList = implode($request->macAddressList);
-			$macAddressList = str_replace(";", "\n", $macAddressList);
+		exec_cli("sudo sh -c \"echo {$request->macAddress} >> /etc/hostapd/accept\"");
+		exec_cli_no("sudo systemctl restart hostapd");
+
+		return response(true, 200);
+	}
+
+	public function deleteMacAddress($address)
+	{
+		if (!$address) {
+			return response()->json(['message' => 'Missing address to remove'], 500);
 		}
 
+		$accept_file = file_get_contents("/etc/hostapd/accept", false);
+		$parsed_accept_file = explode("\n", $accept_file);
+
 		exec_cli("sudo truncate -s 0 /etc/hostapd/accept");
-		exec_cli("sudo sh -c \"echo -e {$macAddressList} >> /etc/hostapd/accept\"");
-		exec_cli_no("sudo systemctl restart hostapd");
+
+		foreach ($parsed_accept_file as $i) {
+			if ($i !== $address) {
+				exec_cli("sudo sh -c \"echo {$i} >> /etc/hostapd/accept\"");
+			}
+		}
 
 		return response(true, 200);
 	}
