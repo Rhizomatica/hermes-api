@@ -120,6 +120,8 @@ class WiFiController extends Controller
 			}
 		}
 
+		exec_cli_no("sudo systemctl restart hostapd");
+
 		return response(true, 200);
 	}
 }
