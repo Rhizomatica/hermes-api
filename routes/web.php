@@ -116,4 +116,7 @@ $router->group(['prefix' => '/customerrors'], function () use ($router) {
 $router->group(['prefix' => '/wifi'], function () use ($router) {
     $router->get('',  ['uses' => 'WiFiController@getWiFiConfigurations']);
     $router->post('',  ['uses' => 'WiFiController@saveWiFiConfigurations']);
+    $router->post('/mac/filter',  ['uses' => 'WiFiController@macFilter']);
+    $router->post('/mac/address',  ['uses' => 'WiFiController@macAddress']);
+    $router->delete('/mac/address/{address}',  ['uses' => 'WiFiController@deleteMacAddress']);
 });
