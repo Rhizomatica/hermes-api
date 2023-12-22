@@ -48,7 +48,10 @@ class DatabaseSeeder extends Seeder
     private function insertNewFrequency($alias)
     {
 
-        if (empty($alias) || $alias == 'gw' || $alias == 'local')
+        if (empty($alias) || $alias == 'local')
+            return;
+
+        if($alias == 'gw' && env('HERMES_GATEWAY'))
             return;
 
         DB::table('frequencies')->insert([
