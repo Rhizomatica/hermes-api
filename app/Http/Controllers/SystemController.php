@@ -196,8 +196,9 @@ class SystemController extends Controller
 						$emails = null;
 					}
 
-					$messageID = $this->getMessageIDFromUuidhost($uuid_host);
-
+					$messageID = $this->getMessageIDFromUuidhost($fields[10]);
+					$message = null;
+					
 					if(intval($messageID)){
 						$message = $this->getMessageFromDataBase($messageID);
 					}
@@ -231,12 +232,17 @@ class SystemController extends Controller
 		return response()->json(null, 200);
 	}
 
-	public function getMessageIDFromUuidhost($uuid_host)
+	public function getMessageIDFromUuidhost($destpath)
 	{
+
+		if(!$destpath){
+			return null;
+		}
+
 		$delimiter1 = "_";
 		$delimiter2 = ".";
 
-		$parts = explode($delimiter1, $uuid_host);
+		$parts = explode($delimiter1, $destpath);
 		$result = [];
 		
 		foreach ($parts as $part) {
@@ -244,7 +250,7 @@ class SystemController extends Controller
 			$result = array_merge($result, $subparts);
 		}
 
-		if(is_numeric($result[1])){
+		if(sizeof($result) > 0 &&  is_numeric($result[1])){
 			return intval($result[1]);
 		}
 
