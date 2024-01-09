@@ -194,6 +194,8 @@ class SystemController extends Controller
 						$emails = null;
 					}
 
+					$messageID = $this->getMessageIDFromUuidhost($uuid_host);
+
 					$spool[]  =  [
 						'uuidhost' => $uuid_host,
 						'uuiduucp' => $uuid,
@@ -217,6 +219,26 @@ class SystemController extends Controller
 		}
 
 		return response()->json(null, 200);
+	}
+
+	public function getMessageIDFromUuidhost($uuid_host)
+	{
+		$delimiter1 = "_";
+		$delimiter2 = ".";
+
+		$parts = explode($delimiter1, $uuid_host);
+		$result = [];
+		
+		foreach ($parts as $part) {
+			$subparts = explode($delimiter2, $part);
+			$result = array_merge($result, $subparts);
+		}
+
+		if(is_numeric($result[1])){
+			return intval($result[1]);
+		}
+
+		return null;
 	}
 
 	/**
@@ -261,10 +283,10 @@ class SystemController extends Controller
 	{
 		$radioCtrl = new RadioController();
 
-		if($radioCtrl->getRadioProfileUC() == 1){
+		if ($radioCtrl->getRadioProfileUC() == 1) {
 			$radioCtrl->setRadioProfileUC(2); //Set digital
 		}
-		
+
 		$command = 'sudo uucico -r1 ';
 		$output = exec_cli($command);
 		return response($output, 200);
@@ -279,7 +301,7 @@ class SystemController extends Controller
 	{
 		$radioCtrl = new RadioController();
 
-		if($radioCtrl->getRadioProfileUC() == 1){
+		if ($radioCtrl->getRadioProfileUC() == 1) {
 			$radioCtrl->setRadioProfileUC(2); //Set digital
 		}
 
