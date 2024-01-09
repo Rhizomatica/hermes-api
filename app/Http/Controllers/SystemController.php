@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\System;
+use App\Message;
+
 
 class SystemController extends Controller
 {
@@ -196,6 +198,10 @@ class SystemController extends Controller
 
 					$messageID = $this->getMessageIDFromUuidhost($uuid_host);
 
+					if(intval($messageID)){
+						$message = $this->getMessageFromDataBase($messageID);
+					}
+
 					$spool[]  =  [
 						'uuidhost' => $uuid_host,
 						'uuiduucp' => $uuid,
@@ -209,6 +215,10 @@ class SystemController extends Controller
 						'destpath' =>  $fields[6] == "crmail" ? null : $fields[10],
 						'emails' =>  $emails,
 						'emailinfo' =>  $email_info,
+						'messageId' => $message != null ? $message->id : null,
+						'messageName' => $message != null ? $message->name : null,
+						'messageFile' => $message != null ? $message->file : null,
+						'messageMymeType' => $message != null ? $message->mymetype : null
 					];
 				}
 			}
@@ -239,6 +249,16 @@ class SystemController extends Controller
 		}
 
 		return null;
+	}
+
+	public function getMessageFromDataBase($messageID){
+		$message = Message::find($messageID);
+
+		if(!$message){
+			return null;
+		}
+
+		return $message;
 	}
 
 	/**
