@@ -220,7 +220,7 @@ class SystemController extends Controller
 						'messageName' => $message != null ? $message->name : null,
 						'messageFile' => $message != null ? $message->file : null,
 						'messageMimeType' => $message != null ? $message->mimetype : null,
-						'messageMimeType' => $message != null ? $message->secure : null
+						'messageSecure' => $message != null ? $message->secure : null
 					];
 				}
 			}
