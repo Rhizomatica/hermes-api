@@ -251,7 +251,7 @@ class SystemController extends Controller
 			$result = array_merge($result, $subparts);
 		}
 
-		if(sizeof($result) == 2 && is_numeric($result[1])){
+		if(sizeof($result) >= 2 && is_numeric($result[1])){
 			return intval($result[1]);
 		}
 
