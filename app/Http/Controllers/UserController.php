@@ -119,12 +119,10 @@ class UserController extends Controller
 		$user = User::firstWhere('email', $request->email);
 
 		if (!$user) {
-			(new ErrorController)->saveError(get_class($this), 404, 'API user login - user not found');
-			return response()->json(['message' => 'Not found'], 404);
+			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		if ($user['password'] !== hash('sha256', $request->password)) { //sucessfull login
-			(new ErrorController)->saveError(get_class($this), 500, 'API user login - wrong password');
+		if ($user['password'] !== hash('sha256', $request->password)) {
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
