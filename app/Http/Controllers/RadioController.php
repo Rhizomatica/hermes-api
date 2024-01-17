@@ -310,8 +310,11 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioFreq(int $freq)
+	public function setRadioFreq(int $freq, int $profile)
 	{
+
+		$this->setRadioProfileUC($profile);
+
 		$command = explode("\n", exec_uc("set_frequency -a " . $freq))[0];
 
 		if ($command == "OK") {
