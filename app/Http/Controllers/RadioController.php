@@ -332,8 +332,11 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioMode($mode)
+	public function setRadioMode(string $mode, int $profile)
 	{
+
+		$this->setRadioProfileUC($profile);
+
 		$radio_mode = "";
 
 		if ($mode == "USB") {
