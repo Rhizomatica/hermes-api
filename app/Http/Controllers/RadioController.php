@@ -707,7 +707,7 @@ class RadioController extends Controller
 
 	public function setRadioProfile($profile)
 	{
-		if (!$profile) {
+		if ($profile == null) {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing profile value');
 			return response()->json(['message' => 'Server error'], 500);
 		}
