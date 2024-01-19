@@ -203,8 +203,8 @@ class RadioController extends Controller
 	{
 		$command = "";
 
-		if($this->getRadioProfileUC() == 1){
-			$this->setRadioProfileUC(2); //Set digital
+		if($this->getRadioProfileUC() == 0){
+			$this->setRadioProfileUC(1); //Set digital
 		}
 
 		if ($status == "ON") {
