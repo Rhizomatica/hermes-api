@@ -722,11 +722,11 @@ class RadioController extends Controller
 		return response()->json(['message' => 'Server error'], 500);
 	}
 
-	public function setRadioProfileUC($profile){
-		return explode("\n", exec_uc("sbitx_client -c --set-profile " . $profile))[0]; //TODO - update uc
+	public function getRadioProfileUC(){
+		return 	explode("\n", exec_uc("sbitx_client get_profile"))[0];
 	}
 
-	public function getRadioProfileUC(){
-		return 	explode("\n", exec_uc("sbitx_client -c --get-profile "))[0]; //TODO - update uc
+	public function setRadioProfileUC($profile){
+		return explode("\n", exec_uc("sbitx_client -c set_profile -a" . $profile))[0];
 	}
 }
