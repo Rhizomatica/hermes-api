@@ -736,11 +736,11 @@ class RadioController extends Controller
 
 	public function getRadioProfileUC()
 	{
-		return explode("\n", exec_uc("sbitx_client get_profile"))[0];
+		return explode("\n", exec_uc("get_profile"))[0];
 	}
 
 	public function setRadioProfileUC($profile)
 	{
-		return explode("\n", exec_uc("sbitx_client -c set_profile -a " . $profile))[0];
+		return explode("\n", exec_uc("set_profile -a " . $profile))[0];
 	}
 }
