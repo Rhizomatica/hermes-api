@@ -11,19 +11,22 @@ class RadioController extends Controller
 	 */
 	public function getRadioStatus()
 	{
-		$radio_frequency = explode("\n", exec_uc("get_frequency"))[0];
-		$radio_mode = explode("\n", exec_uc("get_mode"))[0];
-		$radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold"))[0];
-		$radio_serial = explode("\n", exec_uc("get_serial"))[0];
-		$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
-		$radio_txrx = explode("\n", exec_uc("get_txrx_status"))[0];
+
+		// sbitx_client -c set_frequency -p 1 -a 7100000
+		// sbitx_client -c get_frequency
+		$radio_frequency = explode("\n", exec_uc("get_frequency -p1"))[0];
+		$radio_mode = explode("\n", exec_uc("get_mode -p1"))[0];
+		$radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold -p1"))[0];
+		$radio_serial = explode("\n", exec_uc("get_serial -p1"))[0];
+		$radio_bfo = explode("\n", exec_uc("get_bfo -p1"))[0];
+		$radio_txrx = explode("\n", exec_uc("get_txrx_status -p1"))[0];
 		$radio_rx = true;
 		$radio_tx = false;
-		$radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
-		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep ffplay -a"))[0]);
+		$radio_mastercal = explode("\n", exec_uc("get_mastercal -p1"))[0];
+		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep ffplay -a -p1"))[0]);
 		$radio_led = explode("\n", exec_uc("get_led_status"))[0];
-		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
-		$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
+		$radio_protection = explode("\n", exec_uc("get_protection_status -p1"))[0];
+		$radio_connection = explode("\n", exec_uc("get_connected_status -p1"))[0];
 
 		if (isset($radio_ref_threshold)) {
 			$radio_ref_thresholdv = adc2volts($radio_ref_threshold);
@@ -736,11 +739,11 @@ class RadioController extends Controller
 
 	public function getRadioProfileUC()
 	{
-		return explode("\n", exec_uc("sbitx_client get_profile"))[0];
+		return explode("\n", exec_uc("get_profile"))[0];
 	}
 
 	public function setRadioProfileUC($profile)
 	{
-		return explode("\n", exec_uc("sbitx_client -c set_profile -a " . $profile))[0];
+		return explode("\n", exec_uc("set_profile -a " . $profile))[0];
 	}
 }
