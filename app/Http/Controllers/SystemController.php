@@ -310,8 +310,8 @@ class SystemController extends Controller
 	{
 		$radioCtrl = new RadioController();
 
-		if ($radioCtrl->getRadioProfileUC() == 1) {
-			$radioCtrl->setRadioProfileUC(2); //Set digital
+		if ($radioCtrl->getRadioProfileUC() == 0) {
+			$radioCtrl->setRadioProfileUC(1); //Set digital
 		}
 
 		$command = 'sudo uucico -r1 ';
@@ -328,8 +328,8 @@ class SystemController extends Controller
 	{
 		$radioCtrl = new RadioController();
 
-		if ($radioCtrl->getRadioProfileUC() == 1) {
-			$radioCtrl->setRadioProfileUC(2); //Set digital
+		if ($radioCtrl->getRadioProfileUC() == 0) {
+			$radioCtrl->setRadioProfileUC(1); //Set digital
 		}
 
 		// $command = 'sudo uucico -r1 ' ;
