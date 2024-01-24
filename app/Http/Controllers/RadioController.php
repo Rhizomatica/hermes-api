@@ -203,8 +203,12 @@ class RadioController extends Controller
 	{
 		$command = "";
 
-		if($this->getRadioProfileUC() == 0){
-			$this->setRadioProfileUC(1); //Set digital
+		if ($this->getRadioProfileUC() == 0) {
+			$setProfileCommand = $this->setRadioProfileUC(1); //Set digital
+
+			if ($setProfileCommand != "OK") {
+				return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
+			}
 		}
 
 		if ($status == "ON") {
@@ -313,7 +317,11 @@ class RadioController extends Controller
 	public function setRadioFreq(int $freq, int $profile)
 	{
 
-		$this->setRadioProfileUC($profile);
+		$setProfileCommand = $this->setRadioProfileUC($profile);
+
+		if ($setProfileCommand != "OK") {
+			return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
+		}
 
 		$command = explode("\n", exec_uc("set_frequency -a " . $freq))[0];
 
@@ -335,7 +343,11 @@ class RadioController extends Controller
 	public function setRadioMode(string $mode, int $profile)
 	{
 
-		$this->setRadioProfileUC($profile);
+		$setProfileCommand = $this->setRadioProfileUC($profile);
+
+		if ($setProfileCommand != "OK") {
+			return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
+		}
 
 		$radio_mode = "";
 
@@ -722,11 +734,13 @@ class RadioController extends Controller
 		return response()->json(['message' => 'Server error'], 500);
 	}
 
-	public function getRadioProfileUC(){
-		return 	explode("\n", exec_uc("sbitx_client get_profile"))[0];
+	public function getRadioProfileUC()
+	{
+		return explode("\n", exec_uc("sbitx_client get_profile"))[0];
 	}
 
-	public function setRadioProfileUC($profile){
+	public function setRadioProfileUC($profile)
+	{
 		return explode("\n", exec_uc("sbitx_client -c set_profile -a " . $profile))[0];
 	}
 }

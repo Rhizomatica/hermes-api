@@ -311,7 +311,11 @@ class SystemController extends Controller
 		$radioCtrl = new RadioController();
 
 		if ($radioCtrl->getRadioProfileUC() == 0) {
-			$radioCtrl->setRadioProfileUC(1); //Set digital
+			$setProfileCommand = $radioCtrl->setRadioProfileUC(1); //Set digital
+
+			if ($setProfileCommand != "OK") {
+				return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
+			}
 		}
 
 		$command = 'sudo uucico -r1 ';
@@ -329,7 +333,11 @@ class SystemController extends Controller
 		$radioCtrl = new RadioController();
 
 		if ($radioCtrl->getRadioProfileUC() == 0) {
-			$radioCtrl->setRadioProfileUC(1); //Set digital
+			$setProfileCommand = $radioCtrl->setRadioProfileUC(1); //Set digital
+
+			if ($setProfileCommand != "OK") {
+				return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
+			}
 		}
 
 		// $command = 'sudo uucico -r1 ' ;
