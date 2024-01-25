@@ -337,14 +337,13 @@ class RadioController extends Controller
 	 */
 	public function setRadioFreq(int $freq, int $profile)
 	{
+		$command = "set_frequency -a " . $freq;
 
-		$setProfileCommand = $this->setRadioProfileUC($profile);
-
-		if ($setProfileCommand != "OK") {
-			return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
+		if($profile != null){
+			$command .= " -p " . $profile;
 		}
 
-		$command = explode("\n", exec_uc("set_frequency -a " . $freq))[0];
+		$command = explode("\n", exec_uc($command))[0];
 
 		if ($command == "OK") {
 			$radio_frequency = explode("\n", exec_uc("get_frequency"))[0];
