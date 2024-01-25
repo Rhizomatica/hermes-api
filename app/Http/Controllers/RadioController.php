@@ -525,7 +525,7 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioConnectionStatus($status)
+	public function setRadioConnectionStatus($status, $profile)
 	{
 		$par = '';
 
@@ -536,6 +536,10 @@ class RadioController extends Controller
 		} else {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioConnectionStatus fail: ' . $status);
 			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		if($profile != null){
+			$par .= " -p " . $profile;
 		}
 
 		$command = explode("\n", exec_uc($par))[0];
