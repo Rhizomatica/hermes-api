@@ -308,16 +308,6 @@ class SystemController extends Controller
 	 */
 	public function uucpCall()
 	{
-		$radioCtrl = new RadioController();
-
-		if ($radioCtrl->getRadioProfileUC() == 0) {
-			$setProfileCommand = $radioCtrl->setRadioProfileUC(1); //Set digital
-
-			if ($setProfileCommand != "OK") {
-				return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
-			}
-		}
-
 		$command = 'sudo uucico -r1 ';
 		$output = exec_cli($command);
 		return response($output, 200);
@@ -330,16 +320,6 @@ class SystemController extends Controller
 	 */
 	public function uucpCallForHost($uuidhost)
 	{
-		$radioCtrl = new RadioController();
-
-		if ($radioCtrl->getRadioProfileUC() == 0) {
-			$setProfileCommand = $radioCtrl->setRadioProfileUC(1); //Set digital
-
-			if ($setProfileCommand != "OK") {
-				return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
-			}
-		}
-
 		// $command = 'sudo uucico -r1 ' ;
 		$command = 'sudo uucico -S ' . $uuidhost; //TODO - test
 		$output = exec_cli($command);

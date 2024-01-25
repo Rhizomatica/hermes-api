@@ -203,13 +203,15 @@ class RadioController extends Controller
 	{
 		$command = "";
 
-		if ($this->getRadioProfileUC() == 0) {
-			$setProfileCommand = $this->setRadioProfileUC(1); //Set digital
+		// //TODO - receive profile id and run command for same profile
+		// //But it should update profile...
+		// if ($this->getRadioProfileUC() == 0) {
+		// 	$setProfileCommand = $this->setRadioProfileUC(1); //Set digital
 
-			if ($setProfileCommand != "OK") {
-				return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
-			}
-		}
+		// 	if ($setProfileCommand != "OK") {
+		// 		return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
+		// 	}
+		// }
 
 		if ($status == "ON") {
 			$command = "ptt_on";
