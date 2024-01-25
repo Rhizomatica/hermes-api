@@ -345,25 +345,19 @@ class RadioController extends Controller
 	public function setRadioMode(string $mode, int $profile)
 	{
 
-		$setProfileCommand = $this->setRadioProfileUC($profile);
-
-		if ($setProfileCommand != "OK") {
-			return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
-		}
-
 		$radio_mode = "";
 
 		if ($mode == "USB") {
-			$command = explode("\n", exec_uc("set_mode -a USB"))[0];
+			$command = explode("\n", exec_uc("set_mode -a USB -p " . $profile))[0];
 		} else if ($mode == "LSB") {
-			$command = explode("\n", exec_uc("set_mode -a LSB"))[0];
+			$command = explode("\n", exec_uc("set_mode -a LSB -p " . $profile))[0];
 		} else {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioMode invalid error: is not USB or LSB' . $mode);
 			return response()->json(['message' => 'Server error' . $mode], 500);
 		}
 
 		if ($command == "OK") {
-			$radio_mode = explode("\n", exec_uc("get_mode"))[0];
+			$radio_mode = explode("\n", exec_uc("get_mode -p " . $profile))[0];
 			return response()->json($radio_mode, 200);
 		}
 
