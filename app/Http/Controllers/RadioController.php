@@ -318,9 +318,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioFreq()
+	public function getRadioFreq($profile)
 	{
-		$radio_frequency = explode("\n", exec_uc("get_frequency"))[0];
+		$command = "get_frequency";
+
+		if($profile != null){
+			$command .= " -p " . $profile;
+		}
+
+		$radio_frequency = explode("\n", exec_uc($command))[0];
 		return response()->json($radio_frequency, 200);
 	}
 
