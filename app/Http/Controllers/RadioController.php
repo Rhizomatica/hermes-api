@@ -623,13 +623,18 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioRefThresholdV($value)
+	public function setRadioRefThresholdV($value, $profile)
 	{
 		if ($value >= 0 && $value <= 5) {
 
 			$ratio = 5 / 1023;
 			$vvalue = ceil($value / $ratio);
 			$par = "set_ref_threshold -a " . $vvalue;
+			
+			if ($profile != null) {
+				$par .= " -p " . $profile;
+			}
+			
 			$radio_ref_threshold = explode("\n", exec_uc($par))[0];
 
 			if ($radio_ref_threshold == "OK") {
