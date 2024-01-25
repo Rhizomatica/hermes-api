@@ -393,9 +393,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioBfo()
+	public function getRadioBfo($profile)
 	{
-		$bfo = explode("\n", exec_uc("get_bfo"))[0];
+		$command = "get_bfo";
+
+		if($profile != null){
+			$command .= " -p " . $profile;
+		}
+
+		$bfo = explode("\n", exec_uc($command))[0];
 		return response()->json($bfo, 200);
 	}
 
