@@ -677,9 +677,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function restoreRadioDefaults()
+	public function restoreRadioDefaults($profile)
 	{
-		$output = explode("\n", exec_uc("restore_radio_defaults"))[0];
+		$command = "restore_radio_defaults";
+
+		if ($profile != null) {
+			$command .= " -p " . $profile;
+		}
+
+		$output = explode("\n", exec_uc($command))[0];
 
 		if ($output == "OK") {
 			return response(true, 200);
