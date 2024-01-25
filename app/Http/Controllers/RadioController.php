@@ -545,7 +545,14 @@ class RadioController extends Controller
 		$command = explode("\n", exec_uc($par))[0];
 
 		if ($command == "OK") {
-			$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
+			$radio_connection = "get_connected_status";
+
+			if($profile != null){
+				$radio_connection .= " -p " . $profile;
+			}
+
+			$radio_connection = explode("\n", exec_uc($radio_connection))[0];
+			
 			if ($radio_connection == "LED_ON") {
 				return response()->json(true, 200);
 			} else if ($radio_connection == "LED_OFF") {
