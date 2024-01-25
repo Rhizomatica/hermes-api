@@ -68,7 +68,7 @@ $router->group(['prefix' => '/caller'], function () use ($router) { //TODO - REN
 });
 
 $router->group(['prefix' => '/radio'], function () use ($router) {
-    $router->get('power',  ['uses' => 'RadioController@getRadioPowerStatus']);
+    $router->get('power/{profile}',  ['uses' => 'RadioController@getRadioPowerStatus']);
     $router->post('mode/{mode}/{profile}',  ['uses' => 'RadioController@setRadioMode']);
     $router->get('freq/{profile}',  ['uses' => 'RadioController@getRadioFreq']);
     $router->post('freq/{freq}/{profile}',  ['uses' => 'RadioController@setRadioFreq']);

@@ -11,9 +11,8 @@ class RadioController extends Controller
 	 */
 	public function getRadioStatus($profile)
 	{
-		if ($profile == null) {
-			(new ErrorController)->saveError(get_class($this), 500, 'API Error: : missing radio profile ID');
-			return response()->json(['message' => 'Server error'], 500);
+		if($profile == null){
+			$profile = 0;
 		}
 
 		$radio_frequency = explode("\n", exec_uc("get_frequency -p " . $profile))[0];
@@ -98,8 +97,13 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioPowerStatus()
+	public function getRadioPowerStatus($profile)
 	{
+
+		if($profile == null){
+			$profile = 0;
+		}
+
 		$radio_rx = true;
 		$radio_tx = false;
 		$radio_ref = 0;
@@ -110,18 +114,18 @@ class RadioController extends Controller
 		$radio_fwd_volts = 0;
 		$radio_swr = 0;
 
-		$radio_txrx = explode("\n", exec_uc("get_txrx_status"))[0];
-		$radio_led = explode("\n", exec_uc("get_led_status"))[0];
-		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
-		$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
+		$radio_txrx = explode("\n", exec_uc("get_txrx_status -p " . $profile))[0];
+		$radio_led = explode("\n", exec_uc("get_led_status -p " . $profile))[0];
+		$radio_protection = explode("\n", exec_uc("get_protection_status -p " . $profile))[0];
+		$radio_connection = explode("\n", exec_uc("get_connected_status -p " . $profile))[0];
 
 
 		if ($radio_txrx == "INTX" || !$radio_txrx) {
 			$radio_tx = true;
 			$radio_rx = false;
 
-			$radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
-			$radio_ref = explode("\n", exec_uc("get_ref"))[0];
+			$radio_fwd = explode("\n", exec_uc("get_fwd -p " . $profile))[0];
+			$radio_ref = explode("\n", exec_uc("get_ref -p " . $profile))[0];
 
 			if (isset($radio_fwd)) {
 				$radio_fwd_volts = adc2volts($radio_fwd);
@@ -250,7 +254,7 @@ class RadioController extends Controller
 	 * @return Json
 	 *
 	 */
-	public function setRadioTone($par, $profile)
+	public function setRadioTone($par)
 	{
 		system("sudo killall ffplay");
 
