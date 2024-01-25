@@ -11,7 +11,7 @@ class RadioController extends Controller
 	 */
 	public function getRadioStatus($profile)
 	{
-		if($profile == null){
+		if($profile === null){
 			$profile = 0;
 		}
 
@@ -100,7 +100,7 @@ class RadioController extends Controller
 	public function getRadioPowerStatus($profile)
 	{
 
-		if($profile == null){
+		if($profile === null){
 			$profile = 0;
 		}
 
@@ -232,7 +232,7 @@ class RadioController extends Controller
 			return response()->json(["message" => "Server error"], 500);
 		}
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -302,7 +302,7 @@ class RadioController extends Controller
 			$command = "set_tone -a 1";
 		}
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -326,7 +326,7 @@ class RadioController extends Controller
 	{
 		$command = "get_frequency";
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -343,7 +343,7 @@ class RadioController extends Controller
 	{
 		$command = "set_frequency -a " . $freq;
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -367,9 +367,8 @@ class RadioController extends Controller
 	public function setRadioMode(string $mode, int $profile)
 	{
 
-		if ($profile == null) {
-			(new ErrorController)->saveError(get_class($this), 500, 'API Error: : missing radio profile ID');
-			return response()->json(['message' => 'Server error'], 500);
+		if ($profile === null) {
+			$profile = 0;
 		}
 
 		$radio_mode = "";
@@ -401,7 +400,7 @@ class RadioController extends Controller
 	{
 		$command = "get_bfo";
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -418,7 +417,7 @@ class RadioController extends Controller
 	{
 		$command = "set_bfo -a " . $freq;
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -443,7 +442,7 @@ class RadioController extends Controller
 
 		$command = "set_mastercal -a " . $freq;
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -467,7 +466,7 @@ class RadioController extends Controller
 	{
 		$command = "get_protection_status";
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -501,7 +500,7 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$par .= " -p " . $profile;
 		}
 
@@ -542,7 +541,7 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$par .= " -p " . $profile;
 		}
 
@@ -551,7 +550,7 @@ class RadioController extends Controller
 		if ($command == "OK") {
 			$radio_connection = "get_connected_status";
 
-			if ($profile != null) {
+			if ($profile !== null) {
 				$radio_connection .= " -p " . $profile;
 			}
 
@@ -580,7 +579,7 @@ class RadioController extends Controller
 	{
 		$command = "get_ref_threshold";
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$command .= " -p " . $profile;
 		}
 		$radio_ref_threshold = explode("\n", exec_uc($command))[0];
@@ -604,7 +603,7 @@ class RadioController extends Controller
 
 			$par = "set_ref_threshold -a " . $value;
 
-			if ($profile != null) {
+			if ($profile !== null) {
 				$par .= " -p " . $profile;
 			}
 
@@ -635,7 +634,7 @@ class RadioController extends Controller
 			$vvalue = ceil($value / $ratio);
 			$par = "set_ref_threshold -a " . $vvalue;
 
-			if ($profile != null) {
+			if ($profile !== null) {
 				$par .= " -p " . $profile;
 			}
 
@@ -662,7 +661,7 @@ class RadioController extends Controller
 	{
 		$command = "reset_protection";
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -685,7 +684,7 @@ class RadioController extends Controller
 	{
 		$command = "restore_radio_defaults";
 
-		if ($profile != null) {
+		if ($profile !== null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -809,7 +808,7 @@ class RadioController extends Controller
 
 	public function setRadioProfile($profile)
 	{
-		if ($profile == null) {
+		if ($profile === null) {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing profile value');
 			return response()->json(['message' => 'Server error'], 500);
 		}
