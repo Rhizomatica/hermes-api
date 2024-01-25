@@ -497,8 +497,8 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		if($profile != null){
-			$par .= " -p " . $profile; 
+		if ($profile != null) {
+			$par .= " -p " . $profile;
 		}
 
 		$command = explode("\n", exec_uc($par))[0];
@@ -538,7 +538,7 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		if($profile != null){
+		if ($profile != null) {
 			$par .= " -p " . $profile;
 		}
 
@@ -547,12 +547,12 @@ class RadioController extends Controller
 		if ($command == "OK") {
 			$radio_connection = "get_connected_status";
 
-			if($profile != null){
+			if ($profile != null) {
 				$radio_connection .= " -p " . $profile;
 			}
 
 			$radio_connection = explode("\n", exec_uc($radio_connection))[0];
-			
+
 			if ($radio_connection == "LED_ON") {
 				return response()->json(true, 200);
 			} else if ($radio_connection == "LED_OFF") {
@@ -572,9 +572,14 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioRefThreshold()
+	public function getRadioRefThreshold($profile)
 	{
-		$radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold"))[0];
+		$command = "get_ref_threshold";
+
+		if ($profile != null) {
+			$command .= " -p " . $profile;
+		}
+		$radio_ref_threshold = explode("\n", exec_uc($command))[0];
 
 		if ($radio_ref_threshold != "ERROR") {
 			return response()->json($radio_ref_threshold, 200);
