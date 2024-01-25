@@ -82,7 +82,7 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->get('protection/{profile}',  ['uses' => 'RadioController@getRadioProtection']);
     $router->post('connection/{status}/{profile}',  ['uses' => 'RadioController@setRadioConnectionStatus']);
     $router->get('refthreshold/{profile}',  ['uses' => 'RadioController@getRadioRefThreshold']);
-    $router->post('refthreshold/{value}',  ['uses' => 'RadioController@setRadioRefThreshold']);
+    $router->post('refthreshold/{value}/{profile}',  ['uses' => 'RadioController@setRadioRefThreshold']);
     $router->post('refthresholdv/{value}',  ['uses' => 'RadioController@setRadioRefThresholdV']);
     $router->post('protection',  ['uses' => 'RadioController@resetRadioProtection']);
     $router->post('default',  ['uses' => 'RadioController@restoreRadioDefaults']);
@@ -93,7 +93,6 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('sosemergency',  ['uses' => 'RadioController@sosEmergency']);
     $router->post('profile/{profile}',  ['uses' => 'RadioController@setRadioProfile']);
     $router->get('{profile}',  ['uses' => 'RadioController@getRadioStatus']);
-
 });
 
 $router->group(['prefix' => '/geolocation'], function () use ($router) {

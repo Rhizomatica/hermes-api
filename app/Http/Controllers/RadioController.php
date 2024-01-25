@@ -594,11 +594,16 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioRefThreshold($value)
+	public function setRadioRefThreshold($value, $profile)
 	{
 		if ($value >= 0 && $value <= 1023) {
 
 			$par = "set_ref_threshold -a " . $value;
+
+			if ($profile != null) {
+				$par .= " -p " . $profile;
+			}
+
 			$radio_ref_threshold = explode("\n", exec_uc($par))[0];
 
 			if ($radio_ref_threshold == "OK") {
