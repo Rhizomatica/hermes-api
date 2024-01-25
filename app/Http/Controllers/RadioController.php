@@ -459,9 +459,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json bool
 	 */
-	public function getRadioProtection()
+	public function getRadioProtection($profile)
 	{
-		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
+		$command = "get_protection_status";
+
+		if ($profile != null) {
+			$command .= " -p " . $profile;
+		}
+
+		$radio_protection = explode("\n", exec_uc($command))[0];
 
 		if ($radio_protection == "PROTECTION_OFF") {
 			return response()->json(false, 200);
