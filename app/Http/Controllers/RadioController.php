@@ -11,6 +11,11 @@ class RadioController extends Controller
 	 */
 	public function getRadioStatus($profile)
 	{
+		if ($profile == null) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: : missing radio profile ID');
+			return response()->json(['message' => 'Server error'], 500);
+		}
+
 		$radio_frequency = explode("\n", exec_uc("get_frequency -p " . $profile))[0];
 		$radio_mode = explode("\n", exec_uc("get_mode -p " . $profile))[0];
 		$radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold -p " . $profile))[0];
@@ -199,7 +204,7 @@ class RadioController extends Controller
 	 * @return Json
 	 *
 	 */
-	public function setRadioPtt($status)
+	public function setRadioPtt($status, $profile)
 	{
 		$command = "";
 
@@ -221,6 +226,10 @@ class RadioController extends Controller
 			$command = "ptt_off";
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioPTTon - invalid parameter: ' . $status);
 			return response()->json(["message" => "Server error"], 500);
+		}
+
+		if ($profile != null) {
+			$command .= " -p " . $profile;
 		}
 
 		$output = exec_uc($command);
@@ -344,6 +353,11 @@ class RadioController extends Controller
 	 */
 	public function setRadioMode(string $mode, int $profile)
 	{
+
+		if ($profile == null) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: : missing radio profile ID' . $mode);
+			return response()->json(['message' => 'Server error'], 500);
+		}
 
 		$radio_mode = "";
 
