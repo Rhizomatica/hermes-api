@@ -630,11 +630,11 @@ class RadioController extends Controller
 			$ratio = 5 / 1023;
 			$vvalue = ceil($value / $ratio);
 			$par = "set_ref_threshold -a " . $vvalue;
-			
+
 			if ($profile != null) {
 				$par .= " -p " . $profile;
 			}
-			
+
 			$radio_ref_threshold = explode("\n", exec_uc($par))[0];
 
 			if ($radio_ref_threshold == "OK") {
@@ -654,9 +654,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function resetRadioProtection()
+	public function resetRadioProtection($profile)
 	{
-		$radio_prot = explode("\n", exec_uc("reset_protection"))[0];
+		$command = "reset_protection";
+
+		if ($profile != null) {
+			$command .= " -p " . $profile;
+		}
+
+		$radio_prot = explode("\n", exec_uc($command))[0];
 
 		if ($radio_prot == "OK") {
 			return response(true, 200);
