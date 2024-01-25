@@ -298,7 +298,7 @@ class RadioController extends Controller
 			$command = "set_tone -a 1";
 		}
 
-		if($profile != null){
+		if ($profile != null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -322,7 +322,7 @@ class RadioController extends Controller
 	{
 		$command = "get_frequency";
 
-		if($profile != null){
+		if ($profile != null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -339,7 +339,7 @@ class RadioController extends Controller
 	{
 		$command = "set_frequency -a " . $freq;
 
-		if($profile != null){
+		if ($profile != null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -397,7 +397,7 @@ class RadioController extends Controller
 	{
 		$command = "get_bfo";
 
-		if($profile != null){
+		if ($profile != null) {
 			$command .= " -p " . $profile;
 		}
 
@@ -410,9 +410,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioBfo($freq)
+	public function setRadioBfo($freq, $profile)
 	{
-		$command = explode("\n", exec_uc("set_bfo -a " . $freq))[0];
+		$command = "set_bfo -a " . $freq;
+
+		if ($profile != null) {
+			$command .= " -p " . $profile;
+		}
+
+		$command = explode("\n", exec_uc($command))[0];
 
 		if ($command == "OK") {
 			$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
