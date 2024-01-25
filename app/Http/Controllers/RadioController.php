@@ -702,7 +702,7 @@ class RadioController extends Controller
 	 */
 	public function getStep()
 	{
-		$output = explode("\n", exec_uc("sbitx_client -c get_freqstep"))[0];
+		$output = explode("\n", exec_uc("get_freqstep"))[0];
 
 		if (is_string($output)) {
 			return response($output, 200);
@@ -725,7 +725,7 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		$output = explode("\n", exec_uc("sbitx_client -c set_freqstep -a " . $step))[0];
+		$output = explode("\n", exec_uc("set_freqstep -a " . $step))[0];
 
 		if ($output == "OK") {
 			return response(true, 200);
@@ -742,7 +742,7 @@ class RadioController extends Controller
 	 */
 	public function getVolume()
 	{
-		$output = explode("\n", exec_uc("sbitx_client get_volume"))[0];
+		$output = explode("\n", exec_uc("get_volume"))[0];
 
 		if (is_string($output)) {
 			return response($output, 200);
@@ -764,7 +764,7 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		$output = explode("\n", exec_uc("sbitx_client -c set_volume -a " . $volume))[0];
+		$output = explode("\n", exec_uc("set_volume -a " . $volume))[0];
 
 		if ($output == "OK") {
 			return response(true, 200);
