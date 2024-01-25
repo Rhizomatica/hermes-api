@@ -195,7 +195,7 @@ class RadioController extends Controller
 	 * @return Json
 	 *
 	 */
-	public function getRadioTXRXStatus()
+	public function getRadioTXRXStatus() // Ain't using
 	{
 		$radio_frequency = explode("\n", exec_uc("get_txrx_status"))[0];
 		return response($radio_frequency, 200);
