@@ -9,21 +9,21 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioStatus()
+	public function getRadioStatus($profile)
 	{
-		$radio_frequency = explode("\n", exec_uc("get_frequency"))[0];
-		$radio_mode = explode("\n", exec_uc("get_mode"))[0];
-		$radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold"))[0];
-		$radio_serial = explode("\n", exec_uc("get_serial"))[0];
-		$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
-		$radio_txrx = explode("\n", exec_uc("get_txrx_status"))[0];
-		$radio_rx = true;
+		$radio_frequency = explode("\n", exec_uc("get_frequency -p " . $profile))[0];
+		$radio_mode = explode("\n", exec_uc("get_mode -p " . $profile))[0];
+		$radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold -p " . $profile))[0];
+		$radio_serial = explode("\n", exec_uc("get_serial -p " . $profile))[0];
+		$radio_bfo = explode("\n", exec_uc("get_bfo -p " . $profile))[0];
+		$radio_txrx = explode("\n", exec_uc("get_txrx_status -p " . $profile))[0];
+		$radio_rx = true; //TODO - Verify!! Same for both profiles?
 		$radio_tx = false;
-		$radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
-		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep ffplay -a"))[0]);
-		$radio_led = explode("\n", exec_uc("get_led_status"))[0];
-		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
-		$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
+		$radio_mastercal = explode("\n", exec_uc("get_mastercal -p " . $profile))[0];
+		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep ffplay -a -p " . $profile))[0]);
+		$radio_led = explode("\n", exec_uc("get_led_status -p " . $profile))[0];
+		$radio_protection = explode("\n", exec_uc("get_protection_status -p " . $profile))[0];
+		$radio_connection = explode("\n", exec_uc("get_connected_status -p " . $profile))[0];
 
 		if (isset($radio_ref_threshold)) {
 			$radio_ref_thresholdv = adc2volts($radio_ref_threshold);
