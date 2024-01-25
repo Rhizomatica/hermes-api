@@ -434,9 +434,16 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioMasterCal($freq)
+	public function setRadioMasterCal($freq, $profile)
 	{
-		$command = explode("\n", exec_uc("set_mastercal -a " . $freq))[0];
+
+		$command = "set_mastercal -a " . $freq;
+
+		if ($profile != null) {
+			$command .= " -p " . $profile;
+		}
+
+		$command = explode("\n", exec_uc($command))[0];
 
 		if ($command == "OK") {
 			$radio_fwd = explode("\n", exec_uc("get_mastercal"))[0];
