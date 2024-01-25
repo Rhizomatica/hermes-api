@@ -364,7 +364,7 @@ class RadioController extends Controller
 	{
 
 		if ($profile == null) {
-			(new ErrorController)->saveError(get_class($this), 500, 'API Error: : missing radio profile ID' . $mode);
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: : missing radio profile ID');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
@@ -484,7 +484,7 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioLedStatus($status)
+	public function setRadioLedStatus($status, $profile)
 	{
 		$par = '';
 
@@ -495,6 +495,10 @@ class RadioController extends Controller
 		} else {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioLedStatus fail');
 			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		if($profile != null){
+			$par .= " -p " . $profile; 
 		}
 
 		$command = explode("\n", exec_uc($par))[0];
