@@ -250,7 +250,7 @@ class RadioController extends Controller
 	 * @return Json
 	 *
 	 */
-	public function setRadioTone($par)
+	public function setRadioTone($par, $profile)
 	{
 		system("sudo killall ffplay");
 
@@ -289,13 +289,17 @@ class RadioController extends Controller
 		return response()->json(["message" => "Server error"], 500);
 	}
 
-	public function setRadioToneSBitx($par)
+	public function setRadioToneSBitx($par, $profile)
 	{
 
 		if ($par == 0) {
 			$command = "set_tone -a 0";
 		} else {
 			$command = "set_tone -a 1";
+		}
+
+		if($profile != null){
+			$command .= " -p " . $profile;
 		}
 
 		$output = exec_uc($command);
