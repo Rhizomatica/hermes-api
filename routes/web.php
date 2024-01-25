@@ -68,7 +68,6 @@ $router->group(['prefix' => '/caller'], function () use ($router) { //TODO - REN
 });
 
 $router->group(['prefix' => '/radio'], function () use ($router) {
-    $router->get('{profile}',  ['uses' => 'RadioController@getRadioStatus']);
     $router->get('power',  ['uses' => 'RadioController@getRadioPowerStatus']);
     $router->post('mode/{mode}/{profile}',  ['uses' => 'RadioController@setRadioMode']);
     $router->get('freq',  ['uses' => 'RadioController@getRadioFreq']);
@@ -93,6 +92,8 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('volume/{volume}',  ['uses' => 'RadioController@changeVolume']);
     $router->post('sosemergency',  ['uses' => 'RadioController@sosEmergency']);
     $router->post('profile/{profile}',  ['uses' => 'RadioController@setRadioProfile']);
+    $router->get('{profile}',  ['uses' => 'RadioController@getRadioStatus']);
+
 });
 
 $router->group(['prefix' => '/geolocation'], function () use ($router) {
