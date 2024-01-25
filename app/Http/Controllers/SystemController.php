@@ -346,7 +346,8 @@ class SystemController extends Controller
 	public function sysShutdown()
 	{
 		// set led status OFF on cabinet
-		exec_uc("set_led_status -a OFF");
+		exec_uc("set_led_status -a OFF -p 0");
+		exec_uc("set_led_status -a OFF -p 1");
 		sleep(1);
 
 		// linux shutdown
