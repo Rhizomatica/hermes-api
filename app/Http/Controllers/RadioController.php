@@ -350,7 +350,15 @@ class RadioController extends Controller
 		$command = explode("\n", exec_uc($command))[0];
 
 		if ($command == "OK") {
-			$radio_frequency = explode("\n", exec_uc("get_frequency"))[0];
+
+			$get_frequency_command = "get_frequency";
+
+			if ($profile !== null) {
+				$get_frequency_command .= " -p " . $profile;
+			}
+
+			$radio_frequency = explode("\n", exec_uc($get_frequency_command))[0];
+			
 			return response()->json($radio_frequency, 200);
 		}
 
