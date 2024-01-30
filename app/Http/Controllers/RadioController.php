@@ -767,7 +767,7 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		$output = explode("\n", exec_uc("set_volume -a " . $volume))[0];
+		$output = explode("\n", exec_uc("set_volume -a " . $volume . " -p 1"))[0];
 
 		if ($output == "OK") {
 			return response(true, 200);
