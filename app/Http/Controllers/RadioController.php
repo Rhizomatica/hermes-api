@@ -11,7 +11,7 @@ class RadioController extends Controller
 	 */
 	public function getRadioStatus($profile)
 	{
-		if($profile === null){
+		if ($profile === null) {
 			$profile = 0;
 		}
 
@@ -100,7 +100,7 @@ class RadioController extends Controller
 	public function getRadioPowerStatus($profile)
 	{
 
-		if($profile === null){
+		if ($profile === null) {
 			$profile = 0;
 		}
 
@@ -358,7 +358,7 @@ class RadioController extends Controller
 			}
 
 			$radio_frequency = explode("\n", exec_uc($get_frequency_command))[0];
-			
+
 			return response()->json($radio_frequency, 200);
 		}
 
@@ -432,7 +432,14 @@ class RadioController extends Controller
 		$command = explode("\n", exec_uc($command))[0];
 
 		if ($command == "OK") {
-			$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
+
+			$radio_bfo = "get_bfo";
+
+			if ($profile !== null) {
+				$radio_bfo .= " -p " . $profile;
+			}
+
+			$radio_bfo = explode("\n", exec_uc($radio_bfo))[0];
 			return response($radio_bfo, 200);
 		}
 
