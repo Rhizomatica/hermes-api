@@ -464,7 +464,14 @@ class RadioController extends Controller
 		$command = explode("\n", exec_uc($command))[0];
 
 		if ($command == "OK") {
-			$radio_fwd = explode("\n", exec_uc("get_mastercal"))[0];
+
+			$radio_fwd = "get_mastercal";
+
+			if ($profile !== null) {
+				$radio_fwd .= " -p " . $profile;
+			}
+
+			$radio_fwd = explode("\n", exec_uc($radio_fwd))[0];
 			return response()->json($radio_fwd, 200);
 		}
 
