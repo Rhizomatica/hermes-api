@@ -239,7 +239,7 @@ class RadioController extends Controller
 		$output = exec_uc($command);
 		$output = explode("\n", $output)[0];
 
-		if ($output == "OK") {
+		if ($output == "OK" || $output == "NOK") {
 			return response()->json($status, 200);
 		}
 
