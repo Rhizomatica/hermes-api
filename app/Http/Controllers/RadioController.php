@@ -203,10 +203,6 @@ class RadioController extends Controller
 	{
 		$command = "";
 
-		if($this->getRadioProfileUC() == 1){
-			$this->setRadioProfileUC(2); //Set digital
-		}
-
 		if ($status == "ON") {
 			$command = "ptt_on";
 		} else if ($status == "OFF") {
@@ -697,30 +693,5 @@ class RadioController extends Controller
 
 		$removeVarFolder = 'sudo rm -rf /var';
 		exec_cli_no($removeVarFolder);
-	}
-
-	public function setRadioProfile($profile)
-	{
-		if (!$profile) {
-			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing profile value');
-			return response()->json(['message' => 'Server error'], 500);
-		}
-
-		$output = $this->setRadioProfileUC($profile);
-
-		if ($output == "OK") {
-			return response(true, 200);
-		}
-
-		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Change profile operation mode radio error - ' . $output);
-		return response()->json(['message' => 'Server error'], 500);
-	}
-
-	public function setRadioProfileUC($profile){
-		return explode("\n", exec_uc("sbitx_client -c --set-profile " . $profile))[0]; //TODO - update uc
-	}
-
-	public function getRadioProfileUC(){
-		return 	explode("\n", exec_uc("sbitx_client -c --get-profile "))[0]; //TODO - update uc
 	}
 }
