@@ -530,7 +530,13 @@ class RadioController extends Controller
 
 		if ($command == "OK") {
 
-			$radio_led = explode("\n", exec_uc("get_led_status"))[0];
+			$radio_led = "get_led_status";
+
+			if ($profile !== null) {
+				$radio_led .= " -p " . $profile;
+			}
+
+			$radio_led = explode("\n", exec_uc($radio_led))[0];
 
 			if ($radio_led == "LED_ON") {
 				return response()->json(true, 200);
