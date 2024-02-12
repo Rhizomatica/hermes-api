@@ -864,7 +864,7 @@ class RadioController extends Controller
 	public function restartVoiceTimeout()
 	{
 		
-		$command = "set_voice_timeout -a " . 0 . " -p 1";		
+		$command = "reset_timeout";		
 		$output = explode("\n", exec_uc($command))[0];
 
 		if ($output == "OK") {
