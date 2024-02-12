@@ -860,4 +860,19 @@ class RadioController extends Controller
 	{
 		return explode("\n", exec_uc("set_profile -a " . $profile))[0];
 	}
+
+	public function restartVoiceTimeout()
+	{
+		
+		$command = "set_voice_timeout -a " . 0 . " -p 1";		
+		$output = explode("\n", exec_uc($command))[0];
+
+		if ($output == "OK") {
+			return response(0, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Change profile operation mode radio error - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
 }
