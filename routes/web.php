@@ -94,6 +94,8 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('profile/{profile}',  ['uses' => 'RadioController@setRadioProfile']);
     $router->get('{profile}',  ['uses' => 'RadioController@getRadioStatus']);
     $router->post('/voice/timeout',  ['uses' => 'RadioController@restartVoiceTimeout']);
+    $router->get('/voice/timeout/config',  ['uses' => 'RadioController@getTimeoutConfig']);
+    $router->post('/voice/timeout/config/{seconds}',  ['uses' => 'RadioController@setTimeoutConfig']);
 });
 
 $router->group(['prefix' => '/geolocation'], function () use ($router) {

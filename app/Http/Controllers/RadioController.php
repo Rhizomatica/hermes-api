@@ -875,4 +875,36 @@ class RadioController extends Controller
 		return response()->json(['message' => 'Server error'], 500);
 	}
 
+	public function getTimeoutConfig()
+	{
+		$command = "get_timeout";		
+		$output = explode("\n", exec_uc($command))[0];
+
+		if ($output != "ERROR") {
+			return response($output, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during getting the timeout period - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	public function setTimeoutConfig($seconds)
+	{
+
+		if($seconds >= 0 && $seconds < 300){
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Timeout value must be above 300');
+			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		$command = "set_timeout -a " . $seconds;		
+		$output = explode("\n", exec_uc($command))[0];
+
+		if ($output != "ERROR") {
+			return response($output, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during updating the timeout period - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
 }
