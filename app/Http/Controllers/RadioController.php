@@ -899,8 +899,8 @@ class RadioController extends Controller
 		$command = "set_timeout -a " . $seconds;		
 		$output = explode("\n", exec_uc($command))[0];
 
-		if ($output != "ERROR") {
-			return response($output, 200);
+		if ($output == "OK") {
+			return response(true, 200);
 		}
 
 		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during updating the timeout period - ' . $output);
