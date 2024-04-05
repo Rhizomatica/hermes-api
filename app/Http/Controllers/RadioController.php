@@ -710,11 +710,11 @@ class RadioController extends Controller
 	 */
 	public function restoreRadioDefaults($profile)
 	{
-		$command = "restore_radio_defaults";
+		$command = "set_radio_defaults";
 
-		if ($profile !== null) {
-			$command .= " -p " . $profile;
-		}
+		// if ($profile !== null) {
+		// 	$command .= " -p " . $profile;
+		// }
 
 		$output = explode("\n", exec_uc($command))[0];
 
