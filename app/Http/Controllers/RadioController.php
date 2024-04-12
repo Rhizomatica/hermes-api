@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Hamcrest\Type\IsInteger;
+
 class RadioController extends Controller
 {
 	/**
@@ -790,7 +792,7 @@ class RadioController extends Controller
 	 */
 	public function changeVolume($volume)
 	{
-		if (!$volume) {
+		if ($volume == null || !is_int($volume)) {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing volume value');
 			return response()->json(['message' => 'Server error'], 500);
 		}
