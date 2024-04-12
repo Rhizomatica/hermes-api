@@ -792,7 +792,7 @@ class RadioController extends Controller
 	 */
 	public function changeVolume($volume)
 	{
-		if ($volume == null || !is_int($volume)) {
+		if (!isset($volume)) {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing volume value');
 			return response()->json(['message' => 'Server error'], 500);
 		}
