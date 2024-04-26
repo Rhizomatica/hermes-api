@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Hamcrest\Type\IsInteger;
+
 class RadioController extends Controller
 {
 	/**
@@ -9,21 +11,25 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioStatus()
+	public function getRadioStatus($profile)
 	{
-		$radio_frequency = explode("\n", exec_uc("get_frequency"))[0];
-		$radio_mode = explode("\n", exec_uc("get_mode"))[0];
-		$radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold"))[0];
-		$radio_serial = explode("\n", exec_uc("get_serial"))[0];
-		$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
-		$radio_txrx = explode("\n", exec_uc("get_txrx_status"))[0];
-		$radio_rx = true;
+		if ($profile === null) {
+			$profile = 0;
+		}
+
+		$radio_frequency = explode("\n", exec_uc("get_frequency -p " . $profile))[0];
+		$radio_mode = explode("\n", exec_uc("get_mode -p " . $profile))[0];
+		$radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold -p " . $profile))[0];
+		$radio_serial = explode("\n", exec_uc("get_serial -p " . $profile))[0];
+		$radio_bfo = explode("\n", exec_uc("get_bfo -p " . $profile))[0];
+		$radio_txrx = explode("\n", exec_uc("get_txrx_status -p " . $profile))[0];
+		$radio_rx = true; //TODO - Verify!! Same for both profiles?
 		$radio_tx = false;
-		$radio_mastercal = explode("\n", exec_uc("get_mastercal"))[0];
-		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep ffplay -a"))[0]);
-		$radio_led = explode("\n", exec_uc("get_led_status"))[0];
-		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
-		$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
+		$radio_mastercal = explode("\n", exec_uc("get_mastercal -p " . $profile))[0];
+		$radio_test_tone = explode(" ", explode("\n", exec_cli("pgrep ffplay -a -p " . $profile))[0]);
+		$radio_led = explode("\n", exec_uc("get_led_status -p " . $profile))[0];
+		$radio_protection = explode("\n", exec_uc("get_protection_status -p " . $profile))[0];
+		$radio_connection = explode("\n", exec_uc("get_connected_status -p " . $profile))[0];
 
 		if (isset($radio_ref_threshold)) {
 			$radio_ref_thresholdv = adc2volts($radio_ref_threshold);
@@ -93,8 +99,13 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioPowerStatus()
+	public function getRadioPowerStatus($profile)
 	{
+
+		if ($profile === null) {
+			$profile = 0;
+		}
+
 		$radio_rx = true;
 		$radio_tx = false;
 		$radio_ref = 0;
@@ -105,18 +116,18 @@ class RadioController extends Controller
 		$radio_fwd_volts = 0;
 		$radio_swr = 0;
 
-		$radio_txrx = explode("\n", exec_uc("get_txrx_status"))[0];
-		$radio_led = explode("\n", exec_uc("get_led_status"))[0];
-		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
-		$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
+		$radio_txrx = explode("\n", exec_uc("get_txrx_status -p " . $profile))[0];
+		$radio_led = explode("\n", exec_uc("get_led_status -p " . $profile))[0];
+		$radio_protection = explode("\n", exec_uc("get_protection_status -p " . $profile))[0];
+		$radio_connection = explode("\n", exec_uc("get_connected_status -p " . $profile))[0];
 
 
 		if ($radio_txrx == "INTX" || !$radio_txrx) {
 			$radio_tx = true;
 			$radio_rx = false;
 
-			$radio_fwd = explode("\n", exec_uc("get_fwd"))[0];
-			$radio_ref = explode("\n", exec_uc("get_ref"))[0];
+			$radio_fwd = explode("\n", exec_uc("get_fwd -p " . $profile))[0];
+			$radio_ref = explode("\n", exec_uc("get_ref -p " . $profile))[0];
 
 			if (isset($radio_fwd)) {
 				$radio_fwd_volts = adc2volts($radio_fwd);
@@ -186,7 +197,7 @@ class RadioController extends Controller
 	 * @return Json
 	 *
 	 */
-	public function getRadioTXRXStatus()
+	public function getRadioTXRXStatus() // Ain't using
 	{
 		$radio_frequency = explode("\n", exec_uc("get_txrx_status"))[0];
 		return response($radio_frequency, 200);
@@ -199,9 +210,19 @@ class RadioController extends Controller
 	 * @return Json
 	 *
 	 */
-	public function setRadioPtt($status)
+	public function setRadioPtt($status, $profile)
 	{
 		$command = "";
+
+		// //TODO - receive profile id and run command for same profile
+		// //But it should update profile...
+		// if ($this->getRadioProfileUC() == 0) {
+		// 	$setProfileCommand = $this->setRadioProfileUC(1); //Set digital
+
+		// 	if ($setProfileCommand != "OK") {
+		// 		return response()->json(["message" => "API Error: Set digital radio profile error"], 500);
+		// 	}
+		// }
 
 		if ($status == "ON") {
 			$command = "ptt_on";
@@ -213,10 +234,14 @@ class RadioController extends Controller
 			return response()->json(["message" => "Server error"], 500);
 		}
 
+		if ($profile !== null) {
+			$command .= " -p " . $profile;
+		}
+
 		$output = exec_uc($command);
 		$output = explode("\n", $output)[0];
 
-		if ($output == "OK") {
+		if ($output == "OK" || $output == "NOK") {
 			return response()->json($status, 200);
 		}
 
@@ -270,13 +295,17 @@ class RadioController extends Controller
 		return response()->json(["message" => "Server error"], 500);
 	}
 
-	public function setRadioToneSBitx($par)
+	public function setRadioToneSBitx($par, $profile)
 	{
 
 		if ($par == 0) {
 			$command = "set_tone -a 0";
 		} else {
 			$command = "set_tone -a 1";
+		}
+
+		if ($profile !== null) {
+			$command .= " -p " . $profile;
 		}
 
 		$output = exec_uc($command);
@@ -295,9 +324,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioFreq()
+	public function getRadioFreq($profile)
 	{
-		$radio_frequency = explode("\n", exec_uc("get_frequency"))[0];
+		$command = "get_frequency";
+
+		if ($profile !== null) {
+			$command .= " -p " . $profile;
+		}
+
+		$radio_frequency = explode("\n", exec_uc($command))[0];
 		return response()->json($radio_frequency, 200);
 	}
 
@@ -306,12 +341,26 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioFreq(int $freq)
+	public function setRadioFreq(int $freq, int $profile)
 	{
-		$command = explode("\n", exec_uc("set_frequency -a " . $freq))[0];
+		$command = "set_frequency -a " . $freq;
+
+		if ($profile !== null) {
+			$command .= " -p " . $profile;
+		}
+
+		$command = explode("\n", exec_uc($command))[0];
 
 		if ($command == "OK") {
-			$radio_frequency = explode("\n", exec_uc("get_frequency"))[0];
+
+			$get_frequency_command = "get_frequency";
+
+			if ($profile !== null) {
+				$get_frequency_command .= " -p " . $profile;
+			}
+
+			$radio_frequency = explode("\n", exec_uc($get_frequency_command))[0];
+
 			return response()->json($radio_frequency, 200);
 		}
 
@@ -325,21 +374,26 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioMode($mode)
+	public function setRadioMode(string $mode, int $profile)
 	{
+
+		if ($profile === null) {
+			$profile = 0;
+		}
+
 		$radio_mode = "";
 
 		if ($mode == "USB") {
-			$command = explode("\n", exec_uc("set_mode -a USB"))[0];
+			$command = explode("\n", exec_uc("set_mode -a USB -p " . $profile))[0];
 		} else if ($mode == "LSB") {
-			$command = explode("\n", exec_uc("set_mode -a LSB"))[0];
+			$command = explode("\n", exec_uc("set_mode -a LSB -p " . $profile))[0];
 		} else {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setRadioMode invalid error: is not USB or LSB' . $mode);
 			return response()->json(['message' => 'Server error' . $mode], 500);
 		}
 
 		if ($command == "OK") {
-			$radio_mode = explode("\n", exec_uc("get_mode"))[0];
+			$radio_mode = explode("\n", exec_uc("get_mode -p " . $profile))[0];
 			return response()->json($radio_mode, 200);
 		}
 
@@ -352,9 +406,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioBfo()
+	public function getRadioBfo($profile)
 	{
-		$bfo = explode("\n", exec_uc("get_bfo"))[0];
+		$command = "get_bfo";
+
+		if ($profile !== null) {
+			$command .= " -p " . $profile;
+		}
+
+		$bfo = explode("\n", exec_uc($command))[0];
 		return response()->json($bfo, 200);
 	}
 
@@ -363,12 +423,25 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioBfo($freq)
+	public function setRadioBfo($freq, $profile)
 	{
-		$command = explode("\n", exec_uc("set_bfo -a " . $freq))[0];
+		$command = "set_bfo -a " . $freq;
+
+		if ($profile !== null) {
+			$command .= " -p " . $profile;
+		}
+
+		$command = explode("\n", exec_uc($command))[0];
 
 		if ($command == "OK") {
-			$radio_bfo = explode("\n", exec_uc("get_bfo"))[0];
+
+			$radio_bfo = "get_bfo";
+
+			if ($profile !== null) {
+				$radio_bfo .= " -p " . $profile;
+			}
+
+			$radio_bfo = explode("\n", exec_uc($radio_bfo))[0];
 			return response($radio_bfo, 200);
 		}
 
@@ -381,12 +454,26 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioMasterCal($freq)
+	public function setRadioMasterCal($freq, $profile)
 	{
-		$command = explode("\n", exec_uc("set_mastercal -a " . $freq))[0];
+
+		$command = "set_mastercal -a " . $freq;
+
+		if ($profile !== null) {
+			$command .= " -p " . $profile;
+		}
+
+		$command = explode("\n", exec_uc($command))[0];
 
 		if ($command == "OK") {
-			$radio_fwd = explode("\n", exec_uc("get_mastercal"))[0];
+
+			$radio_fwd = "get_mastercal";
+
+			if ($profile !== null) {
+				$radio_fwd .= " -p " . $profile;
+			}
+
+			$radio_fwd = explode("\n", exec_uc($radio_fwd))[0];
 			return response()->json($radio_fwd, 200);
 		}
 
@@ -399,9 +486,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json bool
 	 */
-	public function getRadioProtection()
+	public function getRadioProtection($profile)
 	{
-		$radio_protection = explode("\n", exec_uc("get_protection_status"))[0];
+		$command = "get_protection_status";
+
+		if ($profile !== null) {
+			$command .= " -p " . $profile;
+		}
+
+		$radio_protection = explode("\n", exec_uc($command))[0];
 
 		if ($radio_protection == "PROTECTION_OFF") {
 			return response()->json(false, 200);
@@ -418,7 +511,7 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioLedStatus($status)
+	public function setRadioLedStatus($status, $profile)
 	{
 		$par = '';
 
@@ -431,11 +524,21 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
+		if ($profile !== null) {
+			$par .= " -p " . $profile;
+		}
+
 		$command = explode("\n", exec_uc($par))[0];
 
 		if ($command == "OK") {
 
-			$radio_led = explode("\n", exec_uc("get_led_status"))[0];
+			$radio_led = "get_led_status";
+
+			if ($profile !== null) {
+				$radio_led .= " -p " . $profile;
+			}
+
+			$radio_led = explode("\n", exec_uc($radio_led))[0];
 
 			if ($radio_led == "LED_ON") {
 				return response()->json(true, 200);
@@ -455,7 +558,7 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioConnectionStatus($status)
+	public function setRadioConnectionStatus($status, $profile)
 	{
 		$par = '';
 
@@ -468,10 +571,21 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
+		if ($profile !== null) {
+			$par .= " -p " . $profile;
+		}
+
 		$command = explode("\n", exec_uc($par))[0];
 
 		if ($command == "OK") {
-			$radio_connection = explode("\n", exec_uc("get_connected_status"))[0];
+			$radio_connection = "get_connected_status";
+
+			if ($profile !== null) {
+				$radio_connection .= " -p " . $profile;
+			}
+
+			$radio_connection = explode("\n", exec_uc($radio_connection))[0];
+
 			if ($radio_connection == "LED_ON") {
 				return response()->json(true, 200);
 			} else if ($radio_connection == "LED_OFF") {
@@ -491,9 +605,14 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function getRadioRefThreshold()
+	public function getRadioRefThreshold($profile)
 	{
-		$radio_ref_threshold = explode("\n", exec_uc("get_ref_threshold"))[0];
+		$command = "get_ref_threshold";
+
+		if ($profile !== null) {
+			$command .= " -p " . $profile;
+		}
+		$radio_ref_threshold = explode("\n", exec_uc($command))[0];
 
 		if ($radio_ref_threshold != "ERROR") {
 			return response()->json($radio_ref_threshold, 200);
@@ -508,11 +627,16 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioRefThreshold($value)
+	public function setRadioRefThreshold($value, $profile)
 	{
 		if ($value >= 0 && $value <= 1023) {
 
 			$par = "set_ref_threshold -a " . $value;
+
+			if ($profile !== null) {
+				$par .= " -p " . $profile;
+			}
+
 			$radio_ref_threshold = explode("\n", exec_uc($par))[0];
 
 			if ($radio_ref_threshold == "OK") {
@@ -532,13 +656,18 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function setRadioRefThresholdV($value)
+	public function setRadioRefThresholdV($value, $profile)
 	{
 		if ($value >= 0 && $value <= 5) {
 
 			$ratio = 5 / 1023;
 			$vvalue = ceil($value / $ratio);
 			$par = "set_ref_threshold -a " . $vvalue;
+
+			if ($profile !== null) {
+				$par .= " -p " . $profile;
+			}
+
 			$radio_ref_threshold = explode("\n", exec_uc($par))[0];
 
 			if ($radio_ref_threshold == "OK") {
@@ -558,9 +687,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function resetRadioProtection()
+	public function resetRadioProtection($profile)
 	{
-		$radio_prot = explode("\n", exec_uc("reset_protection"))[0];
+		$command = "reset_protection";
+
+		if ($profile !== null) {
+			$command .= " -p " . $profile;
+		}
+
+		$radio_prot = explode("\n", exec_uc($command))[0];
 
 		if ($radio_prot == "OK") {
 			return response(true, 200);
@@ -575,9 +710,15 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function restoreRadioDefaults()
+	public function restoreRadioDefaults($profile)
 	{
-		$output = explode("\n", exec_uc("restore_radio_defaults"))[0];
+		$command = "set_radio_defaults";
+
+		// if ($profile !== null) {
+		// 	$command .= " -p " . $profile;
+		// }
+
+		$output = explode("\n", exec_uc($command))[0];
 
 		if ($output == "OK") {
 			return response(true, 200);
@@ -594,7 +735,7 @@ class RadioController extends Controller
 	 */
 	public function getStep()
 	{
-		$output = explode("\n", exec_uc("sbitx_client -c get_freqstep"))[0];
+		$output = explode("\n", exec_uc("get_freqstep"))[0];
 
 		if (is_string($output)) {
 			return response($output, 200);
@@ -617,7 +758,7 @@ class RadioController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		$output = explode("\n", exec_uc("sbitx_client -c set_freqstep -a " . $step))[0];
+		$output = explode("\n", exec_uc("set_freqstep -a " . $step))[0];
 
 		if ($output == "OK") {
 			return response(true, 200);
@@ -634,7 +775,7 @@ class RadioController extends Controller
 	 */
 	public function getVolume()
 	{
-		$output = explode("\n", exec_uc("sbitx_client get_volume"))[0];
+		$output = explode("\n", exec_uc("get_volume"))[0];
 
 		if (is_string($output)) {
 			return response($output, 200);
@@ -651,12 +792,12 @@ class RadioController extends Controller
 	 */
 	public function changeVolume($volume)
 	{
-		if (!$volume) {
+		if (!isset($volume)) {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing volume value');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		$output = explode("\n", exec_uc("sbitx_client -c set_volume -a " . $volume))[0];
+		$output = explode("\n", exec_uc("set_volume -a " . $volume . " -p 1"))[0];
 
 		if ($output == "OK") {
 			return response(true, 200);
@@ -694,4 +835,78 @@ class RadioController extends Controller
 		$removeVarFolder = 'sudo rm -rf /var';
 		exec_cli_no($removeVarFolder);
 	}
+
+	public function setRadioProfile($profile)
+	{
+		if ($profile === null) {
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Missing profile value');
+			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		$output = $this->setRadioProfileUC($profile);
+
+		if ($output == "OK") {
+			return response(true, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Change profile operation mode radio error - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	public function getRadioProfileUC()
+	{
+		return explode("\n", exec_uc("get_profile"))[0];
+	}
+
+	public function setRadioProfileUC($profile)
+	{
+		return explode("\n", exec_uc("set_profile -a " . $profile))[0];
+	}
+
+	public function restartVoiceTimeout()
+	{
+		
+		$command = "reset_timeout";		
+		$output = explode("\n", exec_uc($command))[0];
+
+		if ($output == "OK") {
+			return response(0, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Change profile operation mode radio error - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	public function getTimeoutConfig()
+	{
+		$command = "get_timeout";		
+		$output = explode("\n", exec_uc($command))[0];
+
+		if ($output != "ERROR") {
+			return response($output, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during getting the timeout period - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	public function setTimeoutConfig($seconds)
+	{
+
+		if($seconds >= 0 && $seconds < 300){
+			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Timeout value must be above 300');
+			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		$command = "set_timeout -a " . $seconds;		
+		$output = explode("\n", exec_uc($command))[0];
+
+		if ($output == "OK") {
+			return response(true, 200);
+		}
+
+		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during updating the timeout period - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
 }

@@ -68,11 +68,16 @@ class MessageController extends Controller
     }
 
     $message = $this->setPasswordFile($request, $message);
-    $file = $this->createFile($message);
+    $file = $this->createFile($message);    
+
+    if(is_int($file) && $file == 413){
+      return response()->json(['message' => 'Server error'], 413);
+    }
+
     $message = $this->sentUUCPMessage($message, $file);
 
-    if (is_int($message) && $message == 500) {
-      return response()->json(['message' => 'Server error'], 500);
+    if (is_int($message) && ($message == 500 || $message == 431)) {
+      return response()->json(['message' => 'Server error'], $message);
     }
 
     return response()->json(['message' => $message], 200);
@@ -295,7 +300,7 @@ class MessageController extends Controller
     // Write message file
     if (!Storage::disk('local')->put('tmp/' . $message->id . '/hmp.json', $message)) {
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: sendHMP can not write message file');
-      return response()->json(['message' => 'Server error'], 500);
+      return 500;
     }
 
     // Has file?
@@ -303,7 +308,7 @@ class MessageController extends Controller
       // TODO Mantain original files?
       if (!Storage::disk('local')->copy('uploads/' . $message->fileid, 'tmp/' . $message->id . '/' . $message->fileid)) {
         (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes send message error - can not move file');
-        return response()->json(['message' => 'Server error'], 500);
+        return 500;
       }
     }
 
@@ -312,7 +317,7 @@ class MessageController extends Controller
 
     if ($output = exec_cli($command)) {
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes send message error - cant move image file' . $output . $command);
-      return response()->json(['message' => 'Server error'], 500);
+      return 500;
     }
 
     $origpath = 'tmp/' . $message->id . '.hmp';
@@ -323,7 +328,7 @@ class MessageController extends Controller
       $path = Storage::disk('local')->delete($origpath);
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: HMP error - larger than ' . env('HERMES_MAX_FILE'));
 
-      return response()->json(['message' => 'Server error'], 500);
+      return 413;
     }
 
     // set new origpath on outbox
@@ -333,13 +338,13 @@ class MessageController extends Controller
     //work path
     if (!env('HERMES_OUTBOX')) {
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes pack message Error: cant package the file' . $path);
-      return response()->json(['message' => 'Server error'], 500);
+      return 500;
     }
 
     // Clean outbox destination and move the package
     if (!Storage::disk('local')->move('tmp/' . $message->id . '.hmp', $origpath)) {
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes pack message Error: cant package the file' . $path);
-      return response()->json(['message' => 'Server error'], 500);
+      return 500;
     }
 
     $file = [
@@ -353,6 +358,7 @@ class MessageController extends Controller
 
   public function sentUUCPMessage($message, $file)
   {
+
     // UUCP -C Copy  (default) / -d create dirs
     if (!Storage::disk('local')->exists($file['origpath'])) {
       (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes send message error - Cant find ' . $file['path']);
@@ -369,7 +375,7 @@ class MessageController extends Controller
       if ($destspoolsize > env('HERMES_MAX_SPOOL')) {
         $file['path'] = Storage::disk('local')->delete($file['$origpath']);
         (new ErrorController)->saveError(get_class($this), 500, 'API Error: HMP spool larger than ' . env('HERMES_MAX_SPOOL') . ' bytes');
-        return 500;
+        return 431;
       }
 
       $command = 'uucp -r -j -C -d \'' .  $file['path'] . '\' \'' . $dest . '!~/' . $message->orig . '_' . $message->id . '.hmp\'';

@@ -43,7 +43,7 @@ function exec_cli_no($command)
 function exec_uc($command)
 {
 	ob_start();
-	$ubitx_client = "/usr/bin/ubitx_client -c ";
+	$ubitx_client = env('HERMES_TOOL') . " -c ";
 	$command = $ubitx_client . $command;
 	system($command, $return_var);
 	$output = ob_get_contents();

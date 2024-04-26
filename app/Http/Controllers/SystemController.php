@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\System;
+use App\Message;
+
 
 class SystemController extends Controller
 {
@@ -194,6 +196,13 @@ class SystemController extends Controller
 						$emails = null;
 					}
 
+					$messageID = $this->getMessageIDFromUuidhost($fields[10]);
+					$message = null;
+					
+					if(intval($messageID)){
+						$message = $this->getMessageFromDataBase($messageID);
+					}
+
 					$spool[]  =  [
 						'uuidhost' => $uuid_host,
 						'uuiduucp' => $uuid,
@@ -207,6 +216,11 @@ class SystemController extends Controller
 						'destpath' =>  $fields[6] == "crmail" ? null : $fields[10],
 						'emails' =>  $emails,
 						'emailinfo' =>  $email_info,
+						'messageId' => $message != null ? $message->id : null,
+						'messageName' => $message != null ? $message->name : null,
+						'messageFile' => $message != null ? $message->file : null,
+						'messageMimeType' => $message != null ? $message->mimetype : null,
+						'messageSecure' => $message != null ? $message->secure : null
 					];
 				}
 			}
@@ -217,6 +231,41 @@ class SystemController extends Controller
 		}
 
 		return response()->json(null, 200);
+	}
+
+	public function getMessageIDFromUuidhost($destpath)
+	{
+
+		if(!$destpath){
+			return null;
+		}
+
+		$delimiter1 = "_";
+		$delimiter2 = ".";
+
+		$parts = explode($delimiter1, $destpath);
+		$result = [];
+		
+		foreach ($parts as $part) {
+			$subparts = explode($delimiter2, $part);
+			$result = array_merge($result, $subparts);
+		}
+
+		if(sizeof($result) >= 2 && is_numeric($result[1])){
+			return intval($result[1]);
+		}
+
+		return null;
+	}
+
+	public function getMessageFromDataBase($messageID){
+		$message = Message::find($messageID);
+
+		if(!$message){
+			return null;
+		}
+
+		return $message;
 	}
 
 	/**
@@ -297,7 +346,8 @@ class SystemController extends Controller
 	public function sysShutdown()
 	{
 		// set led status OFF on cabinet
-		exec_uc("set_led_status -a OFF");
+		exec_uc("set_led_status -a OFF -p 0");
+		exec_uc("set_led_status -a OFF -p 1");
 		sleep(1);
 
 		// linux shutdown
