@@ -65,8 +65,6 @@ class UserController extends Controller
 		$email = $request['email'] . '@' . env('HERMES_DOMAIN');
 		//Can't update email (remove)
 		$request->request->remove('email');
-		//Update user table first
-		$user = $user->update($request->all());
 
 		if ($request['password']) {
 			$password = $request['password'];
@@ -74,6 +72,8 @@ class UserController extends Controller
 
 			exec_cli_no("sudo email_update_user {$email} {$password}");
 		}
+
+		$user = $user->update($request->all());
 
 		if (!$user) {
 			(new ErrorController)->saveError(get_class($this), 500, 'User could not be updated');
