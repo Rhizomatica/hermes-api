@@ -100,7 +100,6 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
 
 $router->group(['prefix' => '/geolocation'], function () use ($router) {
     $router->get('calibration',  ['uses' => 'GeoLocationController@startGPSCalibration']);
-    $router->get('files',  ['uses' => 'GeoLocationController@getStoredLocationFilesFromPath']);
 });
 
 $router->group(['prefix' => '/frequency'], function () use ($router) {
