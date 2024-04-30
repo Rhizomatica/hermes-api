@@ -50,4 +50,28 @@ class GeoLocationController extends Controller
         }
         return response()->json(['message' => $paths], 200);
     }
+
+
+    public function getStoredLocationFileByName(string $name)
+    {
+        if (!$name) {
+            return "missing file name";
+        }
+
+        $file = basename($name);
+        $file = $this->gpsFilesPath . $file;
+
+        if (!file_exists($file)) {
+            return 'file not found';
+        }
+
+        header("Cache-Control: public");
+        header("Content-Description: File Transfer");
+        header("Content-Disposition: attachment; filename=$name");
+        header("Content-Type: text/csv");
+        header("Content-Transfer-Encoding: binary");
+
+        // read the file from disk
+        readfile($file);
+    }
 }
