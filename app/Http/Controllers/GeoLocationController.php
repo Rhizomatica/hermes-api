@@ -9,6 +9,9 @@ class GeoLocationController extends Controller
      *
      * @return Json GPS
      */
+
+    public $gpsFilesPath = '/var/spool/sensors';
+
     public function startGPSCalibration()
     {
         try {
@@ -30,5 +33,22 @@ class GeoLocationController extends Controller
             (new ErrorController)->saveError(get_class($this), 500, 'API Error: nternal Server Error: ' . $th);
             return response()->json(['message' => 'Server error'], 500);
         }
+    }
+
+    public function getStoredLocationFilesFromPath()
+    {
+
+        $paths = [];
+        if (is_dir($this->gpsFilesPath)) {
+            $scanpathvalues = scandir($this->gpsFilesPath);
+            if (is_array($scanpathvalues) || is_object($scanpathvalues)) {
+                foreach ($scanpathvalues as $name) {
+                    if ($name !== '.' && $name !== '..' && !is_dir($this->gpsFilesPath . '/' . $name)) {
+                        $paths[] = $name;
+                    }
+                }
+            }
+        }
+        return response()->json(['message' => $paths], 200);
     }
 }
