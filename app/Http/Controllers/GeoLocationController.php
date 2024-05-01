@@ -10,7 +10,7 @@ class GeoLocationController extends Controller
      * @return Json GPS
      */
 
-    public $gpsFilesPath = '/var/spool/sensors';
+    public $gpsFilesPath = '/var/spool/sensors/';
 
     public function startGPSCalibration()
     {
