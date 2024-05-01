@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Storage;
 
 class GeoLocationController extends Controller
 {
@@ -65,13 +66,22 @@ class GeoLocationController extends Controller
             return 'file not found';
         }
 
-        header("Cache-Control: public");
-        header("Content-Description: File Transfer");
-        header("Content-Disposition: attachment; filename=$name");
-        header("Content-Type: text/csv");
-        header("Content-Transfer-Encoding: binary");
+        $file = Storage::disk('local')->path($file);
+        $content = Storage::disk('local')->get($file);
 
-        // read the file from disk
-        readfile($file);
+        return response($content)
+            ->header('Content-Type', 'text/csv')
+            ->header('Pragma', 'public')
+            ->header('Content-Disposition', 'inline; filename="' . $file)
+            ->header('Cache-Control', 'max-age=60, must-revalidate');
+
+        // header("Cache-Control: public");
+        // header("Content-Description: File Transfer");
+        // header("Content-Disposition: attachment; filename=$name");
+        // header("Content-Type: text/csv");
+        // header("Content-Transfer-Encoding: binary");
+
+        // // read the file from disk
+        // readfile($file);
     }
 }
