@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class GeoLocationController extends Controller
 {
@@ -66,22 +68,8 @@ class GeoLocationController extends Controller
             return 'file not found';
         }
 
-        $file = Storage::disk('local')->path($file);
-        $content = Storage::disk('local')->get($file);
+        $headers = ['Content-Type' => 'text/csv'];
 
-        return response($content)
-            ->header('Content-Type', 'text/csv')
-            ->header('Pragma', 'public')
-            ->header('Content-Disposition', 'inline; filename="' . $file)
-            ->header('Cache-Control', 'max-age=60, must-revalidate');
-
-        // header("Cache-Control: public");
-        // header("Content-Description: File Transfer");
-        // header("Content-Disposition: attachment; filename=$name");
-        // header("Content-Type: text/csv");
-        // header("Content-Transfer-Encoding: binary");
-
-        // // read the file from disk
-        // readfile($file);
+        return new BinaryFileResponse($file, 200, $headers);
     }
 }
