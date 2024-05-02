@@ -102,6 +102,10 @@ $router->group(['prefix' => '/geolocation'], function () use ($router) {
     $router->get('calibration',  ['uses' => 'GeoLocationController@startGPSCalibration']);
     $router->get('files',  ['uses' => 'GeoLocationController@getStoredLocationFilesFromPath']);
     $router->post('file/{name}',  ['uses' => 'GeoLocationController@getStoredLocationFileByName']);
+    $router->post('coordinates',  ['uses' => 'GeoLocationController@getCurrentCoordinates']);
+    $router->post('delay/{seconds}',  ['uses' => 'GeoLocationController@setGPSStoringDelay']);
+    $router->post('dump/{seconds}',  ['uses' => 'GeoLocationController@setGPSFileDumpTime']);
+    $router->post('status/{status}',  ['uses' => 'GeoLocationController@setStoringGPSStatus']);
 });
 
 $router->group(['prefix' => '/frequency'], function () use ($router) {

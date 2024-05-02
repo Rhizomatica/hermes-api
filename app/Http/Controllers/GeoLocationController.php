@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+// use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class GeoLocationController extends Controller
 {
@@ -68,8 +67,32 @@ class GeoLocationController extends Controller
             return 'file not found';
         }
 
-        $headers = ['Content-Type' => 'text/csv'];
+        $content = file_get_contents($file);
 
-        return new BinaryFileResponse($file, 200, $headers);
+        return response($content)
+            ->header('Content-Type', 'text/csv')
+            ->header('Pragma', 'public')
+            ->header('Content-Disposition', 'inline; filename="' . $name)
+            ->header('Cache-Control', 'max-age=60, must-revalidate');
+    }
+
+    public function getCurrentCoordinates()
+    {
+        return null;
+    }
+
+    public function setGPSStoringDelay(int $seconds)
+    {
+        return response()->json(['message' => $seconds], 200);
+    }
+
+    public function setGPSFileDumpTime($seconds)
+    {
+        return response()->json(['message' => $seconds], 200);
+    }
+
+    public function setStoringGPSStatus($status)
+    {
+        return response()->json(['message' => $status], 200);
     }
 }
