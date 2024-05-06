@@ -95,4 +95,26 @@ class GeoLocationController extends Controller
     {
         return response()->json(['message' => $status], 200);
     }
+
+    public function deleteStoredFiles()
+    {
+        $command = 'clean captured GPS files';
+        $output = exec_cli($command);
+
+        if ($output == 'ERROR') {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during deleting GPS stored files' . $output);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        $commandRM = 'rm -f' . $this->gpsFilesPath . "*";
+        $outputRM = exec_cli_no($commandRM);
+
+        if ($outputRM == 'ERROR') {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during deleting GPS stored files' . $output);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        return response()->json(['message' => 'Stored files deleted successfully'], 200);
+    }
+    
 }

@@ -106,6 +106,7 @@ $router->group(['prefix' => '/geolocation'], function () use ($router) {
     $router->post('delay/{seconds}',  ['uses' => 'GeoLocationController@setGPSStoringDelay']);
     $router->post('dump/{seconds}',  ['uses' => 'GeoLocationController@setGPSFileDumpTime']);
     $router->post('status/{status}',  ['uses' => 'GeoLocationController@setStoringGPSStatus']);
+    $router->delete('delete',  ['uses' => 'GeoLocationController@deleteStoredFiles']);
 });
 
 $router->group(['prefix' => '/frequency'], function () use ($router) {
