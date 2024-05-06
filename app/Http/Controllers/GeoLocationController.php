@@ -81,12 +81,12 @@ class GeoLocationController extends Controller
         return null;
     }
 
-    public function setGPSStoringDelay(int $seconds)
+    public function setGPSStoringInterval(int $seconds)
     {
         return response()->json(['message' => $seconds], 200);
     }
 
-    public function setGPSFileDumpTime($seconds)
+    public function setGPSFileRangeTime($seconds)
     {
         return response()->json(['message' => $seconds], 200);
     }
