@@ -67,8 +67,8 @@ class GeoLocationController extends Controller
             return 'file not found';
         }
 
-        // $content = file_get_contents($file);
-        $content = Storage::disk('local')->get($file);
+        $content = file_get_contents($file);
+        // $content = Storage::disk('local')->get($file);
 
 
         return response($content)
