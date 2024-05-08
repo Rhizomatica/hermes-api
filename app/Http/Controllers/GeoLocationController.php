@@ -53,7 +53,6 @@ class GeoLocationController extends Controller
         return response()->json(['message' => $paths], 200);
     }
 
-
     public function getStoredLocationFileByName(string $name)
     {
         if (!$name) {
@@ -68,8 +67,6 @@ class GeoLocationController extends Controller
         }
 
         $content = file_get_contents($file);
-        // $content = Storage::disk('local')->get($file);
-
 
         return response($content)
             ->header('Content-Type', 'text/csv')
@@ -101,7 +98,7 @@ class GeoLocationController extends Controller
     public function deleteStoredFiles()
     {
         $command = 'clean captured GPS files';
-        $output = exec_cli($command);
+        $output = exec_cli_no($command);
 
         if ($output == 'ERROR') {
             (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during deleting GPS stored files' . $output);
