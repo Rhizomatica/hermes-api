@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-// use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Illuminate\Support\Facades\Storage;
 
 class GeoLocationController extends Controller
 {
@@ -67,7 +67,9 @@ class GeoLocationController extends Controller
             return 'file not found';
         }
 
-        $content = file_get_contents($file);
+        // $content = file_get_contents($file);
+        $content = Storage::disk('local')->get($file);
+
 
         return response($content)
             ->header('Content-Type', 'text/csv')
@@ -116,5 +118,4 @@ class GeoLocationController extends Controller
 
         return response()->json(['message' => 'Stored files deleted successfully'], 200);
     }
-    
 }
