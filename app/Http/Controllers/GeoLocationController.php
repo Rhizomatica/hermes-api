@@ -135,9 +135,21 @@ class GeoLocationController extends Controller
         return response()->json(['message' => $output], 200);
     }
 
-    public function setStoringGPSStatus($status)
+    public function setStoringGPSStatus(bool $status)
     {
-        return response()->json(['message' => $status], 200);
+        if($status !== true && $status !== false){
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        $command = '' . $status;
+        $output = exec_cli($command);
+
+        if ($output == 'ERROR') {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS storing status' . $output);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        return response()->json(['message' => $output], 200);
     }
 
     public function deleteStoredFiles()
