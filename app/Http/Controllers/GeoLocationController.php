@@ -77,21 +77,16 @@ class GeoLocationController extends Controller
 
     public function getCurrentCoordinates()
     {
-        $commandGetLatitude = 'gpspipe -w -n 4  | jq -r .lat | grep "[[:digit:]]" | tail -1 | tr -d "\n"';
-        $outputLatitude = exec_cli($commandGetLatitude);
+        $commandGetCoords = 'gpspipe -w -n 5 | grep -m 1 TPV | jq -r "[.lat, .lon] | @csv"';
+        $outputCoords = exec_cli($commandGetCoords);
 
-        if ($outputLatitude == 'ERROR') {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting the current coordinates' . $outputLatitude);
+        if ($outputCoords == 'ERROR') {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting the current coordinates' . $outputCoords);
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        $commandGetLongitude = 'gpspipe -w -n 4  | jq -r .lon | grep "[[:digit:]]" | tail -1 | tr -d "\n"';
-        $outputLongitude = exec_cli($commandGetLongitude);
-
-        if ($outputLongitude == 'ERROR') {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting the current coordinates' . $outputLatitude);
-            return response()->json(['message' => 'Server error'], 500);
-        }
+        $outputLatitude = explode(',', trim($outputCoords))[0];
+        $outputLongitude = explode(',', trim($outputCoords))[1];
 
         $coordinates = [
             'latitude' => $outputLatitude,
