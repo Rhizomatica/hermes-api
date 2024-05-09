@@ -77,7 +77,28 @@ class GeoLocationController extends Controller
 
     public function getCurrentCoordinates()
     {
-        return null;
+        $commandGetLatitude = '';
+        $outputLatitude = exec_cli($commandGetLatitude);
+
+        if ($outputLatitude == 'ERROR') {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting the current coordinates' . $outputLatitude);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        $commandGetLongitude = '';
+        $outputLongitude = exec_cli($commandGetLongitude);
+
+        if ($outputLongitude == 'ERROR') {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting the current coordinates' . $outputLatitude);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        $coordinates = [
+            'latitude' => $outputLatitude,
+            'longitude' => $outputLongitude
+        ];
+
+        return response()->json(['message' => $coordinates], 200);
     }
 
     public function setGPSStoringInterval(int $seconds)
