@@ -136,15 +136,22 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        if ($status == true)
-            $command = 'systemctl enable sensors';
-        if ($status == false)
-            $command = 'systemctl disable sensors';
+        if ($status == true) {
+            $command = 'sudo systemctl enable sensors';
+            $output = exec_cli_no($command);             // we just hope for the best here
+            $command = 'sudo systemctl start sensors';
+            $output = exec_cli_no($command);
+        }
 
-        $output = exec_cli($command);
+        if ($status == false){
+            $command = 'sudo systemctl disable sensors';
+            $output = exec_cli_no($command);            // we just hope for the best here
+            $command = 'sudo systemctl stop sensors';
+            $output = exec_cli_no($command);
+        }
 
-        if ($output == 'ERROR') {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS storing status' . $output);
+        if ($output == false) {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS storing status');
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -153,19 +160,11 @@ class GeoLocationController extends Controller
 
     public function deleteStoredFiles()
     {
-        $command = 'clean captured GPS files';
-        $output = exec_cli_no($command);
-
-        if ($output == 'ERROR') {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during deleting GPS stored files' . $output);
-            return response()->json(['message' => 'Server error'], 500);
-        }
-
-        $commandRM = 'rm -f' . $this->gpsFilesPath . '*';
+        $commandRM = 'rm -f ' . $this->gpsFilesPath . '*';
         $outputRM = exec_cli_no($commandRM);
 
-        if ($outputRM == 'ERROR') {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during deleting GPS stored files' . $output);
+        if ($outputRM == false) {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during deleting GPS stored files');
             return response()->json(['message' => 'Server error'], 500);
         }
 
