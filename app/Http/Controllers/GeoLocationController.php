@@ -77,7 +77,7 @@ class GeoLocationController extends Controller
 
     public function getCurrentCoordinates()
     {
-        $commandGetLatitude = 'gpspipe -w -n 4  | jq -r .lat | grep "[[:digit:]]" | tail -1';
+        $commandGetLatitude = 'gpspipe -w -n 4  | jq -r .lat | grep "[[:digit:]]" | tail -1 | tr -d "\n"';
         $outputLatitude = exec_cli($commandGetLatitude);
 
         if ($outputLatitude == 'ERROR') {
@@ -85,7 +85,7 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        $commandGetLongitude = 'gpspipe -w -n 4  | jq -r .lon | grep "[[:digit:]]" | tail -1';
+        $commandGetLongitude = 'gpspipe -w -n 4  | jq -r .lon | grep "[[:digit:]]" | tail -1 | tr -d "\n"';
         $outputLongitude = exec_cli($commandGetLongitude);
 
         if ($outputLongitude == 'ERROR') {
