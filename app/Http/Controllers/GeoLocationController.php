@@ -77,7 +77,7 @@ class GeoLocationController extends Controller
 
     public function getCurrentCoordinates()
     {
-        $commandGetLatitude = '';
+        $commandGetLatitude = 'gpspipe -w -n 4  | jq -r .lat | grep "[[:digit:]]" | tail -1';
         $outputLatitude = exec_cli($commandGetLatitude);
 
         if ($outputLatitude == 'ERROR') {
@@ -85,7 +85,7 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        $commandGetLongitude = '';
+        $commandGetLongitude = 'gpspipe -w -n 4  | jq -r .lon | grep "[[:digit:]]" | tail -1';
         $outputLongitude = exec_cli($commandGetLongitude);
 
         if ($outputLongitude == 'ERROR') {
@@ -141,7 +141,11 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        $command = '' . $status;
+        if ($status == true)
+            $command = 'systemctl enable sensors';
+        if ($status == false)
+            $command = 'systemctl disable sensors';
+
         $output = exec_cli($command);
 
         if ($output == 'ERROR') {
@@ -162,7 +166,7 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        $commandRM = 'rm -f' . $this->gpsFilesPath . "*";
+        $commandRM = 'rm -f' . $this->gpsFilesPath . '*';
         $outputRM = exec_cli_no($commandRM);
 
         if ($outputRM == 'ERROR') {
