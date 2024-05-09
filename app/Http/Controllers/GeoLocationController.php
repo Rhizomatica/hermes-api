@@ -103,6 +103,18 @@ class GeoLocationController extends Controller
 
     public function setGPSStoringInterval(int $seconds)
     {
+        if($seconds < 1 || $seconds > 120){
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        $command = '';
+        $output = exec_cli($command);
+
+        if ($output == 'ERROR') {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS storing interval' . $output);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
         return response()->json(['message' => $seconds], 200);
     }
 
