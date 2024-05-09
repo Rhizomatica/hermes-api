@@ -115,12 +115,24 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        return response()->json(['message' => $seconds], 200);
+        return response()->json(['message' => $output], 200);
     }
 
     public function setGPSFileRangeTime($seconds)
     {
-        return response()->json(['message' => $seconds], 200);
+        if($seconds < 600 || $seconds > 3600){
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        $command = '';
+        $output = exec_cli($command);
+
+        if ($output == 'ERROR') {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS file range time' . $output);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        return response()->json(['message' => $output], 200);
     }
 
     public function setStoringGPSStatus($status)
