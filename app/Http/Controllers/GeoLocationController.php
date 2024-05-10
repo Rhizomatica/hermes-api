@@ -13,6 +13,7 @@ class GeoLocationController extends Controller
      */
 
     public $gpsFilesPath = '/var/spool/sensors/';
+    public $zipFilesPath = '/var/spool/sensors-zip/';
 
     public function startGPSCalibration()
     {
@@ -37,15 +38,10 @@ class GeoLocationController extends Controller
         }
     }
 
-    public function getGPSStatus()
+    public function getStoringGPSStatus()
     {
-        $command = ''; //TODO - UPDATE CMD
+        $command = 'sudo systemctl is-active --quiet sensors';
         $output = exec_cli_no($command);
-
-        if (!$output || $output == 'ERROR') {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Fail on get GPS status: ' . $output);
-            return response()->json(['message' => 'Server error'], 500);
-        }
 
         return response()->json($output, 200);
     }
@@ -90,10 +86,16 @@ class GeoLocationController extends Controller
 
     public function getStoredLocationAllFiles()
     {
-        $fileName = "storedGPSFiles-" . date("Y/m/d") . ".zip";
-        $zip = "zip -r " . $fileName . $this->gpsFilesPath;
+        $command = 'sudo mkdir -p ' . $zipFilesPath;
+        $output = exec_cli_no($command);
 
-        return response($zip)
+        $fileName = $zipFilesPath . "storedGPSFiles-" . date("Y/m/d") . ".zip";
+        $command = "sudo zip -r " . $fileName . " " . $this->gpsFilesPath;
+        $output = exec_cli_no($command);
+
+        $content = file_get_contents($fileName);
+
+        return response($content)
             ->header('Content-Type', 'application/zip')
             ->header('Pragma', 'public')
             ->header('Content-Disposition', 'inline; filename="' . $fileName)
@@ -185,7 +187,15 @@ class GeoLocationController extends Controller
 
     public function deleteStoredFiles()
     {
-        $commandRM = 'rm -f ' . $this->gpsFilesPath . '*';
+        $commandRM = 'sudo rm -f ' . $this->gpsFilesPath . '*';
+        $outputRM = exec_cli_no($commandRM);
+
+        if ($outputRM == false) {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during deleting GPS stored files');
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        $commandRM = 'sudo rm -f ' . $this->$zipFilesPath . '*';
         $outputRM = exec_cli_no($commandRM);
 
         if ($outputRM == false) {
