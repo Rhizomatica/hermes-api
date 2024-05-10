@@ -75,6 +75,18 @@ class GeoLocationController extends Controller
             ->header('Cache-Control', 'max-age=60, must-revalidate');
     }
 
+    public function getStoredLocationAllFiles()
+    {
+        $fileName = "storedGPSFiles-" . date("Y/m/d") . ".zip";
+        $zip = "zip -r " . $fileName . $this->gpsFilesPath;
+
+        return response($zip)
+            ->header('Content-Type', 'application/zip')
+            ->header('Pragma', 'public')
+            ->header('Content-Disposition', 'inline; filename="' . $fileName)
+            ->header('Cache-Control', 'max-age=60, must-revalidate');
+    }
+
     public function getCurrentCoordinates()
     {
         $commandGetCoords = 'gpspipe -w -n 5 | grep -m 1 TPV | jq -r "[.lat, .lon] | @csv"';
@@ -98,7 +110,7 @@ class GeoLocationController extends Controller
 
     public function setGPSStoringInterval(int $seconds)
     {
-        if($seconds < 1 || $seconds > 120){
+        if ($seconds < 1 || $seconds > 120) {
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -115,7 +127,7 @@ class GeoLocationController extends Controller
 
     public function setGPSFileRangeTime($seconds)
     {
-        if($seconds < 600 || $seconds > 3600){
+        if ($seconds < 600 || $seconds > 3600) {
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -132,7 +144,7 @@ class GeoLocationController extends Controller
 
     public function setStoringGPSStatus(bool $status)
     {
-        if($status !== true && $status !== false){
+        if ($status !== true && $status !== false) {
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -143,7 +155,7 @@ class GeoLocationController extends Controller
             $output = exec_cli_no($command);
         }
 
-        if ($status == false){
+        if ($status == false) {
             $command = 'sudo systemctl disable sensors';
             $output = exec_cli_no($command);            // we just hope for the best here
             $command = 'sudo systemctl stop sensors';
