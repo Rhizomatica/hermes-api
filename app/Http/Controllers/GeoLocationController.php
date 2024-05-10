@@ -125,6 +125,19 @@ class GeoLocationController extends Controller
         return response()->json($coordinates, 200);
     }
 
+    public function getGPSStoringInterval()
+    {
+        $command = '';
+        $output = exec_cli($command);
+
+        if ($output == 'ERROR') {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting GPS storing interval' . $output);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        return response()->json($output, 200);
+    }
+
     public function setGPSStoringInterval(int $seconds)
     {
         if ($seconds < 1 || $seconds > 120) {
@@ -136,6 +149,19 @@ class GeoLocationController extends Controller
 
         if ($output == 'ERROR') {
             (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS storing interval' . $output);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        return response()->json($output, 200);
+    }
+
+    public function getGPSFileRangeTime()
+    {
+        $command = '';
+        $output = exec_cli($command);
+
+        if ($output == 'ERROR') {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting GPS file range time' . $output);
             return response()->json(['message' => 'Server error'], 500);
         }
 
