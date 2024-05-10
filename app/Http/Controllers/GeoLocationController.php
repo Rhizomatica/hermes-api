@@ -37,6 +37,19 @@ class GeoLocationController extends Controller
         }
     }
 
+    public function getGPSStatus()
+    {
+        $command = ''; //TODO - UPDATE CMD
+        $output = exec_cli_no($command);
+
+        if (!$output || $output == 'ERROR') {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Fail on get GPS status: ' . $output);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        return response()->json(['message' => $output], 200);
+    }
+
     public function getStoredLocationFilesFromPath()
     {
         $paths = [];
