@@ -89,7 +89,7 @@ class GeoLocationController extends Controller
         $command = 'sudo mkdir -p ' . $this->zipFilesPath;
         $output = exec_cli_no($command);
 
-        $fileName = $this->zipFilesPath . "storedGPSFiles-" . date("Y-m-d") . ".zip";
+        $fileName = $this->zipFilesPath . "storedGPSFiles-" . date("Y-m-d:H:m:s") . ".zip";
         $command = 'sudo zip -j ' . $fileName . ' ' . $this->gpsFilesPath . '*';
         $output = exec_cli_no($command);
 
