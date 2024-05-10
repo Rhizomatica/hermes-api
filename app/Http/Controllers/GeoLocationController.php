@@ -47,7 +47,7 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        return response()->json(['message' => $output], 200);
+        return response()->json($output, 200);
     }
 
     public function getStoredLocationFilesFromPath()
@@ -63,7 +63,7 @@ class GeoLocationController extends Controller
                 }
             }
         }
-        return response()->json(['message' => $paths], 200);
+        return response()->json($paths, 200);
     }
 
     public function getStoredLocationFileByName(string $name)
@@ -118,7 +118,7 @@ class GeoLocationController extends Controller
             'longitude' => $outputLongitude
         ];
 
-        return response()->json(['message' => $coordinates], 200);
+        return response()->json($coordinates, 200);
     }
 
     public function setGPSStoringInterval(int $seconds)
@@ -135,7 +135,7 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        return response()->json(['message' => $output], 200);
+        return response()->json($output, 200);
     }
 
     public function setGPSFileRangeTime($seconds)
@@ -152,7 +152,7 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        return response()->json(['message' => $output], 200);
+        return response()->json($output, 200);
     }
 
     public function setStoringGPSStatus(bool $status)
@@ -180,7 +180,7 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        return response()->json(['message' => $output], 200);
+        return response()->json($output, 200);
     }
 
     public function deleteStoredFiles()
