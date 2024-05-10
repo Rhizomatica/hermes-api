@@ -86,10 +86,10 @@ class GeoLocationController extends Controller
 
     public function getStoredLocationAllFiles()
     {
-        $command = 'sudo mkdir -p ' . $zipFilesPath;
+        $command = 'sudo mkdir -p ' . $this->zipFilesPath;
         $output = exec_cli_no($command);
 
-        $fileName = $zipFilesPath . "storedGPSFiles-" . date("Y/m/d") . ".zip";
+        $fileName = $this->zipFilesPath . "storedGPSFiles-" . date("Y/m/d") . ".zip";
         $command = "sudo zip -r " . $fileName . " " . $this->gpsFilesPath;
         $output = exec_cli_no($command);
 
@@ -195,7 +195,7 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        $commandRM = 'sudo rm -f ' . $this->$zipFilesPath . '*';
+        $commandRM = 'sudo rm -f ' . $this->zipFilesPath . '*';
         $outputRM = exec_cli_no($commandRM);
 
         if ($outputRM == false) {
