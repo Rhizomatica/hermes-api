@@ -90,15 +90,17 @@ class GeoLocationController extends Controller
         $output = exec_cli_no($command);
 
         $fileName = $this->zipFilesPath . "storedGPSFiles-" . date("Y-m-d") . ".zip";
-        $command = "sudo zip -r " . $fileName . " " . $this->gpsFilesPath;
+        $command = 'sudo zip -j ' . $fileName . ' ' . $this->gpsFilesPath . '*';
         $output = exec_cli_no($command);
 
         $content = file_get_contents($fileName);
 
+        $file = basename($fileName);
+
         return response($content)
             ->header('Content-Type', 'application/zip')
             ->header('Pragma', 'public')
-            ->header('Content-Disposition', 'inline; filename="' . $fileName)
+            ->header('Content-Disposition', 'inline; filename="' . $file)
             ->header('Cache-Control', 'max-age=60, must-revalidate');
     }
 
