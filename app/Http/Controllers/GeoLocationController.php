@@ -127,10 +127,11 @@ class GeoLocationController extends Controller
 
     public function getGPSStoringInterval()
     {
-        $command = '';
-        $output = exec_cli($command);
+        $command = 'grep sample_time /etc/sbitx/sensors.ini | cut -d = -f 2';
+        $output = intval(exec_cli($command));
 
-        if ($output == 'ERROR') {
+        if ($output < 1 || $output > 180)
+        {
             (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting GPS storing interval' . $output);
             return response()->json(['message' => 'Server error'], 500);
         }
@@ -140,27 +141,32 @@ class GeoLocationController extends Controller
 
     public function setGPSStoringInterval(int $seconds)
     {
-        if ($seconds < 1 || $seconds > 120) {
+        if ($seconds < 1 || $seconds > 180) {
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        $command = '';
-        $output = exec_cli($command);
+        $command = 'sudo sed -i "/^sample_time=/s/=.*/=' . $seconds . '/" /etc/sbitx/sensors.ini';
+        $output = exec_cli_no($command);
 
-        if ($output == 'ERROR') {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS storing interval' . $output);
+        if ($output == false) {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS storing interval to ' . $seconds);
             return response()->json(['message' => 'Server error'], 500);
         }
+
+        $command = 'sudo systemctl stop sensors';
+        $output = exec_cli_no($command);
+        $command = 'sudo systemctl start sensors';
+        $output = exec_cli_no($command);
 
         return response()->json($output, 200);
     }
 
     public function getGPSFileRangeTime()
     {
-        $command = '';
-        $output = exec_cli($command);
+        $command = 'grep time_per_file /etc/sbitx/sensors.ini | cut -d = -f 2';
+        $output = intval(exec_cli($command));
 
-        if ($output == 'ERROR') {
+        if ($output < 240 || $output > 86400) {
             (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting GPS file range time' . $output);
             return response()->json(['message' => 'Server error'], 500);
         }
@@ -170,17 +176,59 @@ class GeoLocationController extends Controller
 
     public function setGPSFileRangeTime($seconds)
     {
-        if ($seconds < 600 || $seconds > 3600) {
+        if ($seconds < 240 || $seconds > 86400) {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS File Range time to ' . $seconds);
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        $command = '';
+        $command = 'sudo sed -i "/^time_per_file=/s/=.*/=' . $seconds . '/" /etc/sbitx/sensors.ini';
+        $output = exec_cli_no($command);
+
+        if ($output == false) {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS file range time to ' . $seconds);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        $command = 'sudo systemctl stop sensors';
+        $output = exec_cli_no($command);
+        $command = 'sudo systemctl start sensors';
+        $output = exec_cli_no($command);
+
+        return response()->json($output, 200);
+    }
+
+    public function getGPSEmail()
+    {
+        $command = 'grep email /etc/sbitx/sensors.ini | cut -d = -f 2';
         $output = exec_cli($command);
 
-        if ($output == 'ERROR') {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS file range time' . $output);
+        if (str_contains($output, '@') == false) {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting GPS Email');
             return response()->json(['message' => 'Server error'], 500);
         }
+
+        return response()->json($output, 200);
+    }
+
+    public function setGPSEmail($email)
+    {
+        if (str_contains($email, '@') == false) {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS Email to ' . $email);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        $command = 'sudo sed -i "/^email=/s/=.*/=' . $email . '/" /etc/sbitx/sensors.ini';
+        $output = exec_cli_no($command);
+
+        if ($output == false) {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS Email to ' . $seconds);
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
+        $command = 'sudo systemctl stop sensors';
+        $output = exec_cli_no($command);
+        $command = 'sudo systemctl start sensors';
+        $output = exec_cli_no($command);
 
         return response()->json($output, 200);
     }
