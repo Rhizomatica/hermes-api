@@ -199,7 +199,7 @@ class GeoLocationController extends Controller
 
     public function getGPSEmail()
     {
-        $command = 'grep email /etc/sbitx/sensors.ini | cut -d = -f 2';
+        $command = 'grep email /etc/sbitx/sensors.ini | cut -d = -f 2 | tr -d "\n"';
         $output = exec_cli($command);
 
         if (str_contains($output, '@') == false) {
