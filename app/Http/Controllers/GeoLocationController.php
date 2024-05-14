@@ -180,7 +180,7 @@ class GeoLocationController extends Controller
         return response()->json($output, 200);
     }
 
-    public function setGPSFileRangeTime($seconds)
+    public function setGPSFileRangeTime(int $seconds)
     {
         if ($seconds < 240 || $seconds > 86400) {
             (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS File Range time to ' . $seconds);
@@ -227,7 +227,7 @@ class GeoLocationController extends Controller
         $output = exec_cli_no($command);
 
         if ($output == false) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS Email to ' . $seconds);
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS Email to ' . $email);
             return response()->json(['message' => 'Server error'], 500);
         }
 
