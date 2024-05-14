@@ -111,8 +111,8 @@ class GeoLocationController extends Controller
         $outputCoords = str_replace('\n', '', $outputCoords);
 
         # this is just for testing a bangladesh boat coordinate
-        $lat = 21.1902183 + rand(-1,1);
-        $lon = 89.9957826 + rand(-1,1);
+        $lat = 21.1902183 + (mt_rand(-1, 1) / mt_getrandmax());
+        $lon = 89.9957826 + (mt_rand(-1, 1) / mt_getrandmax());
         $outputCoords = $lat . ',' . $lon;
 
         if (empty($outputCoords)) {
