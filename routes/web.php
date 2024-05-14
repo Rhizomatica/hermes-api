@@ -110,8 +110,8 @@ $router->group(['prefix' => '/geolocation'], function () use ($router) {
     $router->post('interval/{seconds}',  ['uses' => 'GeoLocationController@setGPSStoringInterval']);
     $router->get('email',  ['uses' => 'GeoLocationController@getGPSEmail']);
     $router->post('email/{email}',  ['uses' => 'GeoLocationController@setGPSEmail']);
-    $router->get('file/range/',  ['uses' => 'GeoLocationController@getGPSFileRangeTime']);
-    $router->post('file/range/{seconds}',  ['uses' => 'GeoLocationController@setGPSFileRangeTime']);
+    $router->get('filetime',  ['uses' => 'GeoLocationController@getGPSFileRangeTime']);
+    $router->post('filetime/{seconds}',  ['uses' => 'GeoLocationController@setGPSFileRangeTime']);
     $router->delete('delete',  ['uses' => 'GeoLocationController@deleteStoredFiles']);
 });
 
