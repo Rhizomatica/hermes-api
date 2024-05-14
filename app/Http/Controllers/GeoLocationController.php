@@ -106,10 +106,13 @@ class GeoLocationController extends Controller
 
     public function getCurrentCoordinates()
     {
-        $commandGetCoords = 'gpspipe -w -n 5 | grep -m 1 TPV | jq -r "[.lat, .lon] | @csv"';
+        $commandGetCoords = 'gpspipe -w -n 5 -x 5 | grep -m 1 TPV | jq -r "[.lat, .lon] | @csv"';
         $outputCoords = exec_cli($commandGetCoords);
+        $outputCoords = str_replace('\n', '', $outputCoords);
+        # this is just for testing a bangladesh boat coordinate
+        # $outputCoords = '21.1902183,89.9957826';
 
-        if ($outputCoords == 'ERROR') {
+        if (empty($outputCoords)) {
             (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting the current coordinates' . $outputCoords);
             return response()->json(['message' => 'Server error'], 500);
         }
