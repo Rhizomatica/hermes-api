@@ -109,11 +109,14 @@ class GeoLocationController extends Controller
         $commandGetCoords = 'gpspipe -w -n 5 -x 5 | grep -m 1 TPV | jq -r "[.lat, .lon] | @csv"';
         $outputCoords = exec_cli($commandGetCoords);
         $outputCoords = str_replace('\n', '', $outputCoords);
+
         # this is just for testing a bangladesh boat coordinate
-        # $outputCoords = '21.1902183,89.9957826';
+        $lat = 21.1902183 + rand(-1,1);
+        $lon = 89.9957826 + rand(-1,1);
+        $outputCoords = $lat . ',' . $lon;
 
         if (empty($outputCoords)) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting the current coordinates' . $outputCoords);
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting the current coordinates');
             return response()->json(['message' => 'Server error'], 500);
         }
 
