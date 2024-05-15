@@ -285,6 +285,14 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
+        $commandUUCP = 'for i in $(uustat -a| grep -v uuadm | grep -v sudo | grep -v bash | grep -v "\-C" | grep dec_sensors | cut -d " " -f 1); do sudo uustat -k $i; done';
+        $outputUUCP = exec_cli_no($commandUUCP);
+
+        if ($commandUUCP == false) {
+            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during deleting GPS UUCP queue');
+            return response()->json(['message' => 'Server error'], 500);
+        }
+
         return response()->json(['message' => 'Stored files deleted successfully'], 200);
     }
 }
