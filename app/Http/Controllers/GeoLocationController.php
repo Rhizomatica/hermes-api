@@ -239,20 +239,20 @@ class GeoLocationController extends Controller
         return response()->json($output, 200);
     }
 
-    public function setStoringGPSStatus(bool $status)
+    public function setStoringGPSStatus($status)
     {
-        if ($status !== true && $status !== false) {
+        if ($status != 'true' && $status != 'false') {
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        if ($status == true) {
+        if ($status == 'true') {
             $command = 'sudo systemctl enable sensors';
             $output = exec_cli_no($command);             // we just hope for the best here
             $command = 'sudo systemctl start sensors';
             $output = exec_cli_no($command);
         }
 
-        if ($status == false) {
+        if ($status == 'false') {
             $command = 'sudo systemctl disable sensors';
             $output = exec_cli_no($command);            // we just hope for the best here
             $command = 'sudo systemctl stop sensors';
