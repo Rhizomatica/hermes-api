@@ -295,4 +295,15 @@ class GeoLocationController extends Controller
 
         return response()->json(['message' => 'Stored files deleted successfully'], 200);
     }
+
+    public function sosEmergency(){
+
+        //TODO
+        //Send last location
+        //Close last file and send it
+        $command = '';
+        $output = exec_cli_no($command);
+
+        return response()->json($output, 200);
+    }
 }

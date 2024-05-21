@@ -113,6 +113,7 @@ $router->group(['prefix' => '/geolocation'], function () use ($router) {
     $router->get('filetime',  ['uses' => 'GeoLocationController@getGPSFileRangeTime']);
     $router->post('filetime/{seconds}',  ['uses' => 'GeoLocationController@setGPSFileRangeTime']);
     $router->delete('delete',  ['uses' => 'GeoLocationController@deleteStoredFiles']);
+    $router->get('sos',  ['uses' => 'GeoLocationController@sosEmergency']);
 });
 
 $router->group(['prefix' => '/frequency'], function () use ($router) {
