@@ -813,7 +813,7 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function sosEmergency()
+	public function eraseSDCard()
 	{
 		//ERASE DATABASE
 		$removeDataBase = 'php artisan db:wipe --force';
