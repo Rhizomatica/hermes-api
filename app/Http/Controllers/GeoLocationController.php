@@ -298,10 +298,7 @@ class GeoLocationController extends Controller
 
     public function sosEmergency(){
 
-        //TODO
-        //Send last location
-        //Close last file and send it
-        $command = '';
+        $command = 'sudo killall -SIGUSR1 sensors_daemon.py';
         $output = exec_cli_no($command);
 
         return response()->json($output, 200);
