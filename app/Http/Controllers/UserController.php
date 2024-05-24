@@ -67,10 +67,8 @@ class UserController extends Controller
 		$request->request->remove('email');
 
 		if ($request['password']) {
-			$password = $request['password'];
-			$request['password'] = hash('sha256', $password);
-
-			exec_cli_no("sudo email_update_user {$email} {$password}");
+			$request['password'] = hash('sha256', $request['password']);
+			exec_cli_no("sudo email_update_user {$email} {$request['password']}");
 		}
 
 		$user = $user->update($request->all());
