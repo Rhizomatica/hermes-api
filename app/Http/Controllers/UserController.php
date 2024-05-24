@@ -63,7 +63,7 @@ class UserController extends Controller
 		}
 
 		$pass = $request['password'];
-		$email = $request['email'] . '@' . env('HERMES_DOMAIN');
+		$email = $user->email . '@' . env('HERMES_DOMAIN');
 		//Can't update email (remove)
 		$request->request->remove('email');
 
