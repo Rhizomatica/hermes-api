@@ -147,7 +147,7 @@ class GeoLocationController extends Controller
 
     public function setGPSStoringInterval(int $seconds)
     {
-        if ($seconds < 1 || $seconds > 180) {
+        if ($seconds < 1 || $seconds > 14400) {
             return response()->json(['message' => 'Server error'], 500);
         }
 
