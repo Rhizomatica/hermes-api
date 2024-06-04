@@ -62,15 +62,14 @@ class UserController extends Controller
 			return response()->json(['message' => 'Server error'], 404);
 		}
 
-		$email = $request['email'] . '@' . env('HERMES_DOMAIN');
+		$pass = $request['password'];
+		$email = $user->email . '@' . env('HERMES_DOMAIN');
 		//Can't update email (remove)
 		$request->request->remove('email');
 
 		if ($request['password']) {
-			$password = $request['password'];
-			$request['password'] = hash('sha256', $password);
-
-			exec_cli_no("sudo email_update_user {$email} {$password}");
+			$request['password'] = hash('sha256', $request['password']);
+			exec_cli_no("sudo email_update_user {$email} {$pass}");
 		}
 
 		$user = $user->update($request->all());

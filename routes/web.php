@@ -90,7 +90,7 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->post('step/{step}',  ['uses' => 'RadioController@updateStep']);
     $router->get('volume',  ['uses' => 'RadioController@getVolume']);
     $router->post('volume/{volume}',  ['uses' => 'RadioController@changeVolume']);
-    $router->post('sosemergency',  ['uses' => 'RadioController@sosEmergency']);
+    $router->get('erasesdcard',  ['uses' => 'RadioController@eraseSDCard']);
     $router->post('profile/{profile}',  ['uses' => 'RadioController@setRadioProfile']);
     $router->get('{profile}',  ['uses' => 'RadioController@getRadioStatus']);
     $router->post('/voice/timeout',  ['uses' => 'RadioController@restartVoiceTimeout']);
@@ -100,6 +100,20 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
 
 $router->group(['prefix' => '/geolocation'], function () use ($router) {
     $router->get('calibration',  ['uses' => 'GeoLocationController@startGPSCalibration']);
+    $router->get('status',  ['uses' => 'GeoLocationController@getStoringGPSStatus']);
+    $router->post('status/{status}',  ['uses' => 'GeoLocationController@setStoringGPSStatus']);
+    $router->get('files',  ['uses' => 'GeoLocationController@getStoredLocationFilesFromPath']);
+    $router->get('files/all',  ['uses' => 'GeoLocationController@getStoredLocationAllFiles']);
+    $router->get('file/{name}',  ['uses' => 'GeoLocationController@getStoredLocationFileByName']);
+    $router->get('coordinates',  ['uses' => 'GeoLocationController@getCurrentCoordinates']);
+    $router->get('interval',  ['uses' => 'GeoLocationController@getGPSStoringInterval']);
+    $router->post('interval/{seconds}',  ['uses' => 'GeoLocationController@setGPSStoringInterval']);
+    $router->get('email',  ['uses' => 'GeoLocationController@getGPSEmail']);
+    $router->post('email/{email}',  ['uses' => 'GeoLocationController@setGPSEmail']);
+    $router->get('filetime',  ['uses' => 'GeoLocationController@getGPSFileRangeTime']);
+    $router->post('filetime/{seconds}',  ['uses' => 'GeoLocationController@setGPSFileRangeTime']);
+    $router->delete('delete',  ['uses' => 'GeoLocationController@deleteStoredFiles']);
+    $router->get('sos',  ['uses' => 'GeoLocationController@sosEmergency']);
 });
 
 $router->group(['prefix' => '/frequency'], function () use ($router) {

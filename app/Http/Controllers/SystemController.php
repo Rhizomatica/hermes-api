@@ -59,7 +59,7 @@ class SystemController extends Controller
 		$piduu = explode("\n", exec_cli("ls  /lib/systemd/system/uucp.socket"))[0];
 		$piduuardop = explode("\n", exec_cli("pgrep -x uuardopd"))[0];
 		$pidmodem = explode("\n", exec_cli("pgrep -x VARA.exe"))[0];
-		$pidradio = explode("\n", exec_cli("pgrep -x ubitx_controlle"))[0];
+		$pidradio = explode("\n", exec_cli("pgrep -x bitx_controller"))[0];
 		$nodename = explode("\n", exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
 		$pidhmp = explode("\n", exec_cli("pgrep -x iwatch"))[0];
 		// $piddb = explode("\n", exec_cli("pgrep -x mariadbd"))[0];
@@ -153,7 +153,7 @@ class SystemController extends Controller
 				$type = $fields[6];
 				// should we also treat rmail?
 
-				if ($type == "crmail" || strpos($type, ".hmp") !== false) {
+				if ($type == "crmail" || strpos($type, ".hmp") !== false || strpos($type, "dec_sensors") !== false) {
 					$count = count($fields);
 					$emails = array();
 					$email_info = array();
@@ -196,9 +196,17 @@ class SystemController extends Controller
 						$emails = null;
 					}
 
-					$messageID = $this->getMessageIDFromUuidhost($fields[10]);
-					$message = null;
-					
+					if ($type == "dec_sensors") {
+						$size = explode("(", $fields[11])[0];
+						$emails = null;
+                        $messageID = null;
+                        $message = null;
+                    }
+                    else {
+                        $messageID = $this->getMessageIDFromUuidhost($fields[10]);
+                        $message = null;
+                    }
+
 					if(intval($messageID)){
 						$message = $this->getMessageFromDataBase($messageID);
 					}

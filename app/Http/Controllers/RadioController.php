@@ -813,7 +813,7 @@ class RadioController extends Controller
 	 *
 	 * @return Json
 	 */
-	public function sosEmergency()
+	public function eraseSDCard()
 	{
 		//ERASE DATABASE
 		$removeDataBase = 'php artisan db:wipe --force';
@@ -865,8 +865,8 @@ class RadioController extends Controller
 
 	public function restartVoiceTimeout()
 	{
-		
-		$command = "reset_timeout";		
+
+		$command = "reset_timeout";
 		$output = explode("\n", exec_uc($command))[0];
 
 		if ($output == "OK") {
@@ -879,10 +879,10 @@ class RadioController extends Controller
 
 	public function getTimeoutConfig()
 	{
-		$command = "get_timeout";		
+		$command = "get_timeout";
 		$output = explode("\n", exec_uc($command))[0];
 
-		if ($output != "ERROR") {
+		if ($output != "Missing volume value") {
 			return response($output, 200);
 		}
 
@@ -893,12 +893,12 @@ class RadioController extends Controller
 	public function setTimeoutConfig($seconds)
 	{
 
-		if($seconds >= 0 && $seconds < 300){
+		if ($seconds >= 0 && $seconds < 300) {
 			(new ErrorController)->saveError(get_class($this), 500, 'API Error: Timeout value must be above 300');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		$command = "set_timeout -a " . $seconds;		
+		$command = "set_timeout -a " . $seconds;
 		$output = explode("\n", exec_uc($command))[0];
 
 		if ($output == "OK") {
@@ -908,5 +908,4 @@ class RadioController extends Controller
 		(new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during updating the timeout period - ' . $output);
 		return response()->json(['message' => 'Server error'], 500);
 	}
-
 }
