@@ -35,7 +35,7 @@ class FileController extends Controller
 		// set external path
 		$path = '';
 		$imageout = '.vvc';
-		$audioout = '.nesc';
+		$audioout = '.lpcnet';
 		$gpgout = '.gpg';
 
 		// get contents of the file on request
