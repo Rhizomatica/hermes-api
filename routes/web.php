@@ -97,6 +97,7 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->get('/voice/timeout/config',  ['uses' => 'RadioController@getTimeoutConfig']);
     $router->post('/voice/timeout/config/{seconds}',  ['uses' => 'RadioController@setTimeoutConfig']);
     $router->get('/bitrate',  ['uses' => 'RadioController@getBitrate']);
+    $router->get('/snr',  ['uses' => 'RadioController@getSNR']);
 });
 
 $router->group(['prefix' => '/geolocation'], function () use ($router) {
