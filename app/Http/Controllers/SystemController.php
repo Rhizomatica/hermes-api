@@ -199,15 +199,14 @@ class SystemController extends Controller
 					if ($type == "dec_sensors") {
 						$size = explode("(", $fields[11])[0];
 						$emails = null;
-                        $messageID = null;
-                        $message = null;
-                    }
-                    else {
-                        $messageID = $this->getMessageIDFromUuidhost($fields[10]);
-                        $message = null;
-                    }
+						$messageID = null;
+						$message = null;
+					} else {
+						$messageID = $this->getMessageIDFromUuidhost($fields[10]);
+						$message = null;
+					}
 
-					if(intval($messageID)){
+					if (intval($messageID)) {
 						$message = $this->getMessageFromDataBase($messageID);
 					}
 
@@ -244,7 +243,7 @@ class SystemController extends Controller
 	public function getMessageIDFromUuidhost($destpath)
 	{
 
-		if(!$destpath){
+		if (!$destpath) {
 			return null;
 		}
 
@@ -253,23 +252,24 @@ class SystemController extends Controller
 
 		$parts = explode($delimiter1, $destpath);
 		$result = [];
-		
+
 		foreach ($parts as $part) {
 			$subparts = explode($delimiter2, $part);
 			$result = array_merge($result, $subparts);
 		}
 
-		if(sizeof($result) >= 2 && is_numeric($result[1])){
+		if (sizeof($result) >= 2 && is_numeric($result[1])) {
 			return intval($result[1]);
 		}
 
 		return null;
 	}
 
-	public function getMessageFromDataBase($messageID){
+	public function getMessageFromDataBase($messageID)
+	{
 		$message = Message::find($messageID);
 
-		if(!$message){
+		if (!$message) {
 			return null;
 		}
 
@@ -415,5 +415,38 @@ class SystemController extends Controller
 	public function language()
 	{
 		return env('APP_LANGUAGE');
+	}
+
+	public function getSpoolStatistics()
+	{
+		$command = 'uustat -a| grep -v uuadm | grep -v sudo | grep -v bash | grep -v "\-C"';
+		$output = exec_cli($command);
+		$output = explode("\n", $output);
+
+		for ($i = "0"; $i < count($output); $i++) {
+			if (!empty($output[$i])) {
+				$fields = explode(" ", $output[$i]);
+			}
+
+			//STATUS (EXECUTING, SENDING) ????
+		}
+
+		return response()->json($fields, 200);
+
+
+
+
+		// $succeededCMD = explode(" ", exec_cli('sudo '))[1];
+		// $retryCMD = explode(" ", exec_cli('sudo '))[1];
+		// $totalBytes = explode(" ", exec_cli('sudo '))[1];
+
+
+		// $statistics[]  =  [
+		// 	'succeeded' => $succeededCMD,
+		// 	'retryCount' => $retryCMD,
+		// 	'totalBytes' => $totalBytes
+		// ];
+
+		// return response()->json($statistics, 200);
 	}
 }
