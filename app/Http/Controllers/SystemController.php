@@ -423,30 +423,140 @@ class SystemController extends Controller
 		$output = exec_cli($command);
 		$output = explode("\n", $output);
 
+		$totalCount = 0;
+		$totalBytes = 0;
+
+		$succeededCount = 0;
+		$succeededBytes = 0;
+
+		$retriesCount = 0;
+		$retriesBytes = 0;
+
+
 		for ($i = "0"; $i < count($output); $i++) {
 			if (!empty($output[$i])) {
 				$fields = explode(" ", $output[$i]);
-			}
+				$type = $fields[6];
+				
+				$bytesPositionInOutput = $this->getBytesFieldPositionInOutputArray($type, $fields);
 
-			//STATUS (EXECUTING, SENDING) ????
+				if (!empty($fields[$bytesPositionInOutput])) {
+
+					//SUM TOTALS
+					$totalBytes += $fields[$bytesPositionInOutput]; //(4102 //TODO - remove "(" if HMP
+					$totalCount += 1;
+				}
+				else {
+					continue;
+				}
+
+				//TODO - Check possible status (Executing, Sending....)
+				//TODO - CHECK HOW TO KONW IF IT'S SUCCEEDED
+				
+				//SUM SUCCEEDED
+				//5 position status in output array
+				if ($fields[5] == "DONE????????") {
+					$succeededCount += 1;
+					$succeededBytes += $fields[$bytesPositionInOutput]; //(4102 //TODO - remove "(" if HMP
+				}
+
+				//CHECK AND SUM RETRIES
+				if ($fields[5] == "Executing" ||$fields[5] == "Sending") {
+
+					//Check retries 
+					//TODO - Check which status should verify the retries
+					$retries = $this->checkRetriesByID($output, $fields[0]);
+					$retriesCount += $retries[0];
+					$retriesBytes += $retries[1]; //(4102 //TODO - remove "(" if HMP
+					//******************
+				}
+
+				// $fields = [
+				// 	"PU2UIT.NWdWupMAAlEy",
+				// 	"PU2UIT",
+				// 	"root",
+				// 	"07-14",
+				// 	"20:59",
+				// 	"Executing",
+				// 	"dec_sensors",
+				// 	"-g",
+				// 	"-e",
+				// 	"test@domain.com",
+				// 	"-f",
+				// 	"root@estacao3.hermes.radio",
+				// 	"(sending",
+				// 	"99",
+				// 	"bytes)"
+				// ]
+			}
 		}
 
-		return response()->json($fields, 200);
 
+		$statistics[]  =  [
+			'totalCount' => $totalCount,
+			'totalBytes' => $totalBytes,
+			'succeededCount' => $succeededCount,
+			'succeededBytes' => $succeededBytes,
+			'retriesCount' => $retriesCount,
+			'retriesBytes' => $retriesBytes
+		];
 
+		return response()->json($statistics, 200);
+	}
 
+	public function getBytesFieldPositionInOutputArray($type, $fields){
+		//CHECK KIND OF ITEM AND DEFINE ARRAY POSITION
+		$bytesPositionInOutput = 13; //13 = Default
 
-		// $succeededCMD = explode(" ", exec_cli('sudo '))[1];
-		// $retryCMD = explode(" ", exec_cli('sudo '))[1];
-		// $totalBytes = explode(" ", exec_cli('sudo '))[1];
+		// if($type == '???'){ //TODO verify difference for 11 (qual seria o 11??) GPS?
+		// 	$bytesPositionInOutput = 11;
+		// }
 
+		if($type == '.hmp'){
+			$bytesPositionInOutput = 7;
+		}
 
-		// $statistics[]  =  [
-		// 	'succeeded' => $succeededCMD,
-		// 	'retryCount' => $retryCMD,
-		// 	'totalBytes' => $totalBytes
-		// ];
+		if ($type == "crmail") {
+			// test if spool is a email
+			// handle when is a multiple email
 
-		// return response()->json($statistics, 200);
+			$count = count($fields);
+
+			//TODO - Verify
+			if ($count > 11) {
+				$bytesPositionInOutput = $fields[$count - 2];
+			}
+			// handle when is a simple email
+			else {
+				$bytesPositionInOutput = 9;
+			}
+		}
+
+		return $bytesPositionInOutput;
+	}
+
+	public function checkRetriesByID($spoolList, $idOrigin)
+	{
+
+		$retriesCount = 0;
+		$retriesBytes = 0;
+
+		for ($i = 0; $i < $spoolList; $i++) {
+
+			$id = explode(" ", $spoolList[$i])[0];
+			$bytes = explode(" ", $spoolList[$i])[13]; //TODO - Confirmar coluna
+
+			if ($id == $idOrigin) {
+				$retriesCount += 1;
+				$retriesBytes += $bytes;
+			}
+		}
+
+		$retries = [
+			$retriesCount,
+			$retriesBytes
+		];
+
+		return $retries;
 	}
 }
