@@ -7,10 +7,6 @@
 |--------------------------------------------------------------------------
 */
 
-$app->middleware([
-    App\Http\Middleware\CorsMiddleware::class 
-]);
-
 $router->get('/',  ['uses' => 'HelpController@showHelpMain']);
 $router->get('/version', function () use ($router) {
     return $router->app->version();
