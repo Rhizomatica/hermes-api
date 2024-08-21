@@ -135,7 +135,7 @@ class MessageController extends Controller
 
       // Test for HMP: hermes message package, create record on messages database
       if (Storage::disk('local')->exists('tmp/' . $id . '/hmp.json')) {
-        $messagefile = json_decode(Storage::disk('local')->get('tmp/' . $id . '/hmp.json'));
+        $messagefile = json_decode((string) Storage::disk('local')->get('tmp/' . $id . '/hmp.json'));
         $message = @json_decode(json_encode($messagefile), true);
         // force reset id to get the next from db
         $message['id'] = null;

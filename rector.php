@@ -8,7 +8,7 @@ use RectorLaravel\Set\LaravelLevelSetList;
 
 return RectorConfig::configure()
     ->withSets([
-        LaravelLevelSetList::UP_TO_LARAVEL_90,
+        LaravelLevelSetList::UP_TO_LARAVEL_110,
         LaravelSetList::LARAVEL_CODE_QUALITY,
         LaravelSetList::LARAVEL_LEGACY_FACTORIES_TO_CLASSES
     ])

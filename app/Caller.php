@@ -15,10 +15,6 @@ class Caller extends Model
     protected $fillable = [
         'id', 'title', 'stations', 'starttime', 'stoptime',  'enable'
     ];
-	
-	protected $casts = [
-		'stations' => 'array',
-	];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -30,5 +26,12 @@ class Caller extends Model
     ];
 
     protected $table = 'caller';
+    #[\Override]
+    protected function casts() : array
+    {
+        return [
+       		'stations' => 'array',
+       	];
+    }
 }
 
