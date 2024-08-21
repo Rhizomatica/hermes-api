@@ -85,16 +85,6 @@ $app->middleware([
  ]);
 
 /*
-
-$app->middleware([
-    App\Http\Middleware\OldMiddleware::class
- ]);
-
-$app->routeMiddleware([
-    'auth' => App\Http\Middleware\Authenticate::class,
-]);
-*/
-/*
 |--------------------------------------------------------------------------
 | Register Service Providers
 |--------------------------------------------------------------------------
@@ -104,6 +94,8 @@ $app->routeMiddleware([
 | totally optional, so you are not required to uncomment this line.
 |
 */
+
+$app->register(Illuminate\Database\Eloquent\LegacyFactoryServiceProvider::class);
 
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);

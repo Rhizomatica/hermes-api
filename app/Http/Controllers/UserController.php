@@ -125,6 +125,7 @@ class UserController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
+		//TODO - Removed PHP 8.3
 		unset($user['password']);
 		unset($user['created_at']);
 		unset($user['updated_at']);
