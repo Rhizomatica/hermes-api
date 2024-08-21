@@ -6,11 +6,11 @@
     "type": "project",
     "require": {
         "php": "^8.3.10",
-        "illuminate/collections": "9.36.3",
-        "illuminate/database": "9.36.3",
-        "illuminate/mail": "9.36.3",
+        "illuminate/collections": "^11.0",
+        "illuminate/database": "^11.0",
+        "illuminate/mail": "^11.0",
         "laravel/legacy-factories": "^1.4",
-        "laravel/lumen-framework": "9.1.6",
+        "laravel/lumen-framework": "^11.0",
         "league/flysystem": "^3.28"
     },
 
