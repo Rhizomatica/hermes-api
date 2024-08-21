@@ -125,7 +125,7 @@ $app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
  
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
-], function ($router) {
+], function ($router): void {
     require __DIR__.'/../routes/web.php';
 });
 

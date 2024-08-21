@@ -51,7 +51,7 @@ class CallerController extends Controller
 		$schedule = Caller::create($request->all());
 
 		if (!$schedule) {
-			(new ErrorController)->saveError(get_class($this), 500, 'API Error: can not create a schedule');
+			(new ErrorController)->saveError(static::class, 500, 'API Error: can not create a schedule');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
@@ -82,7 +82,7 @@ class CallerController extends Controller
 			return response()->json($request, 200);
 		}
 
-		(new ErrorController)->saveError(get_class($this), 500, 'API Error: can not find schedule to update');
+		(new ErrorController)->saveError(static::class, 500, 'API Error: can not find schedule to update');
 		return response()->json(['message' => 'Not found'], 404);
 	}
 

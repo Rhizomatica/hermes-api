@@ -58,12 +58,12 @@ class MessageController extends Controller
     ]);
 
     $request->inbox = false;
-    $request->orig = explode("\n", exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
+    $request->orig = explode("\n", (string) exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
 
     $message = Message::create($request->all());
 
     if (!$message) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes pack message Error: can\'t create message in DB');
+      (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes pack message Error: can\'t create message in DB');
       return response()->json(['message' => 'Server error'], 500);
     }
 
@@ -112,7 +112,7 @@ class MessageController extends Controller
    */
   public function unpackInboxMessage($arg)
   {
-    $arga = explode('_', $arg);
+    $arga = explode('_', (string) $arg);
     $orig = $arga[0];
     $id = $arga[1];
     $id = explode('.', $id)[0];
@@ -121,7 +121,7 @@ class MessageController extends Controller
     // Test for tmp dir, if doesnt exist, creates it
     if (!Storage::disk('local')->exists('inbox/tmp')) {
       if (!Storage::disk('local')->makeDirectory('tmp')) {
-        (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes unpack inbox message Error: can\'t find or create tmp dir');
+        (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes unpack inbox message Error: can\'t find or create tmp dir');
         return response()->json(['message' => 'Server error'], 500);
       }
     }
@@ -131,7 +131,7 @@ class MessageController extends Controller
       $path = Storage::disk('local')->path('');
       $command  = 'tar xvfz ' .  $path . 'inbox/' . $orig . '_' . $id  . '.hmp' . ' -C ' . $path . 'tmp/';
       $output = exec_cli($command);
-      $files[] = explode(' ', $output);
+      $files[] = explode(' ', (string) $output);
 
       // Test for HMP: hermes message package, create record on messages database
       if (Storage::disk('local')->exists('tmp/' . $id . '/hmp.json')) {
@@ -142,13 +142,13 @@ class MessageController extends Controller
         // force inbox flag
         $message['inbox'] = true;
       } else {
-        (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: cant find json file from unpacked message');
+        (new ErrorController)->saveError(static::class, 500, 'Hermes unpack inbox message Error: cant find json file from unpacked message');
         return response()->json(['message' => 'Server error'], 500);
       }
 
       //create message on database, delete tar and hmp
       if (!$message = Message::create($message)) {
-        (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: cant create message on db');
+        (new ErrorController)->saveError(static::class, 500, 'Hermes unpack inbox message Error: cant create message on db');
         return response()->json(['message' => 'Server error'], 500);
       }
 
@@ -160,13 +160,13 @@ class MessageController extends Controller
           // Test and create download folder if it doesn't exists
           if (!Storage::disk('local')->exists('downloads')) {
             if (!Storage::disk('local')->makeDirectory('downloads')) {
-              (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t find or create downloads dir');
+              (new ErrorController)->saveError(static::class, 500, 'Hermes unpack inbox message Error: can\'t find or create downloads dir');
               return response()->json(['message' => 'Server error'], 500);
             }
           }
           // movefile
           if (!Storage::disk('local')->move('tmp/' . $id . '/' .  $message['fileid'], 'downloads/' . $message['fileid'])) {
-            (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t move imagefile');
+            (new ErrorController)->saveError(static::class, 500, 'Hermes unpack inbox message Error: can\'t move imagefile');
             return response()->json(['message' => 'Server error'], 500);
           }
           // TODO move audio and other files
@@ -175,22 +175,13 @@ class MessageController extends Controller
 
       if (env('MAIL_FROM_NAME')) {
 
-        $data = array(
-          'name' => $message['name'],
-          'text' => $message['text'],
-          'file' => $message['file'],
-          'fileid' => $message['fileid'],
-          'mimetype' => $message['mimetype'],
-          'sent_at' => $message['sent_at'],
-          'orig' => $message['orig'],
-          'dest' => $message['dest']
-        );
+        $data = ['name' => $message['name'], 'text' => $message['text'], 'file' => $message['file'], 'fileid' => $message['fileid'], 'mimetype' => $message['mimetype'], 'sent_at' => $message['sent_at'], 'orig' => $message['orig'], 'dest' => $message['dest']];
 
         // $data = array('dest'=>$message['dest']);
         // $data = array('orig'=>$message['orig']);
         // $data = array('sent_at'=>$message['sent_at']);
 
-        Mail::send('mail', $data, function ($message) {
+        Mail::send('mail', $data, function ($message): void {
           // $subject = 'Hermes HMP: ' . $message->subject;
           $message->to(env('HERMES_FWD_EMAIL'))->subject('HERMES Public message ');
           //  $message->from('selva@snamservices.com','Selvakumar');
@@ -199,22 +190,22 @@ class MessageController extends Controller
 
       if (Storage::disk('local')->exists('tmp/' . $id)) {
         if (!Storage::disk('local')->deleteDirectory('tmp/' .  $id)) {
-          (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t delete tmp dir');
+          (new ErrorController)->saveError(static::class, 500, 'Hermes unpack inbox message Error: can\'t delete tmp dir');
           return response()->json(['message' => 'Server error'], 500);
         }
         // $fullpath = Storage::disk('local')->path('inbox/'. $orig . '_' . $message['id'] . '.hmp');
         $fullpath = Storage::disk('local')->path('inbox/' . $arg);
         $command = 'sudo rm -f ' . $fullpath;
         if (!exec_cli_no($command)) {
-          (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t delete orig file');
+          (new ErrorController)->saveError(static::class, 500, 'Hermes unpack inbox message Error: can\'t delete orig file');
           return response()->json(['message' => 'Server error'], 500);
         }
       } else {
-        (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t create message on database');
+        (new ErrorController)->saveError(static::class, 500, 'Hermes unpack inbox message Error: can\'t create message on database');
         return response()->json(['message' => 'Server error'], 500);
       }
     } else {
-      (new ErrorController)->saveError(get_class($this), 500, 'Hermes unpack inbox message Error: can\'t find HMP');
+      (new ErrorController)->saveError(static::class, 500, 'Hermes unpack inbox message Error: can\'t find HMP');
       return response()->json(['message' => 'Server error'], 500);
     }
     Log::info('API unpack  ' . $id  . ' - ' . $message .  ' from ' . $orig);
@@ -231,23 +222,23 @@ class MessageController extends Controller
   {
 
     if (!$request->pass && $request->pass == '') {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: HMP uncrypt error - form pass is required');
+      (new ErrorController)->saveError(static::class, 500, 'API Error: HMP uncrypt error - form pass is required');
       return response()->json(['message' => 'Server error'], 500);
     }
 
     $message = Message::find($id);
 
     if (!$message) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: HMP uncrypt error - can not find message');
+      (new ErrorController)->saveError(static::class, 500, 'API Error: HMP uncrypt error - can not find message');
       return response()->json(['message' => 'Server error'], 500);
     }
 
     if (!$message['secure']) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: HMP uncrypt error - message is not secured');
+      (new ErrorController)->saveError(static::class, 500, 'API Error: HMP uncrypt error - message is not secured');
       return response()->json(['message' => 'Server error'], 500);
     }
 
-    $crypt = hex2bin($message['text']);
+    $crypt = hex2bin((string) $message['text']);
     $messageUncrypt = Storage::disk('local')->put('tmp/' . $message->id . '-uncrypt', $crypt);
 
     if ($messageUncrypt) {
@@ -258,7 +249,7 @@ class MessageController extends Controller
       return response()->json(['message' => $output], 200);
     }
 
-    (new ErrorController)->saveError(get_class($this), 500, 'API Error: HMP uncrypt error - message can not be uncrypted');
+    (new ErrorController)->saveError(static::class, 500, 'API Error: HMP uncrypt error - message can not be uncrypted');
     return response()->json(['message' => 'Server error'], 500);
   }
 
@@ -273,14 +264,14 @@ class MessageController extends Controller
       $output = exec_cli($command);
 
       if (!$output) {
-        (new ErrorController)->saveError(get_class($this), 500, 'API Error: sendHMP can not encrypt the message');
+        (new ErrorController)->saveError(static::class, 500, 'API Error: sendHMP can not encrypt the message');
         return response()->json(['message' => 'Server error'], 500);
       }
 
       $cryptout = $output; // redundant
 
       $message->secure = true;
-      $message->text = bin2hex($cryptout);
+      $message->text = bin2hex((string) $cryptout);
       $message->save();
     }
 
@@ -299,7 +290,7 @@ class MessageController extends Controller
 
     // Write message file
     if (!Storage::disk('local')->put('tmp/' . $message->id . '/hmp.json', $message)) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: sendHMP can not write message file');
+      (new ErrorController)->saveError(static::class, 500, 'API Error: sendHMP can not write message file');
       return 500;
     }
 
@@ -307,7 +298,7 @@ class MessageController extends Controller
     if ($message->fileid && Storage::disk('local')->exists('uploads/' . $message->fileid)) {
       // TODO Mantain original files?
       if (!Storage::disk('local')->copy('uploads/' . $message->fileid, 'tmp/' . $message->id . '/' . $message->fileid)) {
-        (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes send message error - can not move file');
+        (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes send message error - can not move file');
         return 500;
       }
     }
@@ -316,7 +307,7 @@ class MessageController extends Controller
     $command  = 'tar cfz ' . $pathtmp . '/' . $message->id . '.hmp -C ' .  $pathtmp . ' ' . $message->id;
 
     if ($output = exec_cli($command)) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes send message error - cant move image file' . $output . $command);
+      (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes send message error - cant move image file' . $output . $command);
       return 500;
     }
 
@@ -326,7 +317,7 @@ class MessageController extends Controller
     $hmpsize = Storage::disk('local')->size($origpath);
     if ($hmpsize > env('HERMES_MAX_FILE')) {
       $path = Storage::disk('local')->delete($origpath);
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: HMP error - larger than ' . env('HERMES_MAX_FILE'));
+      (new ErrorController)->saveError(static::class, 500, 'API Error: HMP error - larger than ' . env('HERMES_MAX_FILE'));
 
       return 413;
     }
@@ -337,13 +328,13 @@ class MessageController extends Controller
 
     //work path
     if (!env('HERMES_OUTBOX')) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes pack message Error: cant package the file' . $path);
+      (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes pack message Error: cant package the file' . $path);
       return 500;
     }
 
     // Clean outbox destination and move the package
     if (!Storage::disk('local')->move('tmp/' . $message->id . '.hmp', $origpath)) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes pack message Error: cant package the file' . $path);
+      (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes pack message Error: cant package the file' . $path);
       return 500;
     }
 
@@ -361,7 +352,7 @@ class MessageController extends Controller
 
     // UUCP -C Copy  (default) / -d create dirs
     if (!Storage::disk('local')->exists($file['origpath'])) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes send message error - Cant find ' . $file['path']);
+      (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes send message error - Cant find ' . $file['path']);
       return 500;
     }
 
@@ -374,21 +365,21 @@ class MessageController extends Controller
 
       if ($destspoolsize > env('HERMES_MAX_SPOOL')) {
         $file['path'] = Storage::disk('local')->delete($file['$origpath']);
-        (new ErrorController)->saveError(get_class($this), 500, 'API Error: HMP spool larger than ' . env('HERMES_MAX_SPOOL') . ' bytes');
+        (new ErrorController)->saveError(static::class, 500, 'API Error: HMP spool larger than ' . env('HERMES_MAX_SPOOL') . ' bytes');
         return 431;
       }
 
       $command = 'uucp -r -j -C -d \'' .  $file['path'] . '\' \'' . $dest . '!~/' . $message->orig . '_' . $message->id . '.hmp\'';
 
       if (!$output = exec_cli_no($command)) {
-        (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes sendMessage - Error on uucp:  ' . $output . ' - ' . $command);
+        (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes sendMessage - Error on uucp:  ' . $output . ' - ' . $command);
         return 500;
       }
     }
 
     //setting no draft
     if (!$message->update(['draft' => false])) {
-      (new ErrorController)->saveError(get_class($this), 500, 'API Error: Hermes sendMessage - cant update no draft:  ' . $output);
+      (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes sendMessage - cant update no draft:  ' . $output);
       return 500;
     }
 

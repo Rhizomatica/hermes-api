@@ -11,7 +11,7 @@ class ISPConfigController extends Controller
     {
         if (env('HERMES_EMAILAPI_FORWARDING_ID')) {
             $mail_forward = $client->mail_forward_get($session_id, env('HERMES_EMAILAPI_FORWARDING_ID'));
-            $find =  strpos($mail_forward['destination'], $email);
+            $find =  strpos((string) $mail_forward['destination'], (string) $email);
             if ($find === false) {
                 $mail_forward['destination'] .= ', ' .  $email . '@' . env('HERMES_DOMAIN');
                 $client->mail_forward_update($session_id, $client_id, env('HERMES_EMAILAPI_FORWARDING_ID'), $mail_forward);
@@ -23,10 +23,10 @@ class ISPConfigController extends Controller
         if (env('HERMES_EMAILAPI_FORWARDING_ID')) {
             $client_id = 1;
             $mail_forward = $client->mail_forward_get($session_id, env('HERMES_EMAILAPI_FORWARDING_ID'));
-            $find =  strpos($mail_forward['destination'], $mail);
+            $find =  strpos((string) $mail_forward['destination'], (string) $mail);
 
             if ($find !== false) {
-                $destination = explode(', ', $mail_forward['destination']);
+                $destination = explode(', ', (string) $mail_forward['destination']);
                 $new_destination = [];
                 //remove
                 foreach ($destination as $key => $value) {

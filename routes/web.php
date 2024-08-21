@@ -8,15 +8,13 @@
 */
 
 $router->get('/',  ['uses' => 'HelpController@showHelpMain']);
-$router->get('/version', function () use ($router) {
-    return $router->app->version();
-});
+$router->get('/version', fn() => $router->app->version());
 
 $router->post('login', ['uses' => 'UserController@login']);
 
 $router->get('/unpack/{arg}',  ['uses' => 'MessageController@unpackInboxMessage']); //MESSAGE CONTROLLER?
 
-$router->group(['prefix' => '/user'], function () use ($router) {
+$router->group(['prefix' => '/user'], function () use ($router): void {
     $router->get('', ['uses' => 'UserController@showAllUsers']);
     $router->get('{id}', ['uses' => 'UserController@showOneUser']);
     $router->post('', ['uses' => 'UserController@create']);
@@ -24,7 +22,7 @@ $router->group(['prefix' => '/user'], function () use ($router) {
     $router->delete('{id}/{mail}', ['uses' => 'UserController@delete']);
 });
 
-$router->group(['prefix' => '/message'], function () use ($router) {
+$router->group(['prefix' => '/message'], function () use ($router): void {
     $router->get('{id}', ['uses' => 'MessageController@showOneMessage']);
     $router->get('/type/{type}',  ['uses' => 'MessageController@showAllMessagesByType']);
     $router->get('image/{id}', ['uses' => 'FileController@get']); //FILE CONTROLLER?
@@ -34,13 +32,13 @@ $router->group(['prefix' => '/message'], function () use ($router) {
 });
 
 // file upload, download, crypt, compress, uncompress
-$router->group(['prefix' => '/file'], function () use ($router) {
+$router->group(['prefix' => '/file'], function () use ($router): void {
     $router->get('{file}', ['uses' => 'FileController@downloadFile']);
     $router->post('', ['uses' => 'FileController@uploadFile']);
     $router->delete('', ['uses' => 'FileController@deleteLostFiles']);
 });
 
-$router->group(['prefix' => '/sys'], function () use ($router) {
+$router->group(['prefix' => '/sys'], function () use ($router): void {
     $router->get('',  ['uses' => 'SystemController@getSysStatus']);
     $router->get('config',  ['uses' => 'SystemController@getSysConfig']);
     $router->post('config',  ['uses' => 'SystemController@setSysConfig']);
@@ -60,7 +58,7 @@ $router->group(['prefix' => '/sys'], function () use ($router) {
     $router->get('statistic',  ['uses' => 'SystemController@getSpoolStatistics']);
 });
 
-$router->group(['prefix' => '/caller'], function () use ($router) { //TODO - RENAME TO SCHEDULE?
+$router->group(['prefix' => '/caller'], function () use ($router): void { //TODO - RENAME TO SCHEDULE?
     $router->get('',  ['uses' => 'CallerController@showAll']);
     $router->post('', ['uses' => 'CallerController@createSched']);
     $router->put('{id}', ['uses' => 'CallerController@updateSched']);
@@ -68,7 +66,7 @@ $router->group(['prefix' => '/caller'], function () use ($router) { //TODO - REN
     $router->delete('{id}', ['uses' => 'CallerController@deleteSched']);
 });
 
-$router->group(['prefix' => '/radio'], function () use ($router) {
+$router->group(['prefix' => '/radio'], function () use ($router): void {
     $router->get('power/{profile}',  ['uses' => 'RadioController@getRadioPowerStatus']);
     $router->post('mode/{mode}/{profile}',  ['uses' => 'RadioController@setRadioMode']);
     $router->get('freq/{profile}',  ['uses' => 'RadioController@getRadioFreq']);
@@ -102,7 +100,7 @@ $router->group(['prefix' => '/radio'], function () use ($router) {
     $router->get('{profile}',  ['uses' => 'RadioController@getRadioStatus']);   
 });
 
-$router->group(['prefix' => '/geolocation'], function () use ($router) {
+$router->group(['prefix' => '/geolocation'], function () use ($router): void {
     $router->get('calibration',  ['uses' => 'GeoLocationController@startGPSCalibration']);
     $router->get('status',  ['uses' => 'GeoLocationController@getStoringGPSStatus']);
     $router->post('status/{status}',  ['uses' => 'GeoLocationController@setStoringGPSStatus']);
@@ -120,21 +118,21 @@ $router->group(['prefix' => '/geolocation'], function () use ($router) {
     $router->get('sos',  ['uses' => 'GeoLocationController@sosEmergency']);
 });
 
-$router->group(['prefix' => '/frequency'], function () use ($router) {
+$router->group(['prefix' => '/frequency'], function () use ($router): void {
     $router->get('',  ['uses' => 'FrequenciesController@getFrequencies']);
     $router->get('{id}',  ['uses' => 'FrequenciesController@getFrequency']);
     $router->get('/alias/{alias}',  ['uses' => 'FrequenciesController@getFrequencyByAlias']);
     $router->put('{id}', ['uses' => 'FrequenciesController@updateFrequency']);
 });
 
-$router->group(['prefix' => '/customerrors'], function () use ($router) {
+$router->group(['prefix' => '/customerrors'], function () use ($router): void {
     $router->get('',  ['uses' => 'ErrorController@getCustomErrors']);
     $router->delete('{id}', ['uses' => 'ErrorController@deleteCustomError']);
     $router->delete('', ['uses' => 'ErrorController@deleteCustomError']);
     $router->post('', ['uses' => 'ErrorController@saveErrorApi']);
 });
 
-$router->group(['prefix' => '/wifi'], function () use ($router) {
+$router->group(['prefix' => '/wifi'], function () use ($router): void {
     $router->get('',  ['uses' => 'WiFiController@getWiFiConfigurations']);
     $router->post('',  ['uses' => 'WiFiController@saveWiFiConfigurations']);
     $router->post('/mac/filter',  ['uses' => 'WiFiController@macFilter']);

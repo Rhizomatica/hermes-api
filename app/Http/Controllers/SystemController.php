@@ -13,7 +13,7 @@ class SystemController extends Controller
 	public function getSysConfig()
 	{
 		$system = System::first();
-		$system->nodename = explode("\n", exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
+		$system->nodename = explode("\n", (string) exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
 		return response()->json($system, 200);
 	}
 
@@ -25,11 +25,11 @@ class SystemController extends Controller
 				return response()->json($request->all(), 200);
 			}
 
-			(new ErrorController)->saveError(get_class($this), 500, 'API Error: setSysConfig can not update');
+			(new ErrorController)->saveError(static::class, 500, 'API Error: setSysConfig can not update');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setSysConfig does not have request data');
+		(new ErrorController)->saveError(static::class, 500, 'API Error: setSysConfig does not have request data');
 		return response()->json(['message' => 'Server error'], 500);
 	}
 
@@ -44,7 +44,7 @@ class SystemController extends Controller
 			return response()->json(['message' => 'setSysGw TODO'], 200);
 		}
 
-		(new ErrorController)->saveError(get_class($this), 500, 'API Error: setSysConfig does not have request data');
+		(new ErrorController)->saveError(static::class, 500, 'API Error: setSysConfig does not have request data');
 		return response()->json(['message' => 'Server error'], 500);
 	}
 
@@ -55,22 +55,22 @@ class SystemController extends Controller
 	 */
 	public function getSysStatus()
 	{
-		$uname = explode("\n", exec_cli("uname -n"))[0];
-		$piduu = explode("\n", exec_cli("ls  /lib/systemd/system/uucp.socket"))[0];
-		$piduuardop = explode("\n", exec_cli("pgrep -x uuardopd"))[0];
-		$pidmodem = explode("\n", exec_cli("pgrep -x VARA.exe"))[0];
-		$pidradio = explode("\n", exec_cli("pgrep -x bitx_controller"))[0];
-		$nodename = explode("\n", exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
-		$pidhmp = explode("\n", exec_cli("pgrep -x iwatch"))[0];
+		$uname = explode("\n", (string) exec_cli("uname -n"))[0];
+		$piduu = explode("\n", (string) exec_cli("ls  /lib/systemd/system/uucp.socket"))[0];
+		$piduuardop = explode("\n", (string) exec_cli("pgrep -x uuardopd"))[0];
+		$pidmodem = explode("\n", (string) exec_cli("pgrep -x VARA.exe"))[0];
+		$pidradio = explode("\n", (string) exec_cli("pgrep -x bitx_controller"))[0];
+		$nodename = explode("\n", (string) exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
+		$pidhmp = explode("\n", (string) exec_cli("pgrep -x iwatch"))[0];
 		// $piddb = explode("\n", exec_cli("pgrep -x mariadbd"))[0];
-		$pidpf = explode("\n", exec_cli("pgrep -x master"))[0];
+		$pidpf = explode("\n", (string) exec_cli("pgrep -x master"))[0];
 		// $pidvnc = explode("\n", exec_cli("pgrep -x Xtigervnc"))[0];
-		$wifiessid = explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep ssid | cut -c6-"))[0];
+		$wifiessid = explode("\n", (string) exec_cli("cat /etc/hostapd/hostapd.conf | grep ssid | cut -c6-"))[0];
 		// $wifich = explode("\n", exec_cli("cat /etc/hostapd/hostapd.conf | grep channel| cut -c9-"))[0];
-		$ip = explode("\n", exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''));
+		$ip = explode("\n", (string) exec_cli('/sbin/ifconfig | sed -En \'s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p\''));
 		array_pop($ip);
-		$disk_free = explode("\n", exec_cli("df  / | grep -v Filesystem | awk '{print $4}'"))[0];
-		$interfaces = explode("\n", exec_cli('ip r'));
+		$disk_free = explode("\n", (string) exec_cli("df  / | grep -v Filesystem | awk '{print $4}'"))[0];
+		$interfaces = explode("\n", (string) exec_cli('ip r'));
 		array_pop($interfaces);
 		// $memory = explode(" ", exec_cli("free --mega| grep Mem | awk '{print ($2\" \"$3\" \"$4)}'"));
 		// $phpmemory = (!function_exists('memory_get_usage')) ? '0' : round(memory_get_usage() / 1024 / 1024, 2) . 'MB';
@@ -85,11 +85,11 @@ class SystemController extends Controller
 			'gateway' => env('HERMES_GATEWAY'),
 			'ip' => $ip,
 			'interfaces' => $interfaces,
-			'wifiessid' => $wifiessid ? $wifiessid : false,
+			'wifiessid' => $wifiessid ?: false,
 			// 'wifich' => $wifich ? $wifich : false,
 			'interfaces' => $interfaces,
 			// 'piduu' => $piduu ? $piduu : false,
-			'piduuardop' => $piduuardop ? $piduuardop : false,
+			'piduuardop' => $piduuardop ?: false,
 			// 'pidmodem' => $pidmodem ? $pidmodem : false,
 			// 'pidradio' => $pidradio ? $pidradio : false,
 			// 'pidhmp' => $pidhmp ? $pidhmp : false,
@@ -98,7 +98,7 @@ class SystemController extends Controller
 			// 'memtotal' => $memory[0] . "MB",
 			// 'memused' => $memory[1] . "MB",
 			// 'memfree' => explode("\n", $memory[2])[0] . "MB", //Wrong
-			'diskfree' => $disk_free ? $disk_free : false
+			'diskfree' => $disk_free ?: false
 		];
 
 		return response()->json($status, 200);
@@ -113,11 +113,11 @@ class SystemController extends Controller
 	{
 		$command = "egrep -v '^\s*#' /etc/uucp/sys | grep system | cut -f 2 -d \" \"";
 		$output = exec_cli($command);
-		$sysnames = explode("\n", $output);
+		$sysnames = explode("\n", (string) $output);
 
 		$command2 = "egrep -v '^\s*#' /etc/uucp/sys | grep alias | cut -f 2 -d \" \"";
 		$output2 = exec_cli($command2);
-		$sysnames2 = explode("\n", $output2);
+		$sysnames2 = explode("\n", (string) $output2);
 
 		$sysnameslist = [];
 
@@ -144,7 +144,7 @@ class SystemController extends Controller
 	{
 		$command = 'uustat -a| grep -v uuadm | grep -v sudo | grep -v bash | grep -v "\-C"';
 		$output = exec_cli($command);
-		$output = explode("\n", $output);
+		$output = explode("\n", (string) $output);
 		$spool = [];
 
 		for ($i = "0"; $i < count($output); $i++) {
@@ -153,10 +153,10 @@ class SystemController extends Controller
 				$type = $fields[6];
 				// should we also treat rmail?
 
-				if ($type == "crmail" || strpos($type, ".hmp") !== false || strpos($type, "dec_sensors") !== false) {
+				if ($type == "crmail" || str_contains($type, ".hmp") || str_contains($type, "dec_sensors")) {
 					$count = count($fields);
-					$emails = array();
-					$email_info = array();
+					$emails = [];
+					$email_info = [];
 					$size = 0;
 					$uuid_host = explode(".", $fields[0])[0];
 					$uuid = explode(".", $fields[0])[1];
@@ -179,19 +179,19 @@ class SystemController extends Controller
 						}
 
 						$cfile_path = env('HERMES_UUCP') . '/' .  $uuid_host . '/C./C.' . $uuid;
-						$dfile_id = explode(" ", exec_cli('sudo cat ' . $cfile_path))[1];
+						$dfile_id = explode(" ", (string) exec_cli('sudo cat ' . $cfile_path))[1];
 						$dfile_path = env('HERMES_UUCP') . '/' . $uuid_host . '/D./' . $dfile_id;
 						$dfile =  exec_cli('sudo xzcat ' . $dfile_path . '| head -1');
-						$email_info['from'] = explode(" ", explode("\n", $dfile)[0])[1];
-						$email_info['from_date_week'] = explode(" ", explode("\n", $dfile)[0])[3];
-						$email_info['from_date_month'] = explode(" ", explode("\n", $dfile)[0])[4];
-						$email_info['from_date_day'] = explode(" ", explode("\n", $dfile)[0])[5];
-						$email_info['from_date_year'] = explode(" ", explode("\n", $dfile)[0])[7];
-						$email_info['from_date_time'] = explode(" ", explode("\n", $dfile)[0])[6];
+						$email_info['from'] = explode(" ", explode("\n", (string) $dfile)[0])[1];
+						$email_info['from_date_week'] = explode(" ", explode("\n", (string) $dfile)[0])[3];
+						$email_info['from_date_month'] = explode(" ", explode("\n", (string) $dfile)[0])[4];
+						$email_info['from_date_day'] = explode(" ", explode("\n", (string) $dfile)[0])[5];
+						$email_info['from_date_year'] = explode(" ", explode("\n", (string) $dfile)[0])[7];
+						$email_info['from_date_time'] = explode(" ", explode("\n", (string) $dfile)[0])[6];
 					}
 
 					// HMP
-					if (strpos($type, ".hmp") !== false) {
+					if (str_contains($type, ".hmp")) {
 						$size = explode("(", $fields[7])[1];
 						$emails = null;
 					}
@@ -250,7 +250,7 @@ class SystemController extends Controller
 		$delimiter1 = "_";
 		$delimiter2 = ".";
 
-		$parts = explode($delimiter1, $destpath);
+		$parts = explode($delimiter1, (string) $destpath);
 		$result = [];
 
 		foreach ($parts as $part) {
@@ -293,7 +293,7 @@ class SystemController extends Controller
 			return response()->json("uucp job killed: " . $host . '.' . $id, 200);
 		}
 
-		(new ErrorController)->saveError(get_class($this), 404, 'API Error: Job not found');
+		(new ErrorController)->saveError(static::class, 404, 'API Error: Job not found');
 		return response()->json("Not found", 404);
 	}
 
@@ -373,7 +373,7 @@ class SystemController extends Controller
 	{
 		$command = "sudo tail /var/log/mail.log -n 1000| sort -n ";
 		$output = exec_cli($command);
-		$output = explode("\n", $output);
+		$output = explode("\n", (string) $output);
 		ob_clean();
 		ob_start();
 
@@ -389,7 +389,7 @@ class SystemController extends Controller
 	{
 		$command = "sudo uulog -n 1000 | sort -n ";
 		$output = exec_cli($command);
-		$output = explode("\n", $output);
+		$output = explode("\n", (string) $output);
 		ob_clean();
 		ob_start();
 
@@ -405,7 +405,7 @@ class SystemController extends Controller
 	{
 		$command = "sudo uulog -D -n 1000 | sort -n ";
 		$output = exec_cli($command);
-		$output = explode("\n", $output);
+		$output = explode("\n", (string) $output);
 		ob_clean();
 		ob_start();
 
@@ -421,7 +421,7 @@ class SystemController extends Controller
 	{
 		$command = 'uustat -a| grep -v uuadm | grep -v sudo | grep -v bash | grep -v "\-C"';
 		$output = exec_cli($command);
-		$output = explode("\n", $output);
+		$output = explode("\n", (string) $output);
 
 		$totalCount = 0;
 		$totalBytes = 0;
@@ -437,7 +437,7 @@ class SystemController extends Controller
 			if (!empty($output[$i])) {
 				$fields = explode(" ", $output[$i]);
 				$type = $fields[6];
-				
+
 				$bytesPositionInOutput = $this->getBytesFieldPositionInOutputArray($type, $fields);
 
 				if (!empty($fields[$bytesPositionInOutput])) {
@@ -452,7 +452,7 @@ class SystemController extends Controller
 
 				//TODO - Check possible status (Executing, Sending....)
 				//TODO - CHECK HOW TO KONW IF IT'S SUCCEEDED
-				
+
 				//SUM SUCCEEDED
 				//5 position status in output array
 				if ($fields[5] == "DONE????????") {
@@ -543,8 +543,8 @@ class SystemController extends Controller
 
 		for ($i = 0; $i < $spoolList; $i++) {
 
-			$id = explode(" ", $spoolList[$i])[0];
-			$bytes = explode(" ", $spoolList[$i])[13]; //TODO - Confirmar coluna
+			$id = explode(" ", (string) $spoolList[$i])[0];
+			$bytes = explode(" ", (string) $spoolList[$i])[13]; //TODO - Confirmar coluna
 
 			if ($id == $idOrigin) {
 				$retriesCount += 1;
