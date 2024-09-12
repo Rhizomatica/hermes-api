@@ -11,6 +11,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
+    #[\Override]
     public function register()
     {
         //

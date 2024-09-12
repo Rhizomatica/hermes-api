@@ -42,7 +42,7 @@ class FileController extends Controller
 		$contents = file_get_contents($request->fileup);
 
 		if (!$contents) {
-			(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error fileup is a file? FILE:' . $request->fileup);
+			(new ErrorController)->saveError(static::class, 500, 'API Error: fileup error fileup is a file? FILE:' . $request->fileup);
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
@@ -51,7 +51,7 @@ class FileController extends Controller
 		$newFile = Storage::disk('local')->put($origpath, $contents);
 
 		if (!$newFile) {
-			(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error on write file' . 'tmp/' . $timestamp);
+			(new ErrorController)->saveError(static::class, 500, 'API Error: fileup error on write file' . 'tmp/' . $timestamp);
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
@@ -59,17 +59,17 @@ class FileController extends Controller
 
 		//TODO - Create own function
 		// compress image
-		if (preg_match("/\bimage\b/i", $mimetype)) {
+		if (preg_match("/\bimage\b/i", (string) $mimetype)) {
 			$command = 'compress_image.sh ' . $path . ' ' . $path . $imageout;
 			$output = exec_cli($command);
-			$filesize = explode(":", explode("\n", $output)[5])[1];
+			$filesize = explode(":", explode("\n", (string) $output)[5])[1];
 
 			// delete original file
 			//TODO - create own function
 			$deleteOldFile = Storage::disk('local')->delete($origpath);
 
 			if (!$deleteOldFile) {
-				(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error on delete original image file ' .  $path);
+				(new ErrorController)->saveError(static::class, 500, 'API Error: fileup error on delete original image file ' .  $path);
 				return response()->json(['message' => 'Server error'], 500);
 			}
 
@@ -78,16 +78,16 @@ class FileController extends Controller
 		}
 
 		// compress audio - script supports  wav mp3 or aac
-		if (preg_match("/\baudio\b/i", $mimetype)) {
+		if (preg_match("/\baudio\b/i", (string) $mimetype)) {
 			$command = 'compress_audio.sh ' . $path . ' ' . $path . $audioout;
 			$output = exec_cli($command);
-			$filesize = explode(":", explode("\n", $output)[0])[1];
+			$filesize = explode(":", explode("\n", (string) $output)[0])[1];
 
 			// delete original file
 			$deleteOldFile = Storage::disk('local')->delete($origpath);
 
 			if (!$deleteOldFile) {
-				(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error on delete original audio file ' .  $path);
+				(new ErrorController)->saveError(static::class, 500, 'API Error: fileup error on delete original audio file ' .  $path);
 				return response()->json(['message' => 'Server error'], 500);
 			}
 
@@ -103,14 +103,14 @@ class FileController extends Controller
 			$output = exec_cli_no($command);
 
 			if (!$output) {
-				(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error on encrypt the file:' . $path);
+				(new ErrorController)->saveError(static::class, 500, 'API Error: fileup error on encrypt the file:' . $path);
 				return response()->json(['message' => 'Server error'], 500);
 			}
 
 			$deleteOldFile = Storage::disk('local')->delete($origpath);
 
 			if (!$deleteOldFile) {
-				(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error on delete original file :' . $path);
+				(new ErrorController)->saveError(static::class, 500, 'API Error: fileup error on delete original file :' . $path);
 				return response()->json(['message' => 'Server error'], 500);
 			}
 
@@ -122,7 +122,7 @@ class FileController extends Controller
 
 		// Test and create uploads folder if it doesn't exists
 		if (!Storage::disk('local')->exists('uploads') && !Storage::disk('local')->makeDirectory('uploads')) {
-			(new ErrorController)->saveError(get_class($this), 500, 'API Error: can not find or create uploads dir');
+			(new ErrorController)->saveError(static::class, 500, 'API Error: can not find or create uploads dir');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
@@ -131,7 +131,7 @@ class FileController extends Controller
 		$uploadpath = 'uploads/' . $internalfilename;
 
 		if (!Storage::disk('local')->move($origpath, $uploadpath)) {
-			(new ErrorController)->saveError(get_class($this), 500, 'API Error: fileup error, could not complete and move the file');
+			(new ErrorController)->saveError(static::class, 500, 'API Error: fileup error, could not complete and move the file');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
@@ -166,13 +166,13 @@ class FileController extends Controller
 		$message = Message::where('fileid', '=', $file)->latest('id')->first();
 
 		// get timestamp
-		$timestamp = explode('.', $file)[0];
+		$timestamp = explode('.', (string) $file)[0];
 
 		// handle real file extensions
-		if (!isset(explode('.', $file)[1])) {
+		if (!isset(explode('.', (string) $file)[1])) {
 			$fileext = '';
 		} else {
-			$fileext = '.' . explode('.', $file)[1];
+			$fileext = '.' . explode('.', (string) $file)[1];
 		}
 
 		// handle file nameextension
@@ -206,7 +206,7 @@ class FileController extends Controller
 
 		// verify if file is image and decompress
 		//TODO - Create own function
-		if (preg_match("/\bvvc\b/i", $file)) {
+		if (preg_match("/\bvvc\b/i", (string) $file)) {
 			$fullpath = $fullpathroot . $origpath;
 
 			// decompress image
@@ -234,7 +234,7 @@ class FileController extends Controller
 		}
 
 		// verify if file is audio  - LPCNET and decompress
-		elseif (preg_match("/\blpcnet\b/i", $file) || preg_match("/\bnesc\b/i", $file)) {
+		elseif (preg_match("/\blpcnet\b/i", (string) $file) || preg_match("/\bnesc\b/i", (string) $file)) {
 			$fullpath = $fullpathroot . $origpath;
 
 			// decompress audio
@@ -290,7 +290,7 @@ class FileController extends Controller
 
 			foreach ($files as $file) {
 
-				$message = Message::where('fileid', '=', explode($path . '/', $file)[1])->first();
+				$message = Message::where('fileid', '=', explode($path . '/', (string) $file)[1])->first();
 
 				if (!$message) {
 					$output[] = $file;

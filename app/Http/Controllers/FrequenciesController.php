@@ -18,7 +18,7 @@ class FrequenciesController extends Controller
 		$frequency = Frequencies::firstWhere('id', $id);
 
 		if (!$frequency) {
-			(new ErrorController)->saveError(get_class($this), 404, 'API Error: User not find');
+			(new ErrorController)->saveError(static::class, 404, 'API Error: User not find');
 			return response()->json(['message' => 'Not found'], 404);
 		}
 
@@ -30,7 +30,7 @@ class FrequenciesController extends Controller
 		$frequency = Frequencies::firstWhere('alias', $alias)->orderBy('created_at')->get();
 
 		if (!$frequency) {
-			(new ErrorController)->saveError(get_class($this), 404, 'API Error: Frequency not found');
+			(new ErrorController)->saveError(static::class, 404, 'API Error: Frequency not found');
 			return response()->json(['message' => 'Not found'], 404);
 		}
 
@@ -40,7 +40,7 @@ class FrequenciesController extends Controller
 	public function updateFrequency($id, Request $request)
 	{
 		if (empty($id)) {
-			(new ErrorController)->saveError(get_class($this), 404, 'API Error: missing parameter (id)');
+			(new ErrorController)->saveError(static::class, 404, 'API Error: missing parameter (id)');
 			return response()->json(['message' => 'Missing parameter'], 404);
 		}
 
@@ -57,7 +57,7 @@ class FrequenciesController extends Controller
 			return response()->json($request, 200);
 		}
 
-		(new ErrorController)->saveError(get_class($this), 404, 'API Error: frequency not found');
+		(new ErrorController)->saveError(static::class, 404, 'API Error: frequency not found');
 		return response()->json(['message' => 'Not Found' . $id], 404);
 	}
 }

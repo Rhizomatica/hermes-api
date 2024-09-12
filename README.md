@@ -4,11 +4,11 @@
 
 ## Hermes station api
 This is a REST api for use on Hermes stations to exchange messages between then,
- it uses [Lumen PHP Framework](https://lumen.laravel.com/) and composer to manage its own dependencies.
+ it uses [Lumen PHP Framework v11.0](https://lumen.laravel.com/) and composer to manage its own dependencies.
 
 ## Server Requirements:
 - web server
-- PHP >= 7.3
+- PHP >= 8.2.22
 - OpenSSL PHP Extension
 - PDO PHP Extension
 - Mbstring PHP Extension
@@ -46,3 +46,8 @@ downloads (Files generated from the inbox received messages)
 inbox (incoming hermes message packs)
 outbox (hermes message pack for deliver)
 tmp (tmp files)
+
+## Rector - Instant Upgrades and Automated Refactoring
+
+[Rector](https://github.com/rectorphp/rector)
+Inside the project folder run `vendor/bin/rector` to improve your php code or prepare before upgrade or downgrade your Lumen Laravel app.

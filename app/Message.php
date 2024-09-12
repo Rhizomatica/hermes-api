@@ -16,10 +16,6 @@ class Message extends Model
         'id', 'name', 'orig', 'dest', 'text', 'updated_at', 'created_at', 'sent_at', 'draft', 'inbox', 'file', 'fileid',  'mimetype', 'secure'
     ];
 
-    protected $casts = [
-        'dest' => 'array',
-    ];
-
     /**
      * The attributes excluded from the model's JSON form.
      *
@@ -28,4 +24,11 @@ class Message extends Model
     protected $hidden = [
         'updated_at', 'created_at'
     ];
+    #[\Override]
+    protected function casts() : array
+    {
+        return [
+            'dest' => 'array',
+        ];
+    }
 }

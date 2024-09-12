@@ -22,18 +22,18 @@ class GeoLocationController extends Controller
             $output = exec_cli($command);
 
             if ($output == 'NO_GPS') {
-                (new ErrorController)->saveError(get_class($this), 500, 'API Error: No GPS found for calibration: ' . $output);
+                (new ErrorController)->saveError(static::class, 500, 'API Error: No GPS found for calibration: ' . $output);
                 return response()->json(['message' => 'Server error'], 500);
             }
 
             if (!$output || $output == 'ERROR') {
-                (new ErrorController)->saveError(get_class($this), 500, 'API Error: Fail on start GPS calibration: ' . $output);
+                (new ErrorController)->saveError(static::class, 500, 'API Error: Fail on start GPS calibration: ' . $output);
                 return response()->json(['message' => 'Server error'], 500);
             }
 
             return response()->json(['message' => 'GPS calibration sucessfully'], 200);
         } catch (\Throwable $th) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: nternal Server Error: ' . $th);
+            (new ErrorController)->saveError(static::class, 500, 'API Error: nternal Server Error: ' . $th);
             return response()->json(['message' => 'Server error'], 500);
         }
     }
@@ -116,7 +116,7 @@ class GeoLocationController extends Controller
         #$outputCoords = $lat . ',' . $lon;
 
         if (empty($outputCoords)) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting the current coordinates');
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error getting the current coordinates');
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -138,7 +138,7 @@ class GeoLocationController extends Controller
 
         if ($output < 1 || $output > 180)
         {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting GPS storing interval' . $output);
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error getting GPS storing interval' . $output);
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -155,7 +155,7 @@ class GeoLocationController extends Controller
         $output = exec_cli_no($command);
 
         if ($output == false) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS storing interval to ' . $seconds);
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error setting GPS storing interval to ' . $seconds);
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -173,7 +173,7 @@ class GeoLocationController extends Controller
         $output = intval(exec_cli($command));
 
         if ($output < 240 || $output > 86400) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting GPS file range time' . $output);
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error getting GPS file range time' . $output);
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -183,7 +183,7 @@ class GeoLocationController extends Controller
     public function setGPSFileRangeTime(int $seconds)
     {
         if ($seconds < 240 || $seconds > 86400) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS File Range time to ' . $seconds);
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error setting GPS File Range time to ' . $seconds);
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -191,7 +191,7 @@ class GeoLocationController extends Controller
         $output = exec_cli_no($command);
 
         if ($output == false) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS file range time to ' . $seconds);
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error setting GPS file range time to ' . $seconds);
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -208,8 +208,8 @@ class GeoLocationController extends Controller
         $command = 'grep email /etc/sbitx/sensors.ini | cut -d = -f 2 | tr -d "\n"';
         $output = exec_cli($command);
 
-        if (str_contains($output, '@') == false) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error getting GPS Email');
+        if (str_contains((string) $output, '@') == false) {
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error getting GPS Email');
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -218,8 +218,8 @@ class GeoLocationController extends Controller
 
     public function setGPSEmail($email)
     {
-        if (str_contains($email, '@') == false) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS Email to ' . $email);
+        if (str_contains((string) $email, '@') == false) {
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error setting GPS Email to ' . $email);
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -227,7 +227,7 @@ class GeoLocationController extends Controller
         $output = exec_cli_no($command);
 
         if ($output == false) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS Email to ' . $email);
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error setting GPS Email to ' . $email);
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -260,7 +260,7 @@ class GeoLocationController extends Controller
         }
 
         if ($output == false) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error setting GPS storing status');
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error setting GPS storing status');
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -273,7 +273,7 @@ class GeoLocationController extends Controller
         $outputRM = exec_cli_no($commandRM);
 
         if ($outputRM == false) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during deleting GPS stored files');
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error during deleting GPS stored files');
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -281,7 +281,7 @@ class GeoLocationController extends Controller
         $outputRM = exec_cli_no($commandRM);
 
         if ($outputRM == false) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during deleting GPS stored files');
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error during deleting GPS stored files');
             return response()->json(['message' => 'Server error'], 500);
         }
 
@@ -289,7 +289,7 @@ class GeoLocationController extends Controller
         $outputUUCP = exec_cli_no($commandUUCP);
 
         if ($commandUUCP == false) {
-            (new ErrorController)->saveError(get_class($this), 500, 'API Error: Error during deleting GPS UUCP queue');
+            (new ErrorController)->saveError(static::class, 500, 'API Error: Error during deleting GPS UUCP queue');
             return response()->json(['message' => 'Server error'], 500);
         }
 

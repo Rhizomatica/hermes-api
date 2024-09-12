@@ -12,15 +12,15 @@ class WiFiController extends Controller
 		$hostap_file = file_get_contents("/etc/hostapd/hostapd.conf", false);
 
 		if (!$hostap_file) {
-			(new ErrorController)->saveError(get_class($this), 500, 'Error: WiFi settings are unavailable');
+			(new ErrorController)->saveError(static::class, 500, 'Error: WiFi settings are unavailable');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
 		$parsed_cfg = explode("\n", $hostap_file);
 
 		foreach ($parsed_cfg as $i) {
-			if (strpos($i, "=") !== false) {
-				list($name, $value) = explode("=", $i, 2);
+			if (str_contains($i, "=")) {
+				[$name, $value] = explode("=", $i, 2);
 
 				if ($name == "channel" || $name == "ssid" || $name == "wpa_passphrase" || $name == 'macaddr_acl')
 					$wifi_settings[$name] = $value;
@@ -39,7 +39,7 @@ class WiFiController extends Controller
 		if (isset($wifi_settings['channel']) && isset($wifi_settings['ssid']) && isset($wifi_settings['wpa_passphrase']) && isset($wifi_settings['macaddr_acl']))
 			return response()->json($wifi_settings, 200);
 
-		(new ErrorController)->saveError(get_class($this), 500, 'Error: WiFi settings are unavailable');
+		(new ErrorController)->saveError(static::class, 500, 'Error: WiFi settings are unavailable');
 		return response()->json(['message' => 'Server error'], 500);
 	}
 
@@ -74,8 +74,8 @@ class WiFiController extends Controller
 		$parsed_cfg = explode("\n", $hostap_file);
 
 		foreach ($parsed_cfg as $i) {
-			if (strpos($i, "=") !== false) {
-				list($name, $value) = explode("=", $i, 2);
+			if (str_contains($i, "=")) {
+				[$name, $value] = explode("=", $i, 2);
 
 				if ($name == "channel" || $name == "ssid" || $name == "wpa_passphrase")
 					$wifi_settings[$name] = $value;

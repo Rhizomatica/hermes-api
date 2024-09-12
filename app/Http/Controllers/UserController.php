@@ -19,7 +19,7 @@ class UserController extends Controller
 	public function showOneUser($id)
 	{
 		if (!$user = User::firstWhere('email', $id)) {
-			(new ErrorController)->saveError(get_class($this), 404, 'Could not find user');
+			(new ErrorController)->saveError(static::class, 404, 'Could not find user');
 			return response()->json(['message' => 'Not found'], 404);
 		} else {
 			return response()->json(['message' => $user], 200);
@@ -28,23 +28,23 @@ class UserController extends Controller
 
 	public function create(Request $request)
 	{
-		$request['email'] = strtolower($request['email']);
+		$request['email'] = strtolower((string) $request['email']);
 
 		$user = User::firstWhere('email', $request['email']);
 		if ($user) {
-			(new ErrorController)->saveError(get_class($this), 409, 'User already exists');
+			(new ErrorController)->saveError(static::class, 409, 'User already exists');
 			return response()->json(['message' => 'Server error'], 409);
 		}
 
 		$pass = $request['password'];
 		$email = $request['email'] . '@' . env('HERMES_DOMAIN');
 
-		$request['password'] = hash('sha256', $request['password']);
+		$request['password'] = hash('sha256', (string) $request['password']);
 
 		$user = User::create($request->all());
 
 		if (!$user) {
-			(new ErrorController)->saveError(get_class($this), 500, 'Could not create user');
+			(new ErrorController)->saveError(static::class, 500, 'Could not create user');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
@@ -58,7 +58,7 @@ class UserController extends Controller
 		$user = User::firstWhere('id', $id);
 
 		if (!$user) {
-			(new ErrorController)->saveError(get_class($this), 404, 'User id not found on database');
+			(new ErrorController)->saveError(static::class, 404, 'User id not found on database');
 			return response()->json(['message' => 'Server error'], 404);
 		}
 
@@ -68,14 +68,14 @@ class UserController extends Controller
 		$request->request->remove('email');
 
 		if ($request['password']) {
-			$request['password'] = hash('sha256', $request['password']);
+			$request['password'] = hash('sha256', (string) $request['password']);
 			exec_cli_no("sudo email_update_user {$email} {$pass}");
 		}
 
 		$user = $user->update($request->all());
 
 		if (!$user) {
-			(new ErrorController)->saveError(get_class($this), 500, 'User could not be updated');
+			(new ErrorController)->saveError(static::class, 500, 'User could not be updated');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
@@ -89,7 +89,7 @@ class UserController extends Controller
 
 		// separate here, if the user is root, dont error out, just dont delete it, and the UI should show a graceful message
 		if (!$user || $user->email == 'root') {
-			(new ErrorController)->saveError(get_class($this), 403, 'API cant delete USER root');
+			(new ErrorController)->saveError(static::class, 403, 'API cant delete USER root');
 			return response()->json(['message' => 'Server error'], 403);
 		}
 
@@ -111,7 +111,7 @@ class UserController extends Controller
 	public function login(Request $request)
 	{
 		if (!$request->email) {
-			(new ErrorController)->saveError(get_class($this), 412, 'API user login - lack parameters');
+			(new ErrorController)->saveError(static::class, 412, 'API user login - lack parameters');
 			return response()->json(['message' => 'Server Error'], 412);
 		}
 
@@ -125,6 +125,7 @@ class UserController extends Controller
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
+		//TODO - Removed PHP 8.3
 		unset($user['password']);
 		unset($user['created_at']);
 		unset($user['updated_at']);
@@ -146,7 +147,7 @@ class UserController extends Controller
 		]);
 
 		if (!$validated) {
-			(new ErrorController)->saveError(get_class($this), 412, $validated);
+			(new ErrorController)->saveError(static::class, 412, $validated);
 			return false;
 		}
 
