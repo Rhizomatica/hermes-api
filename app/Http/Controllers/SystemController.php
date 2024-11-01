@@ -315,7 +315,7 @@ class SystemController extends Controller
 	 * @return json message
 	 */
 	public function uucpCall()
-	{
+	{	
 		$command = 'sudo uucico -r1 ';
 		$output = exec_cli($command);
 		return response($output, 200);
