@@ -136,7 +136,7 @@ class GeoLocationController extends Controller
         $command = 'grep sample_time /etc/sbitx/sensors.ini | cut -d = -f 2';
         $output = intval(exec_cli($command));
 
-        if ($output < 1 || $output > 180)
+        if ($output < 0)
         {
             (new ErrorController)->saveError(static::class, 500, 'API Error: Error getting GPS storing interval' . $output);
             return response()->json(['message' => 'Server error'], 500);
