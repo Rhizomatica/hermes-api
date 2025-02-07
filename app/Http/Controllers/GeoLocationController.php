@@ -116,7 +116,6 @@ class GeoLocationController extends Controller
         #$outputCoords = $lat . ',' . $lon;
 
         if (empty($outputCoords)) {
-            (new ErrorController)->saveError(static::class, 500, 'API Error: Error getting the current coordinates');
             return response()->json(['message' => 'Server error'], 500);
         }
 
