@@ -315,7 +315,7 @@ class SystemController extends Controller
 	 * @return json message
 	 */
 	public function uucpCall()
-	{	
+	{
 		$command = 'sudo uucico -r1 ';
 		$output = exec_cli($command);
 		return response($output, 200);
@@ -445,8 +445,7 @@ class SystemController extends Controller
 					//SUM TOTALS
 					$totalBytes += $fields[$bytesPositionInOutput]; //(4102 //TODO - remove "(" if HMP
 					$totalCount += 1;
-				}
-				else {
+				} else {
 					continue;
 				}
 
@@ -461,7 +460,7 @@ class SystemController extends Controller
 				}
 
 				//CHECK AND SUM RETRIES
-				if ($fields[5] == "Executing" ||$fields[5] == "Sending") {
+				if ($fields[5] == "Executing" || $fields[5] == "Sending") {
 
 					//Check retries 
 					//TODO - Check which status should verify the retries
@@ -504,7 +503,8 @@ class SystemController extends Controller
 		return response()->json($statistics, 200);
 	}
 
-	public function getBytesFieldPositionInOutputArray($type, $fields){
+	public function getBytesFieldPositionInOutputArray($type, $fields)
+	{
 		//CHECK KIND OF ITEM AND DEFINE ARRAY POSITION
 		$bytesPositionInOutput = 13; //13 = Default
 
@@ -512,7 +512,7 @@ class SystemController extends Controller
 		// 	$bytesPositionInOutput = 11;
 		// }
 
-		if($type == '.hmp'){
+		if ($type == '.hmp') {
 			$bytesPositionInOutput = 7;
 		}
 
@@ -560,17 +560,23 @@ class SystemController extends Controller
 		return $retries;
 	}
 
-	public function stopTransmission()
+	public function stopTransmission(Request $request)
 	{
-		$command = "sudo killall uucico";
 
-		$output = exec_cli($command) or die;
-		$output = explode("\n", (string) $output);
-		
-		ob_clean();
-		ob_start();
+		if ($request->all()) {
 
-		return response()->json("uucp job finished: " . $output, 200);
+			$command = "sudo killall uucico";
+
+			$output = exec_cli($command) or die;
+			$output = explode("\n", (string) $output);
+
+			ob_clean();
+			ob_start();
+
+			return response()->json("uucp job finished: " . $output, 200);
+		}
+
+		return response()->json(['message' => 'Server error'], 500);
+
 	}
-
 }
