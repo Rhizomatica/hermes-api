@@ -56,6 +56,7 @@ $router->group(['prefix' => '/sys'], function () use ($router): void {
     $router->get('reboot',  ['uses' => 'SystemController@sysReboot']);
     $router->get('language',  ['uses' => 'SystemController@language']);
     $router->get('statistic',  ['uses' => 'SystemController@getSpoolStatistics']);
+    $router->post('stop',  ['uses' => 'SystemController@stopTransmission']);
 });
 
 $router->group(['prefix' => '/caller'], function () use ($router): void { //TODO - RENAME TO SCHEDULE?
