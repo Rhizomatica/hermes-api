@@ -562,21 +562,14 @@ class SystemController extends Controller
 
 	public function stopTransmission(Request $request)
 	{
+		$command = "sudo killall uucico";
 
-		if ($request->all()) {
+		$output = exec_cli($command) or die;
+		$output = explode("\n", (string) $output);
 
-			$command = "sudo killall uucico";
+		ob_clean();
+		ob_start();
 
-			$output = exec_cli($command) or die;
-			$output = explode("\n", (string) $output);
-
-			ob_clean();
-			ob_start();
-
-			return response()->json("uucp job finished: " . $output, 200);
-		}
-
-		return response()->json(['message' => 'Server error'], 500);
-
+		return response()->json("uucp job finished: " . $output, 200);
 	}
 }
