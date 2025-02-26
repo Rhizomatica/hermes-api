@@ -354,9 +354,7 @@ class SystemController extends Controller
 	public function sysShutdown()
 	{
 		// set led status OFF on cabinet
-		exec_uc("set_led_status -a OFF -p 0");
-		exec_uc("set_led_status -a OFF -p 1");
-		sleep(1);
+		exec_uc("set_led_status -a 0");
 
 		// linux shutdown
 		$command = "sudo halt";
@@ -374,8 +372,6 @@ class SystemController extends Controller
 		$command = "sudo tail /var/log/mail.log -n 1000| sort -n ";
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
-		ob_clean();
-		ob_start();
 
 		return response()->json($output, 200);
 	}
@@ -390,8 +386,6 @@ class SystemController extends Controller
 		$command = "sudo uulog -n 1000 | sort -n ";
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
-		ob_clean();
-		ob_start();
 
 		return response()->json($output, 200);
 	}
@@ -406,8 +400,6 @@ class SystemController extends Controller
 		$command = "sudo uulog -D -n 1000 | sort -n ";
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
-		ob_clean();
-		ob_start();
 
 		return response()->json($output, 200);
 	}
@@ -566,9 +558,6 @@ class SystemController extends Controller
 
 		$output = exec_cli($command) or die;
 		$output = explode("\n", (string) $output);
-
-		ob_clean();
-		ob_start();
 
 		return response()->json("uucp job finished: " . $output, 200);
 	}
