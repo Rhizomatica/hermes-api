@@ -353,9 +353,7 @@ class SystemController extends Controller
 	public function sysShutdown()
 	{
 		// set led status OFF on cabinet
-		exec_uc("set_led_status -a OFF -p 0");
-		exec_uc("set_led_status -a OFF -p 1");
-		sleep(1);
+		exec_uc("set_led_status -a 0");
 
 		// linux shutdown
 		$command = "sudo halt";
@@ -373,8 +371,6 @@ class SystemController extends Controller
 		$command = "sudo tail /var/log/mail.log -n 1000| sort -n ";
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
-		ob_clean();
-		ob_start();
 
 		return response()->json($output, 200);
 	}
@@ -389,8 +385,6 @@ class SystemController extends Controller
 		$command = "sudo uulog -n 1000 | sort -n ";
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
-		ob_clean();
-		ob_start();
 
 		return response()->json($output, 200);
 	}
@@ -405,8 +399,6 @@ class SystemController extends Controller
 		$command = "sudo uulog -D -n 1000 | sort -n ";
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
-		ob_clean();
-		ob_start();
 
 		return response()->json($output, 200);
 	}
@@ -444,8 +436,7 @@ class SystemController extends Controller
 					//SUM TOTALS
 					$totalBytes += $fields[$bytesPositionInOutput]; //(4102 //TODO - remove "(" if HMP
 					$totalCount += 1;
-				}
-				else {
+				} else {
 					continue;
 				}
 
@@ -460,7 +451,7 @@ class SystemController extends Controller
 				}
 
 				//CHECK AND SUM RETRIES
-				if ($fields[5] == "Executing" ||$fields[5] == "Sending") {
+				if ($fields[5] == "Executing" || $fields[5] == "Sending") {
 
 					//Check retries 
 					//TODO - Check which status should verify the retries
@@ -503,7 +494,8 @@ class SystemController extends Controller
 		return response()->json($statistics, 200);
 	}
 
-	public function getBytesFieldPositionInOutputArray($type, $fields){
+	public function getBytesFieldPositionInOutputArray($type, $fields)
+	{
 		//CHECK KIND OF ITEM AND DEFINE ARRAY POSITION
 		$bytesPositionInOutput = 13; //13 = Default
 
@@ -511,7 +503,7 @@ class SystemController extends Controller
 		// 	$bytesPositionInOutput = 11;
 		// }
 
-		if($type == '.hmp'){
+		if ($type == '.hmp') {
 			$bytesPositionInOutput = 7;
 		}
 
@@ -557,5 +549,15 @@ class SystemController extends Controller
 		];
 
 		return $retries;
+	}
+
+	public function stopTransmission(Request $request)
+	{
+		$command = "sudo killall uucico";
+
+		$output = exec_cli($command);
+		$output = explode("\n", (string) $output);
+
+		return response()->json("uucp job finished: " . $output, 200);
 	}
 }
