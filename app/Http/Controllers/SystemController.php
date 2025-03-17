@@ -57,7 +57,7 @@ class SystemController extends Controller
 	{
 		$uname = explode("\n", (string) exec_cli("uname -n"))[0];
 		$piduu = explode("\n", (string) exec_cli("ls  /lib/systemd/system/uucp.socket"))[0];
-		$piduuardop = explode("\n", (string) exec_cli("pgrep -x uuardopd"))[0];
+		$piduuardop = explode("\n", (string) exec_cli("pgrep -x uucpd"))[0];
 		$pidmodem = explode("\n", (string) exec_cli("pgrep -x VARA.exe"))[0];
 		$pidradio = explode("\n", (string) exec_cli("pgrep -x bitx_controller"))[0];
 		$nodename = explode("\n", (string) exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
@@ -315,8 +315,8 @@ class SystemController extends Controller
 	 * @return json message
 	 */
 	public function uucpCall()
-	{
-		$command = 'sudo uucico -r1 ';
+	{	
+		$command = 'sudo uucico -m -r1 ';
 		$output = exec_cli($command);
 		return response($output, 200);
 	}
@@ -328,8 +328,7 @@ class SystemController extends Controller
 	 */
 	public function uucpCallForHost($uuidhost)
 	{
-		// $command = 'sudo uucico -r1 ' ;
-		$command = 'sudo uucico -S ' . $uuidhost; //TODO - test
+		$command = 'sudo uucico -m -S ' . $uuidhost; //TODO - test
 		$output = exec_cli($command);
 		return response($output, 200);
 	}
