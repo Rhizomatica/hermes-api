@@ -555,9 +555,8 @@ class SystemController extends Controller
 	{
 		$command = "sudo killall uucico";
 
-		$output = exec_cli($command);
-		$output = explode("\n", (string) $output);
+		exec_cli($command);
 
-		return response()->json("uucp job finished: " . $output, 200);
+		return response()->json("uucp job finished.", 200);
 	}
 }
