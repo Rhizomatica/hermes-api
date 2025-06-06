@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 class HelpController extends Controller
@@ -10,97 +11,141 @@ class HelpController extends Controller
 	 * @return void
 	 */
 
-	public function showHelpMain()
-	{
-		//TODO - Doc. Auto Generator
-		$general = [
-			'/ GET' => 'this help',
-			'version GET' => 'HERMES API version',
-			'login POST' => 'User authenticate HERMES'
-		];
 
-		$user = [
-			'user GET' => 'Show all users',
-			'user/{id} GET' => 'Show a user',
-			'user POST' => 'Create User',
-			'user/{id} PUT' => 'Update User',
-			'user/{id} DELETE' => 'Delete a user'
-		];
+    public function showHelpMain()
+    {
+        $general = [
+            '/ GET' => 'Show this help',
+            '/version GET' => 'Show HERMES API version',
+            '/login POST' => 'Authenticate user',
+            '/unpack/{arg} GET' => 'Unpack inbox message',
+        ];
 
-		$message = [
-			'message/{id} GET' => 'Show a message',
-			'messages/type/{type} GET' => 'Show all messages by type',
-			'image/{id} GET' => 'Show image from message',
-			'message POST' => 'Create message',
-			'message/{id} DELETE' => 'Delete a message',
-			'message/uncrypt/{id} POST' => 'Uncrypt message file'
-		];
+        $user = [
+            '/user GET' => 'Show all users',
+            '/user/{id} GET' => 'Show a user',
+            '/user POST' => 'Create user',
+            '/user/{id} POST' => 'Update user',
+            '/user/{id}/{mail} DELETE' => 'Delete a user by id and mail',
+        ];
 
-		$file = [
-			'file/{file} GET' => 'download, decompress and decrypt a file',
-			'file POST' => 'upload, compress and crypt a file',
-			'file DELETE' => 'Delete file'
-		];
+        $message = [
+            '/message/{id} GET' => 'Show a message',
+            '/message/type/{type} GET' => 'Show all messages by type',
+            '/message/image/{id} GET' => 'Show image from message',
+            '/message POST' => 'Create message',
+            '/message/{id} DELETE' => 'Delete a message',
+            '/message/uncrypt/{id} POST' => 'Uncrypt message file'
+        ];
 
-		$system = [
-			'sys/ GET' => 'Show system status',
-			'sys/config GET' => 'Show system configuration',
-			'sys/config POST' => 'Save system configuration',
-			'sys/maillog GET' => 'Show system mail logs',
-			'sys/stations GET' => 'Show system stations',
-			'sys/status GET' => 'Show system status', 
-			'sys/uuls GET' => 'UUCP list jobs',
-			'sys/mail/{host}/{id}/{language} DELETE' => 'Kill mail job', //TODO - Improve desc.
-			'sys/uuk/{host}/{id} DELETE' => 'Kill UUCP job',
-			'uucall GET' => 'UUCP call', //TODO - CALLER?
-			'uucall/{uuidhost} GET' => 'UUCP call for host', 
-			'uucall/{uuidhost} GET' => 'UUCP call for host',
-			'sys/uulog GET' => 'UUCP log',
-			'sys/uudebug GET' => 'UUCP debug log',
-			'sys/shutdown GET' => 'System shutdown', //TODO - review desc.
-			'sys/reboot GET' => 'System reboot',
-			'sys/reboot GET' => 'Show system language'
-		];
+        $file = [
+            '/file/{file} GET' => 'Download, decompress and decrypt a file',
+            '/file POST' => 'Upload, compress and crypt a file',
+            '/file DELETE' => 'Delete lost files'
+        ];
 
-		$caller = [ 
-			'caller/ GET' => 'Show all schedules',
-			'caller/ POST' => 'Create schedule',
-			'caller/{id} PUT' => 'Update schedule',
-			'caller/{id} GET' => 'Show schedule',
-			'caller/{id} DELETE' => 'Delete schedule'
-		];
+        $system = [
+            '/sys/ GET' => 'Show system status',
+            '/sys/config GET' => 'Show system configuration',
+            '/sys/config POST' => 'Save system configuration',
+            '/sys/maillog GET' => 'Show system mail logs',
+            '/sys/stations GET' => 'Show system stations',
+            '/sys/status GET' => 'Show system status',
+            '/sys/uuls GET' => 'UUCP list jobs',
+            '/sys/mail/{host}/{id}/{language} DELETE' => 'Kill mail job',
+            '/sys/uuk/{host}/{id} DELETE' => 'Kill UUCP job',
+            '/sys/uucall GET' => 'UUCP call',
+            '/sys/uucall/{uuidhost} GET' => 'UUCP call for host',
+            '/sys/uulog GET' => 'UUCP log',
+            '/sys/uudebug GET' => 'UUCP debug log',
+            '/sys/shutdown GET' => 'System shutdown',
+            '/sys/reboot GET' => 'System reboot',
+            '/sys/language GET' => 'Get system language',
+            '/sys/statistic GET' => 'Get spool statistics',
+            '/sys/stop POST' => 'Stop transmission',
+        ];
 
-		$radio = [
-			'radio/status GET' =>  'get radio status',
-			'radio/power GET' =>  'get radio power status',
-			'radio/mode/{mode} POST' => 'set radio mode',
-			'radio/freq GET' => 'get radio freq',
-			'radio/freq/{freq (in hz)} POST' => 'set radio freq (in hz)',
-			'radio/bfo GET' => 'get Radio Freq',
-			'radio/bfo/{freq in hz} POST' => 'set radio bfo (in hz)',
-			'radio/led/{status} POST' => 'set radio LED status',
-			'radio/ptt/{status} POST' => 'Radio post test tone', //TODO - Check
-			'radio/tone/{par} POST' => 'Radio set tone',
-			'radio/mastercal{freq (in hz)} POST' => 'Save radio MasterCal ',
-			'radio/protection GET' => 'get radio MasterCal',
-			'radio/connection/{status} POST' => 'get radio ConnectionStatus',
-			'radio/refthreshold GET' => 'get radio ref. threshold',
-			'radio/refthreshold POST' => 'Set radio ref. threshold',
-			'radio/refthresholdv POST' => 'Set radio ref. thresholdV',
-			'radio/protection POST' => 'Reset radio protection',
-			'radio/default POST' => 'Set radio default'
-		];
+        $caller = [
+            '/caller/ GET' => 'Show all schedules',
+            '/caller/ POST' => 'Create schedule',
+            '/caller/{id} PUT' => 'Update schedule',
+            '/caller/{id} GET' => 'Show schedule',
+            '/caller/{id} DELETE' => 'Delete schedule'
+        ];
 
-		$geolocation = [
-			'geolocation/calibration/ GET' => 'GPS calibration'
-		];
+        $radio = [
+            '/radio/{profile} GET' => 'Get radio status',
+            '/radio/power/{profile} GET' => 'Get radio power status',
+            '/radio/mode/{mode}/{profile} POST' => 'Set radio mode',
+            '/radio/freq/{profile} GET' => 'Get radio frequency',
+            '/radio/freq/{freq}/{profile} POST' => 'Set radio frequency',
+            '/radio/bfo/{profile} GET' => 'Get radio BFO',
+            '/radio/bfo/{freq}/{profile} POST' => 'Set radio BFO',
+            '/radio/led/{status}/{profile} POST' => 'Set radio LED status',
+            '/radio/ptt/{status}/{profile} POST' => 'Set radio PTT',
+            '/radio/tone/{par} POST' => 'Set radio tone',
+            '/radio/tone/sbitx/{par}/{profile} POST' => 'Set radio SBitx tone',
+            '/radio/mastercal/{freq}/{profile} POST' => 'Save radio MasterCal',
+            '/radio/protection/{profile} GET' => 'Get radio protection',
+            '/radio/connection/{status}/{profile} POST' => 'Set radio connection status',
+            '/radio/refthreshold/{profile} GET' => 'Get radio reference threshold',
+            '/radio/refthreshold/{value}/{profile} POST' => 'Set radio reference threshold',
+            '/radio/refthresholdv/{value}/{profile} POST' => 'Set radio reference threshold V',
+            '/radio/protection/{profile} POST' => 'Reset radio protection',
+            '/radio/default/{profile} POST' => 'Restore radio defaults',
+            '/radio/step GET' => 'Get radio step',
+            '/radio/step/{step} POST' => 'Update radio step',
+            '/radio/volume GET' => 'Get radio volume',
+            '/radio/volume/{volume} POST' => 'Change radio volume',
+            '/radio/erasesdcard GET' => 'Erase SD card',
+            '/radio/profile/{profile} POST' => 'Set radio profile',
+            '/radio/voice/timeout POST' => 'Restart voice timeout',
+            '/radio/voice/timeout/config GET' => 'Get voice timeout config',
+            '/radio/voice/timeout/config/{seconds} POST' => 'Set voice timeout config',
+            '/radio/bitrate GET' => 'Get radio bitrate',
+            '/radio/snr GET' => 'Get radio SNR'
+        ];
 
-		$frequency = [
-			'frequency GET' => 'Show frequencies',
-			'frequency/{id} GET' => 'Show frequency',
-			'frequency/alias/{alias} GET' => 'Show frequency by alias',
-			'frequency/{id} PUT' => 'Update frequency'
-		];
+        $geolocation = [
+            '/geolocation/calibration GET' => 'Start GPS calibration',
+            '/geolocation/status GET' => 'Get GPS storing status',
+            '/geolocation/status/{status} POST' => 'Set GPS storing status',
+            '/geolocation/files GET' => 'Get stored location files from path',
+            '/geolocation/files/all GET' => 'Get all stored location files',
+            '/geolocation/file/{name} GET' => 'Get stored location file by name',
+            '/geolocation/coordinates GET' => 'Get current coordinates',
+            '/geolocation/interval GET' => 'Get GPS storing interval',
+            '/geolocation/interval/{seconds} POST' => 'Set GPS storing interval',
+            '/geolocation/email GET' => 'Get GPS email',
+            '/geolocation/email/{email} POST' => 'Set GPS email',
+            '/geolocation/filetime GET' => 'Get GPS file range time',
+            '/geolocation/filetime/{seconds} POST' => 'Set GPS file range time',
+            '/geolocation/delete DELETE' => 'Delete stored files',
+            '/geolocation/sos GET' => 'SOS emergency'
+        ];
+
+        $frequency = [
+            '/frequency GET' => 'Show frequencies',
+            '/frequency/{id} GET' => 'Show frequency',
+            '/frequency/alias/{alias} GET' => 'Show frequency by alias',
+            '/frequency/{id} PUT' => 'Update frequency'
+        ];
+
+        $customerrors = [
+            '/customerrors GET' => 'Get custom errors',
+            '/customerrors DELETE' => 'Delete all custom errors',
+            '/customerrors/{id} DELETE' => 'Delete custom error by id',
+            '/customerrors POST' => 'Save a custom error'
+        ];
+
+        $wifi = [
+            '/wifi GET' => 'Get WiFi configurations',
+            '/wifi POST' => 'Save WiFi configurations',
+            '/wifi/mac/filter POST' => 'Set WiFi MAC filter',
+            '/wifi/mac/address POST' => 'Add WiFi MAC address',
+            '/wifi/mac/address/{address} DELETE' => 'Delete WiFi MAC address'
+        ];
+
 
 		$help = (object) [
 			'title' => 'Hermes API RESUME',
@@ -108,17 +153,19 @@ class HelpController extends Controller
 			'url' => env('APP_URL') . '/api',
 			'endpoints' => (object) [
 				'general' => $general,
-				'user' => $user,
-				'message' => $message,
-				'file' => $file,
-				'system' => $system,
-				'caller' => $caller,
-				'radio' => $radio,
-				'geolocation' => $geolocation,
-				'frequency' => $frequency
+            'user' => $user,
+            'message' => $message,
+            'file' => $file,
+            'system' => $system,
+            'caller' => $caller,
+            'radio' => $radio,
+            'geolocation' => $geolocation,
+            'frequency' => $frequency,
+            'customerrors' => $customerrors,
+            'wifi' => $wifi
 			]
 		];
 
 		return json_encode($help);
-	}
+    }
 }
