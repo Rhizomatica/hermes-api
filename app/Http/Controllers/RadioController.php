@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Hamcrest\Type\IsInteger;
+use Illuminate\Http\Request;
+
 
 class RadioController extends Controller
 {
@@ -937,17 +939,10 @@ class RadioController extends Controller
 
 	public function getPowerLevel($profile)
 	{
-
 		$command = "get_power -p " . $profile;
-
 		$output = explode("\n", (string) exec_uc($command))[0];
 
-		if ($output == "OK") {
-			return response($output, 200);
-		}
-
-		(new ErrorController)->saveError(static::class, 500, 'API Error: Error during getting the power level - ' . $output);
-		return response()->json(['message' => 'Server error'], 500);
+		return response($output, 200);
 	}
 
 	public function setPowerLevel(Request $request)
@@ -957,8 +952,8 @@ class RadioController extends Controller
 			$command = "set_power -a " . $request->powerLevel . " -p " .  $request->profile;
 			$output = explode("\n", (string) exec_uc($command))[0];
 		}
-
-		if ($output == "OK") {
+		
+		if ($output == "0") {
 			return response(true, 200);
 		}
 
