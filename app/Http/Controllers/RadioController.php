@@ -952,8 +952,8 @@ class RadioController extends Controller
 			$command = "set_power -a " . $request->powerLevel . " -p " .  $request->profile;
 			$output = explode("\n", (string) exec_uc($command))[0];
 		}
-		
-		if ($output == "0") {
+
+		if ($output == "OK") {
 			return response(true, 200);
 		}
 
