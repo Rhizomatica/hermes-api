@@ -59,7 +59,7 @@ class FileController extends Controller
 
 		//TODO - Create own function
 		// compress image
-		if (preg_match("/\bimage\b/i", (string) $mimetype)) {
+		if (preg_match("/\bimage\b/i", (string) $mimetype) && !preg_match("/\bgif\b/i", (string) $mimetype)) {
 			$command = 'compress_image.sh ' . $path . ' ' . $path . $imageout;
 			$output = exec_cli($command);
 			$filesize = explode(":", explode("\n", (string) $output)[5])[1];

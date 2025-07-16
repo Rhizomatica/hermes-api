@@ -97,8 +97,10 @@ $router->group(['prefix' => '/radio'], function () use ($router): void {
     $router->post('/voice/timeout/config/{seconds}',  ['uses' => 'RadioController@setTimeoutConfig']);
     $router->get('/bitrate',  ['uses' => 'RadioController@getBitrate']);
     $router->get('/snr',  ['uses' => 'RadioController@getSNR']);
+    $router->get('{profile}',  ['uses' => 'RadioController@getRadioStatus']);
+    $router->get('powerlevel/{profile}',  ['uses' => 'RadioController@getPowerLevel']);
+    $router->post('powerlevel',  ['uses' => 'RadioController@setPowerLevel']);
 
-    $router->get('{profile}',  ['uses' => 'RadioController@getRadioStatus']);   
 });
 
 $router->group(['prefix' => '/geolocation'], function () use ($router): void {

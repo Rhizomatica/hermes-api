@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Hamcrest\Type\IsInteger;
+use Illuminate\Http\Request;
+
 
 class RadioController extends Controller
 {
@@ -909,7 +911,8 @@ class RadioController extends Controller
 		return response()->json(['message' => 'Server error'], 500);
 	}
 
-	public function getBitrate(){
+	public function getBitrate()
+	{
 		$command = "get_bitrate"; /*UPDATE COMMAND*/
 		$output = explode("\n", (string) exec_uc($command))[0];
 
@@ -921,7 +924,8 @@ class RadioController extends Controller
 		return response()->json(['message' => 'Server error'], 500);
 	}
 
-	public function getSNR(){
+	public function getSNR()
+	{
 		$command = "get_snr"; /*UPDATE COMMAND*/
 		$output = explode("\n", (string) exec_uc($command))[0];
 
@@ -931,5 +935,29 @@ class RadioController extends Controller
 
 		(new ErrorController)->saveError(static::class, 500, 'API Error: Error during getting the radio SNR');
 		return response()->json(['message' => 'Server error'], 500);
-	}	
+	}
+
+	public function getPowerLevel($profile)
+	{
+		$command = "get_power -p " . $profile;
+		$output = explode("\n", (string) exec_uc($command))[0];
+
+		return response($output, 200);
+	}
+
+	public function setPowerLevel(Request $request)
+	{
+
+		if ($request->powerLevel >= 0 && $request->powerLevel <= 100) {
+			$command = "set_power -a " . $request->powerLevel . " -p " .  $request->profile;
+			$output = explode("\n", (string) exec_uc($command))[0];
+		}
+
+		if ($output == "OK") {
+			return response(true, 200);
+		}
+
+		(new ErrorController)->saveError(static::class, 500, 'API Error: Error during updating the power level - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
 }
