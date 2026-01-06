@@ -95,6 +95,7 @@ $router->group(['prefix' => '/radio'], function () use ($router): void {
     $router->post('/voice/timeout',  ['uses' => 'RadioController@restartVoiceTimeout']);
     $router->get('/voice/timeout/config',  ['uses' => 'RadioController@getTimeoutConfig']);
     $router->post('/voice/timeout/config/{seconds}',  ['uses' => 'RadioController@setTimeoutConfig']);
+    $router->post('voice/digital',  ['uses' => 'RadioController@setDigitalVoice']);
     $router->get('/bitrate',  ['uses' => 'RadioController@getBitrate']);
     $router->get('/snr',  ['uses' => 'RadioController@getSNR']);
     $router->get('{profile}',  ['uses' => 'RadioController@getRadioStatus']);
