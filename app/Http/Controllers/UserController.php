@@ -18,7 +18,7 @@ class UserController extends Controller
 
 	public function showOneUser($id)
 	{
-		if (!$user = User::firstWhere('email', $id)) {
+		if (!$user = User::firstWhere('id', $id)) {
 			(new ErrorController)->saveError(static::class, 404, 'Could not find user');
 			return response()->json(['message' => 'Not found'], 404);
 		} else {
