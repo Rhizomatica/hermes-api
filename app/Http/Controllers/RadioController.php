@@ -917,8 +917,8 @@ class RadioController extends Controller
 		$command = "get_digital_voice -p 1";
 		$output = explode("\n", (string) exec_uc($command))[0];
 
-		if ($output == "OK") {
-			return response(true, 200);
+		if ($output == "OFF" || $output == "ON") {
+			return response($output, 200);
 		}
 
 		(new ErrorController)->saveError(static::class, 500, 'API Error: Error during getting the digital voice mode - ' . $output);
