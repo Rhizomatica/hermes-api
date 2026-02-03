@@ -913,7 +913,6 @@ class RadioController extends Controller
 
 	public function getDigitalVoice()
 	{
-
 		$command = "get_digital_voice -p 1";
 		$output = explode("\n", (string) exec_uc($command))[0];
 
@@ -925,14 +924,14 @@ class RadioController extends Controller
 		return response()->json(['message' => 'Server error'], 500);
 	}
 
-	public function setDigitalVoice($value)
-	{
-		if ($value < 0 || $value > 1) {
+	public function setDigitalVoice(Request $request)
+	{ 
+		if ($request->value < 0 || $request->value > 1) {
 			(new ErrorController)->saveError(static::class, 500, 'API Error: digital voice value must be 0 or 1');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		$command = "set_digital_voice -a " . $value . " -p 1";
+		$command = "set_digital_voice -a " . $request->value. " -p 1";
 		$output = explode("\n", (string) exec_uc($command))[0];
 
 		if ($output == "OK") {
