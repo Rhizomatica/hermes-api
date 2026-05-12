@@ -917,21 +917,21 @@ class RadioController extends Controller
 		$output = explode("\n", (string) exec_uc($command))[0];
 
 		if ($output == "OFF" || $output == "ON") {
-			return response()->json($output, 200);
+			return response($output, 200);
 		}
 
 		(new ErrorController)->saveError(static::class, 500, 'API Error: Error during getting the digital voice mode - ' . $output);
 		return response()->json(['message' => 'Server error'], 500);
 	}
 
-	public function setDigitalVoice(Request $request)
-	{ 
-		if ($request->value < 0 || $request->value > 1) {
+	public function setDigitalVoice(int $value)
+	{
+		if (!in_array((string) $value, ['0', '1'], true)) {
 			(new ErrorController)->saveError(static::class, 500, 'API Error: digital voice value must be 0 or 1');
 			return response()->json(['message' => 'Server error'], 500);
 		}
 
-		$command = "set_digital_voice -a " . $request->value. " -p 1";
+		$command = "set_digital_voice -a " . $value. " -p 1";
 		$output = explode("\n", (string) exec_uc($command))[0];
 
 		if ($output == "OK") {
