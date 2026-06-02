@@ -911,6 +911,37 @@ class RadioController extends Controller
 		return response()->json(['message' => 'Server error'], 500);
 	}
 
+	public function getDigitalVoice()
+	{
+		$command = "get_digital_voice -p 1";
+		$output = explode("\n", (string) exec_uc($command))[0];
+
+		if ($output == "OFF" || $output == "ON") {
+			return response($output, 200);
+		}
+
+		(new ErrorController)->saveError(static::class, 500, 'API Error: Error during getting the digital voice mode - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
+	public function setDigitalVoice(int $value)
+	{
+		if (!in_array((string) $value, ['0', '1'], true)) {
+			(new ErrorController)->saveError(static::class, 500, 'API Error: digital voice value must be 0 or 1');
+			return response()->json(['message' => 'Server error'], 500);
+		}
+
+		$command = "set_digital_voice -a " . $value. " -p 1";
+		$output = explode("\n", (string) exec_uc($command))[0];
+
+		if ($output == "OK") {
+			return response(true, 200);
+		}
+
+		(new ErrorController)->saveError(static::class, 500, 'API Error: Error during updating the digital voice mode - ' . $output);
+		return response()->json(['message' => 'Server error'], 500);
+	}
+
 	public function getBitrate()
 	{
 		$command = "get_bitrate"; /*UPDATE COMMAND*/
@@ -947,7 +978,6 @@ class RadioController extends Controller
 
 	public function setPowerLevel(Request $request)
 	{
-
 		if ($request->powerLevel >= 0 && $request->powerLevel <= 100) {
 			$command = "set_power -a " . $request->powerLevel . " -p " .  $request->profile;
 			$output = explode("\n", (string) exec_uc($command))[0];
