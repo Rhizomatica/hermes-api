@@ -22,9 +22,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copiar aplicação
 COPY . .
 
-# Configurar permissões
-RUN chmod -R 775 storage bootstrap/cache && \
-    mkdir -p public/inbox public/outbox && \
+# Criar diretórios necessários e configurar permissões
+RUN mkdir -p storage bootstrap/cache public/inbox public/outbox && \
+    chmod -R 775 storage bootstrap/cache && \
     chmod 775 public/inbox public/outbox
 
 EXPOSE 8000
