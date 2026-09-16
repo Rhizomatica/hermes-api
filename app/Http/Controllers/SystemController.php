@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\System;
 use App\Message;
+use App\Services\RadioTransport;
 
 
 class SystemController extends Controller
@@ -13,7 +14,7 @@ class SystemController extends Controller
 	public function getSysConfig()
 	{
 		$system = System::first();
-		$system->nodename = explode("\n", (string) exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
+		$system->nodename = explode("\n", (string) exec_cli(RadioTransport::nodenameCommand()))[0];
 		return response()->json($system, 200);
 	}
 
@@ -56,11 +57,11 @@ class SystemController extends Controller
 	public function getSysStatus()
 	{
 		$uname = explode("\n", (string) exec_cli("uname -n"))[0];
-		$piduu = explode("\n", (string) exec_cli("ls  /lib/systemd/system/uucp.socket"))[0];
-		$piduuardop = explode("\n", (string) exec_cli("pgrep -x uucpd"))[0];
+		$piduu = explode("\n", (string) exec_cli(RadioTransport::serviceUnitCommand()))[0];
+		$piduuardop = explode("\n", (string) exec_cli("pgrep -x " . RadioTransport::daemonProcess()))[0];
 		$pidmodem = explode("\n", (string) exec_cli("pgrep -x VARA.exe"))[0];
 		$pidradio = explode("\n", (string) exec_cli("pgrep -x bitx_controller"))[0];
-		$nodename = explode("\n", (string) exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
+		$nodename = explode("\n", (string) exec_cli(RadioTransport::nodenameCommand()))[0];
 		$pidhmp = explode("\n", (string) exec_cli("pgrep -x iwatch"))[0];
 		// $piddb = explode("\n", exec_cli("pgrep -x mariadbd"))[0];
 		$pidpf = explode("\n", (string) exec_cli("pgrep -x master"))[0];
@@ -111,11 +112,11 @@ class SystemController extends Controller
 	 */
 	public function getSysStations()
 	{
-		$command = "egrep -v '^\s*#' /etc/uucp/sys | grep system | cut -f 2 -d \" \"";
+		$command = RadioTransport::stationsCommand();
 		$output = exec_cli($command);
 		$sysnames = explode("\n", (string) $output);
 
-		$command2 = "egrep -v '^\s*#' /etc/uucp/sys | grep alias | cut -f 2 -d \" \"";
+		$command2 = RadioTransport::stationAliasesCommand();
 		$output2 = exec_cli($command2);
 		$sysnames2 = explode("\n", (string) $output2);
 
@@ -142,7 +143,7 @@ class SystemController extends Controller
 	 */
 	public function sysGetSpoolList()
 	{
-		$command = 'uustat -a| grep -v uuadm | grep -v sudo | grep -v bash | grep -v "\-C"';
+		$command = RadioTransport::queueCommand();
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
 		$spool = [];
@@ -304,7 +305,7 @@ class SystemController extends Controller
 	 */
 	public function uucpKillJob($host, $id)
 	{
-		$command = 'sudo uustat -k ' . $host . '.' . $id;
+		$command = RadioTransport::killJobCommand($host, $id);
 		$output = exec_cli($command) or die;
 		return response()->json("uucp job killed: " . $host . '.' . $id, 200);
 	}
@@ -316,7 +317,7 @@ class SystemController extends Controller
 	 */
 	public function uucpCall()
 	{	
-		$command = 'sudo uucico -m -r1 ';
+		$command = RadioTransport::callCommand();
 		$output = exec_cli($command);
 		return response($output, 200);
 	}
@@ -328,7 +329,7 @@ class SystemController extends Controller
 	 */
 	public function uucpCallForHost($uuidhost)
 	{
-		$command = 'sudo uucico -m -S ' . $uuidhost; //TODO - test
+		$command = RadioTransport::callCommand($uuidhost);
 		$output = exec_cli($command);
 		return response($output, 200);
 	}
@@ -382,7 +383,7 @@ class SystemController extends Controller
 	 */
 	public function sysLogUucp()
 	{
-		$command = "sudo uulog -n 1000 | sort -n ";
+		$command = RadioTransport::logCommand();
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
 
@@ -396,7 +397,7 @@ class SystemController extends Controller
 	 */
 	public function sysDebUucp()
 	{
-		$command = "sudo uulog -D -n 1000 | sort -n ";
+		$command = RadioTransport::logCommand(true);
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
 
@@ -410,7 +411,7 @@ class SystemController extends Controller
 
 	public function getSpoolStatistics()
 	{
-		$command = 'uustat -a| grep -v uuadm | grep -v sudo | grep -v bash | grep -v "\-C"';
+		$command = RadioTransport::queueCommand();
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
 
@@ -553,7 +554,7 @@ class SystemController extends Controller
 
 	public function stopTransmission(Request $request)
 	{
-		$command = "sudo killall uucico";
+		$command = RadioTransport::stopCommand();
 
 		exec_cli($command);
 

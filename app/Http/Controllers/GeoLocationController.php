@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Storage;
+use App\Services\RadioTransport;
 
 class GeoLocationController extends Controller
 {
@@ -284,7 +285,7 @@ class GeoLocationController extends Controller
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        $commandUUCP = 'for i in $(uustat -a| grep -v uuadm | grep -v sudo | grep -v bash | grep -v "\-C" | grep dec_sensors | cut -d " " -f 1); do sudo uustat -k $i; done';
+        $commandUUCP = RadioTransport::purgeSensorJobsCommand();
         $outputUUCP = exec_cli_no($commandUUCP);
 
         if ($commandUUCP == false) {

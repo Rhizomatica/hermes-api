@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Storage;
 use App\Message;
+use App\Services\RadioTransport;
 use Illuminate\Http\Request;
 
 class MessageController extends Controller
@@ -58,7 +59,7 @@ class MessageController extends Controller
     ]);
 
     $request->inbox = false;
-    $request->orig = explode("\n", (string) exec_cli("cat /etc/uucp/config|grep nodename|cut -f 2 -d \" \""))[0];
+    $request->orig = explode("\n", (string) exec_cli(RadioTransport::nodenameCommand()))[0];
 
     $message = Message::create($request->all());
 
@@ -359,7 +360,7 @@ class MessageController extends Controller
     //send message by uucp
     foreach ($message->dest as $dest) {
       //check spool size
-      $command = "uustat -s " . $dest . " -u www-data  | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
+      $command = RadioTransport::spoolSizeCommand($dest);
       $destspoolsize = exec_cli($command);
       $destspoolsize = $file['hmpsize'] + intval($destspoolsize);
 
@@ -369,7 +370,7 @@ class MessageController extends Controller
         return 431;
       }
 
-      $command = 'uucp -r -j -C -d \'' .  $file['path'] . '\' \'' . $dest . '!~/' . $message->orig . '_' . $message->id . '.hmp\'';
+      $command = RadioTransport::sendFileCommand($file['path'], $dest, $message->orig . '_' . $message->id . '.hmp');
 
       if (!$output = exec_cli_no($command)) {
         (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes sendMessage - Error on uucp:  ' . $output . ' - ' . $command);
