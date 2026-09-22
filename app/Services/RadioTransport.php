@@ -114,8 +114,8 @@ class RadioTransport
     {
         if (self::isNncp()) {
             return $host === null
-                ? 'sudo nncp-call -autotoss -all'
-                : 'sudo nncp-call -autotoss ' . escapeshellarg($host);
+                ? 'sudo hermes-nncp-call --all -autotoss'
+                : 'sudo hermes-nncp-call -autotoss ' . escapeshellarg($host);
         }
 
         return $host === null
@@ -128,7 +128,7 @@ class RadioTransport
      */
     public static function stopCommand(): string
     {
-        return self::isNncp() ? 'sudo killall nncp-call' : 'sudo killall uucico';
+        return self::isNncp() ? 'sudo killall hermes-nncp-call nncp-call' : 'sudo killall uucico';
     }
 
     /**
