@@ -28,7 +28,7 @@ class RadioController extends Controller
 		$radio_rx = true; //TODO - Verify!! Same for both profiles?
 		$radio_tx = false;
 		$radio_mastercal = explode("\n", (string) exec_uc("get_mastercal -p " . $profile))[0];
-		$radio_test_tone = explode(" ", explode("\n", (string) exec_cli("pgrep ffplay -a -p " . $profile))[0]);
+		$radio_test_tone = explode(" ", explode("\n", (string) exec_cli("pgrep ffplay -a -p " . escapeshellarg((string) $profile)))[0]);
 		$radio_led = explode("\n", (string) exec_uc("get_led_status -p " . $profile))[0];
 		$radio_protection = explode("\n", (string) exec_uc("get_protection_status -p " . $profile))[0];
 		$radio_connection = explode("\n", (string) exec_uc("get_connected_status -p " . $profile))[0];

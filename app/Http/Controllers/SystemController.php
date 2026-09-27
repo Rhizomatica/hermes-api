@@ -179,9 +179,9 @@ class SystemController extends Controller
 						}
 
 						$cfile_path = env('HERMES_UUCP') . '/' .  $uuid_host . '/C./C.' . $uuid;
-						$dfile_id = explode(" ", (string) exec_cli('sudo cat ' . $cfile_path))[1];
+						$dfile_id = explode(" ", (string) exec_cli('sudo cat ' . escapeshellarg($cfile_path)))[1];
 						$dfile_path = env('HERMES_UUCP') . '/' . $uuid_host . '/D./' . $dfile_id;
-						$dfile =  exec_cli('sudo xzcat ' . $dfile_path . '| head -1');
+						$dfile =  exec_cli('sudo xzcat ' . escapeshellarg($dfile_path) . '| head -1');
 						$email_info['from'] = explode(" ", explode("\n", (string) $dfile)[0])[1];
 						$email_info['from_date_week'] = explode(" ", explode("\n", (string) $dfile)[0])[3];
 						$email_info['from_date_month'] = explode(" ", explode("\n", (string) $dfile)[0])[4];

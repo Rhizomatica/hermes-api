@@ -60,7 +60,7 @@ class FileController extends Controller
 		//TODO - Create own function
 		// compress image
 		if (preg_match("/\bimage\b/i", (string) $mimetype) && !preg_match("/\bgif\b/i", (string) $mimetype)) {
-			$command = 'compress_image.sh ' . $path . ' ' . $path . $imageout;
+			$command = 'compress_image.sh ' . escapeshellarg($path) . ' ' . escapeshellarg($path . $imageout);
 			$output = exec_cli($command);
 			$filesize = explode(":", explode("\n", (string) $output)[5])[1];
 
@@ -79,7 +79,7 @@ class FileController extends Controller
 
 		// compress audio - script supports  wav mp3 or aac
 		if (preg_match("/\baudio\b/i", (string) $mimetype)) {
-			$command = 'compress_audio.sh ' . $path . ' ' . $path . $audioout;
+			$command = 'compress_audio.sh ' . escapeshellarg($path) . ' ' . escapeshellarg($path . $audioout);
 			$output = exec_cli($command);
 			$filesize = explode(":", explode("\n", (string) $output)[0])[1];
 
@@ -98,7 +98,7 @@ class FileController extends Controller
 		// secure the file
 		//TODO - Create own function
 		if ($request->pass &&  $request->pass != 'undefined') {
-			$command = 'gpg -o ' . $path . '.gpg -c  --cipher-algo AES256 --symmetric --batch --passphrase "' . $request->pass . '"  --yes ' . $path;
+			$command = 'gpg -o ' . escapeshellarg($path . '.gpg') . ' -c  --cipher-algo AES256 --symmetric --batch --passphrase ' . escapeshellarg((string) $request->pass) . '  --yes ' . escapeshellarg($path);
 
 			$output = exec_cli_no($command);
 
@@ -199,7 +199,7 @@ class FileController extends Controller
 		if ($message->secure  && $pass) {
 			$fullpath = $fullpathroot . 'tmp/' . $timestamp . $fileext;
 			$gppath = Storage::disk('local')->path('/');
-			$command = 'gpg -o  ' . $fullpath . ' -d --batch --passphrase "' . $pass . '"  --yes ' . $path;
+			$command = 'gpg -o  ' . escapeshellarg($fullpath) . ' -d --batch --passphrase ' . escapeshellarg((string) $pass) . '  --yes ' . escapeshellarg($path);
 			exec_cli_no($command);
 			$origpath = 'tmp/' . $timestamp . $fileext;
 		}
@@ -211,7 +211,7 @@ class FileController extends Controller
 
 			// decompress image
 			// print "DEBUG uncompress command: " . $command. "\n";
-			$command = 'decompress_image.sh ' . $fullpath . ' ' . $fullpath . $decompressext;
+			$command = 'decompress_image.sh ' . escapeshellarg($fullpath) . ' ' . escapeshellarg($fullpath . $decompressext);
 
 			if (!exec_cli_no($command)) {
 				(new ErrorController)->saveError("FileController", 500, 'API Error: download uncompres image error');
@@ -239,7 +239,7 @@ class FileController extends Controller
 
 			// decompress audio
 			// mount command to decompress audio
-			$command = 'decompress_audio.sh ' . $fullpath . ' ' . $fullpath . $decompressext;
+			$command = 'decompress_audio.sh ' . escapeshellarg($fullpath) . ' ' . escapeshellarg($fullpath . $decompressext);
 			$fullpath .= $decompressext;
 
 			// decompress audio

@@ -129,7 +129,7 @@ class MessageController extends Controller
     if (Storage::disk('local')->exists('inbox/' . $orig  . '_' . $id . '.hmp')) {
       // Get path, unpack into tmp and read message data
       $path = Storage::disk('local')->path('');
-      $command  = 'tar xvfz ' .  $path . 'inbox/' . $orig . '_' . $id  . '.hmp' . ' -C ' . $path . 'tmp/';
+      $command  = 'tar xvfz ' . escapeshellarg($path . 'inbox/' . $orig . '_' . $id  . '.hmp') . ' -C ' . escapeshellarg($path . 'tmp/');
       $output = exec_cli($command);
       $files[] = explode(' ', (string) $output);
 
@@ -194,8 +194,8 @@ class MessageController extends Controller
           return response()->json(['message' => 'Server error'], 500);
         }
         // $fullpath = Storage::disk('local')->path('inbox/'. $orig . '_' . $message['id'] . '.hmp');
-        $fullpath = Storage::disk('local')->path('inbox/' . $arg);
-        $command = 'sudo rm -f ' . $fullpath;
+        $fullpath = Storage::disk('local')->path('inbox/' . basename((string) $arg));
+        $command = 'sudo rm -f ' . escapeshellarg($fullpath);
         if (!exec_cli_no($command)) {
           (new ErrorController)->saveError(static::class, 500, 'Hermes unpack inbox message Error: can\'t delete orig file');
           return response()->json(['message' => 'Server error'], 500);
@@ -243,7 +243,7 @@ class MessageController extends Controller
 
     if ($messageUncrypt) {
       $path = Storage::disk('local')->path('tmp') . '/' . $message->id . '-uncrypt';
-      $command  = 'gpg -d --batch --passphrase "' .  $request->pass . '" --decrypt ' . $path;
+      $command  = 'gpg -d --batch --passphrase ' . escapeshellarg((string) $request->pass) . ' --decrypt ' . escapeshellarg($path);
       $output = exec_cli($command);
 
       return response()->json(['message' => $output], 200);
@@ -257,7 +257,7 @@ class MessageController extends Controller
   {
     if ($request->pass && $request->pass != '' && $request->pass != 'undefined') {
 
-      $command = 'echo "' . $request->text . '"| gpg -o - -c -t --cipher-algo AES256 --utf8-strings --batch --passphrase "' . $request->pass . '"  --yes -';
+      $command = 'echo ' . escapeshellarg((string) $request->text) . ' | gpg -o - -c -t --cipher-algo AES256 --utf8-strings --batch --passphrase ' . escapeshellarg((string) $request->pass) . '  --yes -';
 
       $cryptout = "";
 
@@ -304,7 +304,7 @@ class MessageController extends Controller
     }
 
     $pathtmp = Storage::disk('local')->path('tmp');
-    $command  = 'tar cfz ' . $pathtmp . '/' . $message->id . '.hmp -C ' .  $pathtmp . ' ' . $message->id;
+    $command  = 'tar cfz ' . escapeshellarg($pathtmp . '/' . $message->id . '.hmp') . ' -C ' . escapeshellarg($pathtmp) . ' ' . escapeshellarg((string) $message->id);
 
     if ($output = exec_cli($command)) {
       (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes send message error - cant move image file' . $output . $command);
@@ -359,7 +359,7 @@ class MessageController extends Controller
     //send message by uucp
     foreach ($message->dest as $dest) {
       //check spool size
-      $command = "uustat -s " . $dest . " -u www-data  | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
+      $command = "uustat -s " . escapeshellarg((string) $dest) . " -u www-data  | egrep -o '(\w+)\sbytes' | awk -F ' ' '{sum+=$1; } END {print sum}'";
       $destspoolsize = exec_cli($command);
       $destspoolsize = $file['hmpsize'] + intval($destspoolsize);
 
@@ -369,7 +369,7 @@ class MessageController extends Controller
         return 431;
       }
 
-      $command = 'uucp -r -j -C -d \'' .  $file['path'] . '\' \'' . $dest . '!~/' . $message->orig . '_' . $message->id . '.hmp\'';
+      $command = 'uucp -r -j -C -d ' . escapeshellarg($file['path']) . ' ' . escapeshellarg($dest . '!~/' . $message->orig . '_' . $message->id . '.hmp');
 
       if (!$output = exec_cli_no($command)) {
         (new ErrorController)->saveError(static::class, 500, 'API Error: Hermes sendMessage - Error on uucp:  ' . $output . ' - ' . $command);
