@@ -283,7 +283,8 @@ class SystemController extends Controller
 	 */
 	public function uucpKillMail($host, $id, $language)
 	{
-		$command = 'sudo mailkill.sh ' . $language . ' gui ' . $host . '.' . $id;
+		// the three come from the URL: quote them, this runs as root
+		$command = 'sudo mailkill.sh ' . escapeshellarg($language) . ' gui ' . escapeshellarg($host . '.' . $id);
 		ob_start();
 		system($command, $return_var);
 		$output = ob_get_contents();
@@ -304,7 +305,8 @@ class SystemController extends Controller
 	 */
 	public function uucpKillJob($host, $id)
 	{
-		$command = 'sudo uustat -k ' . $host . '.' . $id;
+		// from the URL: quote it, this runs as root
+		$command = 'sudo uustat -k ' . escapeshellarg($host . '.' . $id);
 		$output = exec_cli($command) or die;
 		return response()->json("uucp job killed: " . $host . '.' . $id, 200);
 	}
