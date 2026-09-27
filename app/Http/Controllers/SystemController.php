@@ -315,8 +315,8 @@ class SystemController extends Controller
 	 * @return json message
 	 */
 	public function uucpCall()
-	{	
-		$command = 'sudo uucico -m -r1 ';
+	{
+		$command = 'sudo uucico -m -r1 ' . $this->uucicoAirOpts();
 		$output = exec_cli($command);
 		return response($output, 200);
 	}
@@ -328,9 +328,34 @@ class SystemController extends Controller
 	 */
 	public function uucpCallForHost($uuidhost)
 	{
-		$command = 'sudo uucico -m -S ' . $uuidhost; //TODO - test
+		$command = 'sudo uucico -m ' . $this->uucicoAirOpts($uuidhost) . '-S ' . escapeshellarg($uuidhost);
 		$output = exec_cli($command);
 		return response($output, 200);
+	}
+
+	/**
+	 * uucico options for a call that goes over the air
+	 *
+	 * HERMES_UUCICO_HF_OPTS (the installer sets "-Y", the pre-agreed startup)
+	 * applies to calls over the radio only.  A remote station's systems are
+	 * all reached over the air.  A gateway also reaches the central server,
+	 * "gw" (system hermes), over TCP, which the pre-agreed startup is not for:
+	 * there the options go only on a call to a station, never on "-r1", which
+	 * may call the central server too.
+	 *
+	 * @return string the options, with a trailing space, or ""
+	 */
+	private function uucicoAirOpts($host = null)
+	{
+		$opts = trim((string) env('HERMES_UUCICO_HF_OPTS', ''));
+		if ($opts === '' || !preg_match('/^-[A-Za-z]+( -[A-Za-z]+)*$/', $opts))
+			return '';
+
+		if (filter_var(env('HERMES_GATEWAY'), FILTER_VALIDATE_BOOLEAN) &&
+			($host === null || in_array($host, ['gw', 'hermes'], true)))
+			return '';
+
+		return $opts . ' ';
 	}
 
 	/**
