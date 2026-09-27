@@ -40,8 +40,26 @@ function exec_cli_no($command)
 // 	}
 // }
 
+// Append one line to a root-owned file, exactly as given: quoted for the
+// "sudo sh -c" (which the scoped sudoers policy allows) and for the shell it
+// runs, and without line breaks, so a value cannot add lines of its own.
+function append_root_line($file, $line)
+{
+	$line = str_replace(["\r", "\n"], '', (string) $line);
+	$inner = 'echo ' . escapeshellarg($line) . ' >> ' . escapeshellarg($file);
+	return exec_cli('sudo sh -c ' . escapeshellarg($inner));
+}
+
 function exec_uc($command)
 {
+	// the radio client's commands are words and numbers ("set_frequency -a
+	// 7100000 -p 0"); their values come from the request, and anything else
+	// would reach the shell
+	if (!preg_match('/^[A-Za-z0-9_.:+ -]+$/', (string) $command)) {
+		(new ErrorController)->saveError($_SERVER['PHP_SELF'], 500, 'API Error: refused radio command ' . $command);
+		return 500;
+	}
+
 	ob_start();
 	$ubitx_client = env('HERMES_TOOL') . " -c ";
 	$command = $ubitx_client . $command;

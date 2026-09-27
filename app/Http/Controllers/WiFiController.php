@@ -54,10 +54,10 @@ class WiFiController extends Controller
 
 		exec_cli("sudo truncate -s 0 /etc/hostapd/hostapd.conf");
 		exec_cli_no("sudo cp /etc/hostapd/hostapd.conf.head /etc/hostapd/hostapd.conf");
- 		exec_cli("sudo sh -c \"echo channel={$request->channel} >> /etc/hostapd/hostapd.conf\"");
-		exec_cli("sudo sh -c \"echo ssid={$request->ssid} >> /etc/hostapd/hostapd.conf\"");
-		exec_cli("sudo sh -c \"echo wpa_passphrase={$request->wpa_passphrase} >> /etc/hostapd/hostapd.conf\"");
-		exec_cli("sudo sh -c \"echo macaddr_acl={$request->macaddr_acl} >> /etc/hostapd/hostapd.conf\"");
+ 		append_root_line('/etc/hostapd/hostapd.conf', 'channel=' . $request->channel);
+		append_root_line('/etc/hostapd/hostapd.conf', 'ssid=' . $request->ssid);
+		append_root_line('/etc/hostapd/hostapd.conf', 'wpa_passphrase=' . $request->wpa_passphrase);
+		append_root_line('/etc/hostapd/hostapd.conf', 'macaddr_acl=' . $request->macaddr_acl);
 
 		exec_cli_no("sudo systemctl restart hostapd");
 
@@ -84,10 +84,10 @@ class WiFiController extends Controller
 
 		exec_cli("sudo truncate -s 0 /etc/hostapd/hostapd.conf");
 		exec_cli_no("sudo cp /etc/hostapd/hostapd.conf.head /etc/hostapd/hostapd.conf");
-		exec_cli("sudo sh -c \"echo channel=$wifi_settings[channel] >> /etc/hostapd/hostapd.conf\"");
-		exec_cli("sudo sh -c \"echo ssid=$wifi_settings[ssid] >> /etc/hostapd/hostapd.conf\"");
-		exec_cli("sudo sh -c \"echo wpa_passphrase=$wifi_settings[wpa_passphrase] >> /etc/hostapd/hostapd.conf\"");
-		exec_cli("sudo sh -c \"echo macaddr_acl={$request->macFilter} >> /etc/hostapd/hostapd.conf\"");
+		append_root_line('/etc/hostapd/hostapd.conf', 'channel=' . $wifi_settings['channel']);
+		append_root_line('/etc/hostapd/hostapd.conf', 'ssid=' . $wifi_settings['ssid']);
+		append_root_line('/etc/hostapd/hostapd.conf', 'wpa_passphrase=' . $wifi_settings['wpa_passphrase']);
+		append_root_line('/etc/hostapd/hostapd.conf', 'macaddr_acl=' . $request->macFilter);
 
 		exec_cli_no("sudo systemctl restart hostapd");
 
@@ -100,7 +100,7 @@ class WiFiController extends Controller
 			'macAddress' => 'required|string'
 		]);
 
-		exec_cli("sudo sh -c \"echo {$request->macAddress} >> /etc/hostapd/accept\"");
+		append_root_line('/etc/hostapd/accept', $request->macAddress);
 		exec_cli_no("sudo systemctl restart hostapd");
 
 		return response(true, 200);
@@ -119,7 +119,7 @@ class WiFiController extends Controller
 
 		foreach ($parsed_accept_file as $i) {
 			if ($i !== $address && $i !== '') {
-				exec_cli("sudo sh -c \"echo {$i} >> /etc/hostapd/accept\"");
+				append_root_line('/etc/hostapd/accept', $i);
 			}
 		}
 

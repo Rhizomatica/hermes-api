@@ -217,12 +217,14 @@ class GeoLocationController extends Controller
 
     public function setGPSEmail($email)
     {
-        if (str_contains((string) $email, '@') == false) {
+        if (filter_var((string) $email, FILTER_VALIDATE_EMAIL) === false) {
             (new ErrorController)->saveError(static::class, 500, 'API Error: Error setting GPS Email to ' . $email);
             return response()->json(['message' => 'Server error'], 500);
         }
 
-        $command = 'sudo sed -i "/^email=/s/=.*/=' . $email . '/" /etc/sbitx/sensors.ini';
+        // a valid address can still hold sed's own "/", "&" and "\\"
+        $sed_email = str_replace(['\\', '/', '&'], ['\\\\', '\\/', '\\&'], (string) $email);
+        $command = 'sudo sed -i ' . escapeshellarg('/^email=/s/=.*/=' . $sed_email . '/') . ' /etc/sbitx/sensors.ini';
         $output = exec_cli_no($command);
 
         if ($output == false) {
