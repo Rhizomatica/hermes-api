@@ -98,7 +98,11 @@ class SystemController extends Controller
 			// 'memtotal' => $memory[0] . "MB",
 			// 'memused' => $memory[1] . "MB",
 			// 'memfree' => explode("\n", $memory[2])[0] . "MB", //Wrong
-			'diskfree' => $disk_free ?: false
+			'diskfree' => $disk_free ?: false,
+			// the station's clock, in its time zone (APP_TIMEZONE), as the
+			// sbitx_controller's websocket gives it; the web interface shows it
+			// when radiod, which does not send it, is the radio controller
+			'datetime' => date('d/m/Y H:i:s')
 		];
 
 		return response()->json($status, 200);
