@@ -810,34 +810,6 @@ class RadioController extends Controller
 	}
 
 
-	/**
-	 * SOS EMERGENCY OPERATION
-	 *
-	 * @return Json
-	 */
-	public function eraseSDCard()
-	{
-		//ERASE DATABASE
-		$removeDataBase = 'php artisan db:wipe --force';
-		exec_cli_no($removeDataBase);
-
-		//ERASE FILES
-		$removeEtcFolder = 'sudo rm -rf /etc';
-		exec_cli_no($removeEtcFolder);
-
-		$removeBootFolder = 'sudo rm -rf /boot';
-		exec_cli_no($removeBootFolder);
-
-		$removeRootFolder = 'sudo rm -rf /root';
-		exec_cli_no($removeRootFolder);
-
-		$removeHomeFolder = 'sudo rm -rf /home';
-		exec_cli_no($removeHomeFolder);
-
-		$removeVarFolder = 'sudo rm -rf /var';
-		exec_cli_no($removeVarFolder);
-	}
-
 	public function setRadioProfile($profile)
 	{
 		if ($profile === null) {

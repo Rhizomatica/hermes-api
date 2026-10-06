@@ -97,7 +97,6 @@ class HelpController extends Controller
             '/radio/step/{step} POST' => 'Update radio step',
             '/radio/volume GET' => 'Get radio volume',
             '/radio/volume/{volume} POST' => 'Change radio volume',
-            '/radio/erasesdcard GET' => 'Erase SD card',
             '/radio/profile/{profile} POST' => 'Set radio profile',
             '/radio/voice/timeout POST' => 'Restart voice timeout',
             '/radio/voice/timeout/config GET' => 'Get voice timeout config',
