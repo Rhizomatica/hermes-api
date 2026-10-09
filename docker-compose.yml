@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    container_name: lumen-app
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www
+    working_dir: /var/www
+    # Apenas inicia o servidor - configure manualmente
+    command: php -S 0.0.0.0:8000 -t public
