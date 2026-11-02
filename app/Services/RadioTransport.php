@@ -49,8 +49,10 @@ class RadioTransport
     public static function purgeSensorJobsCommand(): string
     {
         if (self::isNncp()) {
-            return 'for i in $(nncp-stat -pkt | grep dec_sensors | awk \'{print $1}\'); '
-                . 'do sudo nncp-rm -all -pkt $i; done';
+            // NNCP packets are encrypted for their recipient: the queue shows
+            // a packet's id and size, never the file it carries, so sensor
+            // jobs cannot be told from the others there. Nothing to purge.
+            return 'true';
         }
 
         return 'for i in $(uustat -a| grep -v uuadm | grep -v sudo | grep -v bash | grep -v "\-C" '
@@ -75,8 +77,11 @@ class RadioTransport
     public static function spoolSizeCommand(string $dest): string
     {
         if (self::isNncp()) {
-            return 'nncp-stat -node ' . escapeshellarg($dest)
-                . " | egrep -o '[0-9]+ B' | awk '{sum+=\$1} END {print sum}'";
+            // the outgoing packets, whose sizes nncp-stat gives rounded, in
+            // B, KiB, MiB or GiB: "tx <id> 2.4 MiB (nice: B)"
+            return 'nncp-stat -pkt -node ' . escapeshellarg($dest)
+                . " | awk '\$1 == \"tx\" { m = \$4 == \"KiB\" ? 1024 : \$4 == \"MiB\" ? 1048576 : "
+                . "\$4 == \"GiB\" ? 1073741824 : 1; sum += \$3 * m } END { print int(sum) }'";
         }
 
         return 'uustat -s ' . escapeshellarg($dest)
@@ -93,6 +98,33 @@ class RadioTransport
         }
 
         return 'uustat -a| grep -v uuadm | grep -v sudo | grep -v bash | grep -v "\-C"';
+    }
+
+    /**
+     * NNCP's outgoing queue, parsed from nncp-stat -pkt: one entry per
+     * packet, its node, id and size in bytes (nncp-stat rounds it).
+     *
+     * @return array<int, array{node: string, id: string, bytes: int}>
+     */
+    public static function parseNncpQueue(string $stat): array
+    {
+        $units = ['B' => 1, 'KiB' => 1024, 'MiB' => 1048576, 'GiB' => 1073741824, 'TiB' => 1099511627776];
+        $node = null;
+        $packets = [];
+        foreach (explode("\n", $stat) as $line) {
+            if ($line === '') {
+                continue;
+            }
+            if ($line[0] !== "\t" && $line[0] !== ' ') {
+                $node = trim($line);
+                continue;
+            }
+            $f = preg_split('/\s+/', trim($line));
+            if ($node !== null && count($f) >= 4 && $f[0] === 'tx' && isset($units[$f[3]])) {
+                $packets[] = ['node' => $node, 'id' => $f[1], 'bytes' => (int) round((float) $f[2] * $units[$f[3]])];
+            }
+        }
+        return $packets;
     }
 
     /**

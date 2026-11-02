@@ -147,6 +147,21 @@ class SystemController extends Controller
 	 */
 	public function sysGetSpoolList()
 	{
+		if (RadioTransport::isNncp()) {
+			// NNCP's queue: a packet's node, id and size, never what it carries
+			$spool = [];
+			foreach (RadioTransport::parseNncpQueue((string) exec_cli(RadioTransport::queueCommand())) as $p) {
+				$spool[] = [
+					'uuidhost' => $p['node'], 'uuiduucp' => $p['id'], 'dest' => $p['node'],
+					'user' => null, 'date' => null, 'time' => null, 'type' => 'Packet',
+					'size' => $p['bytes'], 'destpath' => null, 'emails' => null, 'emailinfo' => [],
+					'messageId' => null, 'messageName' => null, 'messageFile' => null,
+					'messageMimeType' => null, 'messageSecure' => null
+				];
+			}
+			return response()->json($spool ?: null, 200);
+		}
+
 		$command = RadioTransport::queueCommand();
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
@@ -417,6 +432,16 @@ class SystemController extends Controller
 
 	public function getSpoolStatistics()
 	{
+		if (RadioTransport::isNncp()) {
+			$packets = RadioTransport::parseNncpQueue((string) exec_cli(RadioTransport::queueCommand()));
+			return response()->json([[
+				'totalCount' => count($packets),
+				'totalBytes' => array_sum(array_column($packets, 'bytes')),
+				'succeededCount' => 0, 'succeededBytes' => 0,
+				'retriesCount' => 0, 'retriesBytes' => 0
+			]], 200);
+		}
+
 		$command = RadioTransport::queueCommand();
 		$output = exec_cli($command);
 		$output = explode("\n", (string) $output);
