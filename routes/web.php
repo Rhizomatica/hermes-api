@@ -90,7 +90,6 @@ $router->group(['prefix' => '/radio'], function () use ($router): void {
     $router->post('step/{step}',  ['uses' => 'RadioController@updateStep']);
     $router->get('volume',  ['uses' => 'RadioController@getVolume']);
     $router->post('volume/{volume}',  ['uses' => 'RadioController@changeVolume']);
-    $router->get('erasesdcard',  ['uses' => 'RadioController@eraseSDCard']);
     $router->post('profile/{profile}',  ['uses' => 'RadioController@setRadioProfile']);
     $router->post('/voice/timeout',  ['uses' => 'RadioController@restartVoiceTimeout']);
     $router->get('/voice/timeout/config',  ['uses' => 'RadioController@getTimeoutConfig']);
