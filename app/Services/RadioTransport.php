@@ -133,7 +133,10 @@ class RadioTransport
     public static function killJobCommand(string $host, string $id): string
     {
         if (self::isNncp()) {
-            return 'sudo nncp-rm -node ' . escapeshellarg($host) . ' -pkt ' . escapeshellarg($id);
+            // -pkt takes no value: nncp-rm reads the packet names from stdin
+            // (an argument after it was ignored, and nothing was removed)
+            return 'printf \'%s\\n\' ' . escapeshellarg($id) . ' | sudo nncp-rm -node '
+                . escapeshellarg($host) . ' -pkt';
         }
 
         return 'sudo uustat -k ' . escapeshellarg($host . '.' . $id);
