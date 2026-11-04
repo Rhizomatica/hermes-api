@@ -38,7 +38,10 @@
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "platform": {
+            "php": "8.2.20"
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
