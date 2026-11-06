@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Services\RadioTransport;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -36,7 +37,7 @@ class DatabaseSeeder extends Seeder
 
     private function seedFrequencies()
     {
-        $command = "egrep -v '^\s*#' /etc/uucp/sys | grep alias | cut -f 2 -d \" \"";
+        $command = RadioTransport::stationAliasesCommand();
         $output = exec_cli($command);
         $sysalias = explode("\n", $output);
 
